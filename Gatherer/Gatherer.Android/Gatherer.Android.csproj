@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Gatherer.Droid</RootNamespace>
     <AssemblyName>Gatherer.Android</AssemblyName>
-    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -26,6 +26,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
+    <AotAssemblies>true</AotAssemblies>
+    <EnableLLVM>true</EnableLLVM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,12 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="2.5.0.121934" />
-    <PackageReference Include="Xamarin.Android.Support.Design" Version="25.4.0.2" />
-    <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="25.4.0.2" />
-    <PackageReference Include="Xamarin.Android.Support.v4" Version="25.4.0.2" />
-    <PackageReference Include="Xamarin.Android.Support.v7.CardView" Version="25.4.0.2" />
-    <PackageReference Include="Xamarin.Android.Support.v7.MediaRouter" Version="25.4.0.2" />
+    <PackageReference Include="Realm.Database">
+      <Version>2.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Forms" Version="2.5.0.122203" />
+    <PackageReference Include="Xamarin.Android.Support.Design" Version="26.1.0.1" />
+    <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="26.1.0.1" />
+    <PackageReference Include="Xamarin.Android.Support.v4" Version="26.1.0.1" />
+    <PackageReference Include="Xamarin.Android.Support.v7.CardView" Version="26.1.0.1" />
+    <PackageReference Include="Xamarin.Android.Support.v7.MediaRouter" Version="26.1.0.1" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -66,6 +72,7 @@
     <AndroidResource Include="Resources\drawable-hdpi\icon.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\icon.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\icon.png" />
+    <AndroidAsset Include="Assets\cards.db.cache" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
@@ -86,5 +93,8 @@
       <Name>Gatherer</Name>
     </ProjectReference>
   </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

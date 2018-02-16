@@ -12,7 +12,6 @@ namespace Gatherer
 		{
 			InitializeComponent();
 
-
             MainPage = new MainPage();
         }
 

@@ -1,13 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="2.5.0.121934" />
+    <PackageReference Include="Realm.Database" Version="2.1.0" />
+    <PackageReference Include="Xamarin.Forms" Version="2.5.0.122203" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Views\AboutPage.xaml.cs">
       <SubType>Code</SubType>
@@ -24,6 +27,13 @@
     <Compile Update="Views\NewItemPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\CardPage.xaml.cs">
+      <DependentUpon>CardPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
-
+  <ItemGroup>
+    <EmbeddedResource Update="Views\CardPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
