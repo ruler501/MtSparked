@@ -10,28 +10,27 @@ using Xamarin.Forms.Xaml;
 using Gatherer.Models;
 using Gatherer.Views;
 using Gatherer.ViewModels;
+using Gatherer.Services;
 
 namespace Gatherer.Views
 {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class ItemsPage : ContentPage
+	public partial class SearchPage : ContentPage
 	{
-        ItemsViewModel viewModel;
+        SearchViewModel viewModel;
 
-        public ItemsPage()
+        public SearchPage()
         {
             InitializeComponent();
 
-            BindingContext = viewModel = new ItemsViewModel();
+            BindingContext = viewModel = new SearchViewModel();
         }
 
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
         {
-            var item = args.SelectedItem as Item;
+            var item = args.SelectedItem as SearchCriteria;
             if (item == null)
                 return;
-
-            await Navigation.PushAsync(new ItemDetailPage(new ItemDetailViewModel(item)));
 
             // Manually deselect item.
             ItemsListView.SelectedItem = null;
@@ -39,7 +38,7 @@ namespace Gatherer.Views
 
         async void AddItem_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushModalAsync(new NavigationPage(new NewItemPage()));
+            this.viewModel.AddCriteria();
         }
 
         protected override void OnAppearing()
@@ -48,6 +47,17 @@ namespace Gatherer.Views
 
             if (viewModel.Items.Count == 0)
                 viewModel.LoadItemsCommand.Execute(null);
+        }
+
+        async void Search(object sender, EventArgs e)
+        {
+            CardDataStore.CardsQuery query = new CardDataStore.CardsQuery();
+            foreach(SearchCriteria criteria in viewModel.Items)
+            {
+                query.Where(criteria.Field, criteria.Operation, criteria.Value);
+            }
+            await Navigation.PushAsync(new CardPage(query.Find()));
+            return;
         }
     }
 }

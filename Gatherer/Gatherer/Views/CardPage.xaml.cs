@@ -1,4 +1,5 @@
 ﻿using Gatherer.Models;
+using Gatherer.Services;
 using Gatherer.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,16 @@ namespace Gatherer.Views
         {
             InitializeComponent();
 
-            BindingContext = viewModel = new CardsViewModel();
+            var query = CardDataStore.Where("TypeLine", "Contains", "Planeswalker").Find();
+
+            BindingContext = viewModel = new CardsViewModel(query);
+        }
+
+        public CardPage(CardDataStore cards)
+        {
+            InitializeComponent();
+            
+            BindingContext = viewModel = new CardsViewModel(cards);
         }
 
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)

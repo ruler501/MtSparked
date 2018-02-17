@@ -15,7 +15,7 @@ namespace Gatherer.ViewModels
 {
     public class CardsViewModel : INotifyPropertyChanged
     {
-        public IDataStore<Card> DataStore => new CardDataStore();
+        public IDataStore<Card> DataStore;
 
         bool isBusy = false;
         public bool IsBusy
@@ -45,6 +45,8 @@ namespace Gatherer.ViewModels
         }
 
         public ObservableCollection<Card> Items { get; set; }
+        public int CardCount => Items.Count;
+        public string DatabasePath => CardDataStore.DatabasePath;
         public Command LoadItemsCommand { get; set; }
 
         public CardsViewModel()
@@ -78,6 +80,14 @@ namespace Gatherer.ViewModels
             {
                 IsBusy = false;
             }
+        }
+
+        public CardsViewModel(CardDataStore store)
+        {
+            Title = "Cards";
+            Items = new ObservableCollection<Card>();
+            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
+            this.DataStore = store;
         }
 
         #region INotifyPropertyChanged

@@ -12,7 +12,7 @@ namespace Gatherer.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>() ?? new MockDataStore();
+        public IDataStore<SearchCriteria> DataStore => DependencyService.Get<IDataStore<SearchCriteria>>() ?? new SearchCriteriaDataStore();
 
         bool isBusy = false;
         public bool IsBusy

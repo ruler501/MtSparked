@@ -10,23 +10,21 @@ using Gatherer.Views;
 
 namespace Gatherer.ViewModels
 {
-    public class ItemsViewModel : BaseViewModel
+    public class SearchViewModel : BaseViewModel
     {
-        public ObservableCollection<Item> Items { get; set; }
+        public ObservableCollection<SearchCriteria> Items { get; set; }
         public Command LoadItemsCommand { get; set; }
 
-        public ItemsViewModel()
+        public SearchViewModel()
         {
-            Title = "Browse";
-            Items = new ObservableCollection<Item>();
+            Title = "Search";
+            Items = new ObservableCollection<SearchCriteria>();
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
+        }
 
-            MessagingCenter.Subscribe<NewItemPage, Item>(this, "AddItem", async (obj, item) =>
-            {
-                var _item = item as Item;
-                Items.Add(_item);
-                await DataStore.AddItemAsync(_item);
-            });
+        public void AddCriteria()
+        {
+            this.Items.Add(new SearchCriteria());
         }
 
         async Task ExecuteLoadItemsCommand()

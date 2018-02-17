@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gatherer.Views.CardPage"
               Title="{Binding Title}"
-             x:Name="CardPage">
+             x:Name="CardPage"
+             xmlns:design="clr-namespace:Gatherer"
+             BindingContext="{x:Static design:ViewModelLocator.CardsViewModel}">
     <ContentPage.Content>
         <StackLayout>
             <ListView x:Name="CardsListView" 
@@ -17,16 +19,28 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <StackLayout Padding="10" Orientation="Horizontal">
-                                <Label Text="{Binding Name}" 
-                       LineBreakMode="NoWrap" 
-                       Style="{DynamicResource ListItemTextStyle}" 
-                       FontSize="16" />
-                                <Image Source="{Binding CroppedImageUrl}" />
-                                <Label Text="{Binding ManaCost}" 
-                       LineBreakMode="NoWrap"
-                       Style="{DynamicResource ListItemDetailTextStyle}"
-                       FontSize="13" />
+                            <StackLayout Padding="0" Orientation="Horizontal" HeightRequest="40">
+                                <Image Source="{Binding CroppedImageUrl}" Aspect="Fill" WidthRequest="60"/>
+                                <Label Text="22"
+                                       FontSize="32" 
+                                       WidthRequest="50" 
+                                       VerticalTextAlignment="Center"/>
+                                <StackLayout Padding="0" Orientation="Vertical" WidthRequest="280">
+                                    <Label Text="{Binding Name}" 
+                                               LineBreakMode="WordWrap"
+                                               FontSize="12" />
+                                    <Label Text="{Binding TypeLine}"
+                                                    LineBreakMode="WordWrap"
+                                                    FontSize="12" />
+                                </StackLayout>
+                                <StackLayout Padding="0" Orientation="Vertical" WidthRequest="80">
+                                    <Label Text="{Binding ManaCost}" 
+                                       LineBreakMode="NoWrap"
+                                       FontSize="12" />
+                                    <Label Text="{Binding SetCode}" 
+                                       LineBreakMode="WordWrap"
+                                       FontSize="12" />
+                                </StackLayout>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>
