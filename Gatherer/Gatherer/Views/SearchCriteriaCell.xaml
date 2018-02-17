@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gatherer.Views.SearchCriteriaCell">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
+        <Picker SelectedItem="{Binding Field}" WidthRequest="100" HorizontalOptions="Fill" Grid.Column="0">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Name</x:String>
+                    <x:String>Text</x:String>
+                    <x:String>TypeLine</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+        <Picker SelectedItem="{Binding Operation}" HorizontalOptions="Fill" Grid.Column="1">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Contains</x:String>
+                    <x:String>Equals</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+        <Entry Text="{Binding Value}" HorizontalOptions="Fill" Grid.Column="2"/>
+    </Grid>
+</ContentView>

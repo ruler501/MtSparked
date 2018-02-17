@@ -26,6 +26,10 @@ namespace Gatherer.Services
             foreach (var item in mockItems)
             {
                 items.Add(item);
+                if(items.Count > 250)
+                {
+                    break;
+                }
             }
         }
 
@@ -111,6 +115,47 @@ namespace Gatherer.Services
                 else
                 {
                     throw new NotImplementedException();
+                }
+
+                return this;
+            }
+
+            public CardsQuery Where(CardsQuery other)
+            {
+                if(other is null || other.builtExpression is null)
+                {
+                    throw new ArgumentNullException();
+                }
+                Expression otherExpression = other.builtExpression;
+                if(this.builtExpression is null)
+                {
+                    this.builtExpression = other.builtExpression;
+                }
+                else if (Connector == "All")
+                {
+                    this.builtExpression = Expression.AndAlso(builtExpression, otherExpression);
+                }
+                else if (Connector == "Any")
+                {
+                    this.builtExpression = Expression.OrElse(builtExpression, otherExpression);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+
+                return this;
+            }
+
+            public CardsQuery Negate()
+            {
+                if(this.builtExpression is null)
+                {
+                    throw new Exception("Cannot negate an empty query");
+                }
+                else
+                {
+                    this.builtExpression = Expression.Not(this.builtExpression);
                 }
 
                 return this;

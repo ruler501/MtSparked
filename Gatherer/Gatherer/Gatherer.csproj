@@ -12,6 +12,9 @@
     <PackageReference Include="Xamarin.Forms" Version="2.5.0.122203" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\SearchCriteriaCell.xaml.cs">
+      <DependentUpon>SearchCriteriaCell.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\SearchPage.xaml.cs">
       <SubType>Code</SubType>
       <DependentUpon>SearchPage.xaml</DependentUpon>
@@ -22,12 +25,15 @@
     <Compile Update="Views\CardPage.xaml.cs">
       <DependentUpon>CardPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\SearchGroupCell.xaml.cs">
+      <DependentUpon>SearchGroupCell.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Views\CardPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\SearchGroupView.xaml">
+    <EmbeddedResource Update="Views\SearchGroupCell.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

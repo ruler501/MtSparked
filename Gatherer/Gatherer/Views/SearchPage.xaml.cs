@@ -30,7 +30,7 @@ namespace Gatherer.Views
 
         async void Search(object sender, EventArgs e)
         {
-            CardDataStore.CardsQuery query = RootCriteria.CreateQuery();
+            CardDataStore.CardsQuery query = RootGroup.GetQuery();
             await Navigation.PushAsync(new CardPage(query.Find()));
         }
     }

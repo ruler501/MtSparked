@@ -9,7 +9,8 @@
         <ToolbarItem Text="Search" Clicked="Search" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <local:SearchGroupView
-              x:Name="RootCriteria"/>
+        <ScrollView>
+            <local:SearchGroupCell x:Name="RootGroup"/>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>
