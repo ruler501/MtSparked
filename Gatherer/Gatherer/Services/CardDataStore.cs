@@ -16,7 +16,6 @@ namespace Gatherer.Services
         Expression<Func<Card, bool>> Query;
 
         private static Realm realm = Realm.GetInstance("cards.db");
-        public static string DatabasePath => realm.Config.DatabasePath;
 
         protected CardDataStore(Expression<Func<Card, bool>> query)
         {
@@ -68,6 +67,7 @@ namespace Gatherer.Services
         {
             Expression builtExpression = null;
             ParameterExpression param = Expression.Parameter(typeof(Card));
+            string Connector;
 
             public CardsQuery Where(string field, string op, object value)
             {
@@ -100,9 +100,17 @@ namespace Gatherer.Services
                 {
                     this.builtExpression = fullCombine;
                 }
-                else
+                else if(Connector == "All")
                 {
                     this.builtExpression = Expression.AndAlso(builtExpression, fullCombine);
+                }
+                else if (Connector == "Any")
+                {
+                    this.builtExpression = Expression.OrElse(builtExpression, fullCombine);
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
 
                 return this;
@@ -112,11 +120,16 @@ namespace Gatherer.Services
             {
                 return new CardDataStore(Expression.Lambda<Func<Card, bool>>(this.builtExpression, param));
             }
+
+            public CardsQuery(string connector)
+            {
+                this.Connector = connector;
+            }
         }
 
-        public static CardsQuery Where(string field, string op, object value)
+        public static CardsQuery Where(string field, string op, object value, string connector="All")
         {
-            return new CardsQuery().Where(field, op, value);
+            return new CardsQuery(connector).Where(field, op, value);
         }
     }
 }

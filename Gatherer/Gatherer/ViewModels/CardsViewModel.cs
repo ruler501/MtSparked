@@ -46,7 +46,6 @@ namespace Gatherer.ViewModels
 
         public ObservableCollection<Card> Items { get; set; }
         public int CardCount => Items.Count;
-        public string DatabasePath => CardDataStore.DatabasePath;
         public Command LoadItemsCommand { get; set; }
 
         public CardsViewModel()

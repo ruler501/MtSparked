@@ -4,17 +4,6 @@
             xmlns:views="clr-namespace:Gatherer.Views"
             x:Class="Gatherer.Views.MainPage">
     <TabbedPage.Children>
-        <NavigationPage Title="Cards">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_about.png"/>
-                </OnPlatform>
-            </NavigationPage.Icon>
-            <x:Arguments>
-                <views:CardPage />
-            </x:Arguments>
-        </NavigationPage>
-
         <NavigationPage Title="Search">
             <NavigationPage.Icon>
                 <OnPlatform x:TypeArguments="FileImageSource">

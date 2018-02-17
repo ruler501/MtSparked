@@ -35,11 +35,6 @@ namespace Gatherer.Views
 
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
         {
-            var item = args.SelectedItem as Card;
-            if (item == null)
-                return;
-
-
             // Manually deselect item.
             CardsListView.SelectedItem = null;
         }
