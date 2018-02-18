@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Gatherer.Views.CardsListPage"
+              Title="{Binding Title}"
+             x:Name="CardsListPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <ListView x:Name="CardsListView" 
+                ItemsSource="{Binding Items}"
+                VerticalOptions="FillAndExpand"
+                 CachingStrategy="RecycleElement"
+                 ItemSelected="OnItemSelected">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Padding="0" Orientation="Horizontal" HeightRequest="40">
+                                <Image Source="{Binding CroppedImageUrl}" Aspect="Fill" WidthRequest="60"/>
+                                <Label Text="22"
+                                       FontSize="32" 
+                                       WidthRequest="50" 
+                                       VerticalTextAlignment="Center"/>
+                                <StackLayout Padding="0" Orientation="Vertical" WidthRequest="280">
+                                    <Label Text="{Binding Name}" 
+                                               LineBreakMode="WordWrap"
+                                               FontSize="12" />
+                                    <Label Text="{Binding TypeLine}"
+                                                    LineBreakMode="WordWrap"
+                                                    FontSize="12" />
+                                </StackLayout>
+                                <StackLayout Padding="0" Orientation="Vertical" WidthRequest="80">
+                                    <Label Text="{Binding ManaCost}" 
+                                           LineBreakMode="NoWrap"
+                                           FontSize="12" />
+                                    <Label LineBreakMode="WordWrap"
+                                           FontSize="12"
+                                           Text="{Binding SetCode, Mode=OneWay}"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

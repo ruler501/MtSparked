@@ -22,8 +22,8 @@
     <Compile Update="Views\MainPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\CardPage.xaml.cs">
-      <DependentUpon>CardPage.xaml</DependentUpon>
+    <Compile Update="Views\CardsListPage.xaml.cs">
+      <DependentUpon>CardsListPage.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\SearchGroupCell.xaml.cs">
       <DependentUpon>SearchGroupCell.xaml</DependentUpon>
@@ -31,6 +31,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Views\CardPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\CardsListPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\SearchGroupCell.xaml">

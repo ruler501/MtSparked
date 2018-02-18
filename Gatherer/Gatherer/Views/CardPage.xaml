@@ -1,51 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Gatherer.Views.CardPage"
-              Title="{Binding Title}"
-             x:Name="CardPage"
-             xmlns:design="clr-namespace:Gatherer"
-             BindingContext="{x:Static design:ViewModelLocator.CardsViewModel}">
+             x:Class="Gatherer.Views.CardPage">
     <ContentPage.Content>
-        <StackLayout>
-            <ListView x:Name="CardsListView" 
-                ItemsSource="{Binding Items}"
-                VerticalOptions="FillAndExpand"
-                 HasUnevenRows="true"
-                 RefreshCommand="{Binding LoadItemsCommand}"
-                 IsPullToRefreshEnabled="true"
-                 IsRefreshing="{Binding IsBusy, Mode=OneWay}"
-                 CachingStrategy="RecycleElement">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <StackLayout Padding="0" Orientation="Horizontal" HeightRequest="40">
-                                <Image Source="{Binding CroppedImageUrl}" Aspect="Fill" WidthRequest="60"/>
-                                <Label Text="22"
+        <ScrollView>
+            <StackLayout Orientation="Vertical">
+                <Image Source="{Binding FullImageUrl}" HorizontalOptions="FillAndExpand"/>
+                <StackLayout Orientation="Vertical">
+                    <StackLayout Padding="0" Orientation="Horizontal" HeightRequest="40">
+                        <Label Text="22"
                                        FontSize="32" 
                                        WidthRequest="50" 
                                        VerticalTextAlignment="Center"/>
-                                <StackLayout Padding="0" Orientation="Vertical" WidthRequest="280">
-                                    <Label Text="{Binding Name}" 
+                        <StackLayout Padding="0" Orientation="Vertical" WidthRequest="280">
+                            <Label Text="{Binding Name}" 
                                                LineBreakMode="WordWrap"
                                                FontSize="12" />
-                                    <Label Text="{Binding TypeLine}"
+                            <Label Text="{Binding TypeLine}"
                                                     LineBreakMode="WordWrap"
                                                     FontSize="12" />
-                                </StackLayout>
-                                <StackLayout Padding="0" Orientation="Vertical" WidthRequest="80">
-                                    <Label Text="{Binding ManaCost}" 
+                        </StackLayout>
+                        <StackLayout Padding="0" Orientation="Vertical" WidthRequest="80">
+                            <Label Text="{Binding ManaCost}" 
                                        LineBreakMode="NoWrap"
                                        FontSize="12" />
-                                    <Label Text="{Binding SetCode}" 
-                                       LineBreakMode="WordWrap"
-                                       FontSize="12" />
-                                </StackLayout>
-                            </StackLayout>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackLayout>
+                            <Label LineBreakMode="WordWrap"
+                                   FontSize="12" Text="{Binding SetName}"/>
+                        </StackLayout>
+                    </StackLayout>
+                    <Label Text="{Binding Text}"/>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>
