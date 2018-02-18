@@ -3,34 +3,54 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gatherer.Views.CardPage">
     <ContentPage.Content>
-        <ScrollView>
-            <StackLayout Orientation="Vertical">
-                <Image Source="{Binding FullImageUrl}" HorizontalOptions="FillAndExpand"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="80"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <ScrollView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6">
                 <StackLayout Orientation="Vertical">
-                    <StackLayout Padding="0" Orientation="Horizontal" HeightRequest="40">
-                        <Label Text="22"
+                    <Image Source="{Binding FullImageUrl}" HorizontalOptions="FillAndExpand"/>
+                    <StackLayout Orientation="Vertical">
+                        <StackLayout Padding="0" Orientation="Horizontal" HeightRequest="40">
+                            <Label Text="22"
                                        FontSize="32" 
                                        WidthRequest="50" 
                                        VerticalTextAlignment="Center"/>
-                        <StackLayout Padding="0" Orientation="Vertical" WidthRequest="280">
-                            <Label Text="{Binding Name}" 
+                            <StackLayout Padding="0" Orientation="Vertical" WidthRequest="280">
+                                <Label Text="{Binding Name}" 
                                                LineBreakMode="WordWrap"
                                                FontSize="12" />
-                            <Label Text="{Binding TypeLine}"
+                                <Label Text="{Binding TypeLine}"
                                                     LineBreakMode="WordWrap"
                                                     FontSize="12" />
-                        </StackLayout>
-                        <StackLayout Padding="0" Orientation="Vertical" WidthRequest="80">
-                            <Label Text="{Binding ManaCost}" 
+                            </StackLayout>
+                            <StackLayout Padding="0" Orientation="Vertical" WidthRequest="80">
+                                <Label Text="{Binding ManaCost}" 
                                        LineBreakMode="NoWrap"
                                        FontSize="12" />
-                            <Label LineBreakMode="WordWrap"
+                                <Label LineBreakMode="WordWrap"
                                    FontSize="12" Text="{Binding SetName}"/>
+                            </StackLayout>
                         </StackLayout>
+                        <Label Text="{Binding Text}"/>
                     </StackLayout>
-                    <Label Text="{Binding Text}"/>
                 </StackLayout>
-            </StackLayout>
-        </ScrollView>
+            </ScrollView>
+            <Button Grid.Row="1" Grid.Column="0" Clicked="RemoveNormal" Text="-"/>
+            <Label Grid.Row="1" Grid.Column="1" x:Name="NormalLabel"/>
+            <Button Grid.Row="1" Grid.Column="2" Clicked="AddNormal" Text="+"/>
+            <Button Grid.Row="1" Grid.Column="3" Clicked="RemoveFoil" Text="-"/>
+            <Label Grid.Row="1" Grid.Column="4" x:Name="FoilLabel"/>
+            <Button Grid.Row="1" Grid.Column="5" Clicked="AddFoil" Text="+"/>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

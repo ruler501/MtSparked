@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using WeakEvent;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,9 +16,9 @@ namespace Gatherer.Views
 	{
         Deck Deck;
 
-		public DeckPage ()
+        public DeckPage ()
 		{
-			InitializeComponent ();
+            InitializeComponent ();
 
             Deck deck = new Deck
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using WeakEvent;
 
 namespace Gatherer.Models
 {
@@ -10,6 +11,13 @@ namespace Gatherer.Models
         public string StoragePath { get; set; }
         public Dictionary<string, DeckCard> Cards;
         public Dictionary<string, ISet<string>> CardsByName { get; set; }
+
+        private readonly WeakEventSource<DeckChangedEventArgs> changeEventSource = new WeakEventSource<DeckChangedEventArgs>();
+        public event EventHandler<DeckChangedEventArgs> ChangeEvent
+        {
+            add { changeEventSource.Subscribe(value); }
+            remove { changeEventSource.Unsubscribe(value); }
+        }
 
         public Deck()
         {
@@ -43,6 +51,8 @@ namespace Gatherer.Models
 
             if (normal) cardItem.NormalCount += amount;
             else cardItem.FoilCount += amount;
+
+            changeEventSource.Raise(this, new DeckChangedEventArgs(card, normal, amount));
         }
 
         public void RemoveCard(Card card, bool normal = true, int amount = 1)
@@ -61,10 +71,8 @@ namespace Gatherer.Models
             if (normal) cardItem.NormalCount -= amount;
             else cardItem.FoilCount -= amount;
 
-            if(cardItem.NormalCount < 0 || cardItem.FoilCount < 0)
-            {
-                throw new ArgumentOutOfRangeException("amount", "Tried to remove more than there were items");
-            }
+            if(cardItem.NormalCount < 0) cardItem.NormalCount = 0;
+            if (cardItem.FoilCount < 0) cardItem.FoilCount = 0;
 
             if(cardItem.NormalCount == 0 && cardItem.FoilCount == 0)
             {
@@ -75,6 +83,26 @@ namespace Gatherer.Models
                     CardsByName.Remove(card.Name);
                 }
             }
+
+            changeEventSource.Raise(this, new DeckChangedEventArgs(card, normal, amount));
+        }
+
+        public int GetNormalCount(Card card)
+        {
+            if (!this.Cards.ContainsKey(card.Id))
+            {
+                return 0;
+            }
+            return this.Cards[card.Id].NormalCount;
+        }
+
+        public int GetFoilCount(Card card)
+        {
+            if (!this.Cards.ContainsKey(card.Id))
+            {
+                return 0;
+            }
+            return this.Cards[card.Id].FoilCount;
         }
 
         public class DeckCard
@@ -88,5 +116,23 @@ namespace Gatherer.Models
 
             public int Count => NormalCount + FoilCount;
         }
+    }
+
+    public class DeckChangedEventArgs : EventArgs
+    {
+        private Card card;
+        private int amount;
+        private bool normal;
+
+        public DeckChangedEventArgs(Card card, bool normal, int amount)
+        {
+            this.card = card;
+            this.amount = amount;
+            this.normal = normal;
+        }
+
+        public Card Card => card;
+        public int Amount => amount;
+        public bool Normal => Normal;
     }
 }

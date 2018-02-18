@@ -9,7 +9,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Realm.Database" Version="2.1.0" />
-    <PackageReference Include="Xamarin.Forms" Version="2.5.0.122203" />
+    <PackageReference Include="ThomasLevesque.WeakEvent" Version="2.1.0" />
+    <PackageReference Include="Xamarin.Forms" Version="2.5.0.280555" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\SearchCriteriaCell.xaml.cs">
