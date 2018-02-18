@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Foundation;
@@ -24,6 +25,14 @@ namespace Gatherer.iOS
         {
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
+
+            var prepopulated = "cards.db.cache";
+            var realmDB = "cards.db";
+            var documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+            if (!File.Exists(Path.Combine(documentsPath, realmDB)))
+            {
+                File.Copy(prepopulated, Path.Combine(documentsPath, realmDB));
+            }
 
             return base.FinishedLaunching(app, options);
         }

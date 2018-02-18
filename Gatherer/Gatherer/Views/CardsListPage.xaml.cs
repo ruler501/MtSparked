@@ -21,7 +21,7 @@ namespace Gatherer.Views
         {
             InitializeComponent();
 
-            var query = CardDataStore.Where("TypeLine", "Contains", "Planeswalker").Find();
+            var query = CardDataStore.Where("TypeLine", "Contains", "Planeswalker").ToDataStore();
 
             BindingContext = viewModel = new CardsViewModel(query);
         }
@@ -39,10 +39,10 @@ namespace Gatherer.Views
             {
                 return;
             }
-            Card card = (Card)args.SelectedItem;
-            Navigation.PushAsync(new CardPage(card));
             // Manually deselect item.
             ((ListView)sender).SelectedItem = null;
+            Card card = (Card)args.SelectedItem;
+            await Navigation.PushAsync(new CardPage(card));
         }
 
         protected override void OnAppearing()

@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -61,6 +62,14 @@ namespace Gatherer.UWP
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
+
+                var prepopulated = Path.Combine("../Assets", "cards.db.cache");
+                var realmDB = "cards.db";
+                var documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+                if (!File.Exists(Path.Combine(documentsPath, realmDB)))
+                {
+//                    File.Copy(prepopulated, Path.Combine(documentsPath, realmDB));
+                }
             }
 
             if (rootFrame.Content == null)

@@ -161,9 +161,14 @@ namespace Gatherer.Services
                 return this;
             }
 
-            public CardDataStore Find()
+            public CardDataStore ToDataStore()
             {
                 return new CardDataStore(Expression.Lambda<Func<Card, bool>>(this.builtExpression, param));
+            }
+
+            public List<Card> ToList()
+            {
+                return realm.All<Card>().Where(Expression.Lambda<Func<Card, bool>>(this.builtExpression, param)).ToList();
             }
 
             public CardsQuery(string connector)
