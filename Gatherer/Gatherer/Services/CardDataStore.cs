@@ -15,7 +15,12 @@ namespace Gatherer.Services
         List<Card> items;
         Expression<Func<Card, bool>> Query;
 
-        private static Realm realm = Realm.GetInstance("cards.db");
+        private static Realm realm = null;
+
+        static CardDataStore()
+        {
+            realm = Realm.GetInstance("cards.db");
+        }
 
         protected CardDataStore(Expression<Func<Card, bool>> query)
         {
@@ -70,7 +75,7 @@ namespace Gatherer.Services
         public class CardsQuery
         {
             Expression builtExpression = null;
-            ParameterExpression param = Expression.Parameter(typeof(Card));
+            static ParameterExpression param = Expression.Parameter(typeof(Card), "card");
             string Connector;
 
             public CardsQuery Where(string field, string op, object value)
@@ -94,6 +99,12 @@ namespace Gatherer.Services
                 else if(op == "Greater Than")
                 {
                     fullCombine = Expression.GreaterThan(property, constant);
+                }
+                else if(op == "Exists")
+                {
+                    Expression nullConstant = Expression.Constant(null);
+                    fullCombine = Expression.NotEqual(property, nullConstant);
+                    // fullCombine = Expression.ReferenceNotEqual(property, nullConstant);
                 }
                 else
                 {

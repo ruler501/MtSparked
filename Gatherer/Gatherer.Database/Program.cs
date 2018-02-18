@@ -49,7 +49,7 @@ namespace Gatherer.Database
                         Artist = card.Value<string>("artist"),
                         Border = card.Value<string>("border"),
                         EdhRank = card.Value<int?>("edhrec_rank"),
-                        Flavor = card.Value<string>("flavor"),
+                        Flavor = card.Value<string>("flavor_text"),
                         Power = card.Value<string>("power"),
                         Toughness = card.Value<string>("toughness"),
                         Life = card.Value<int?>("life_modifier"),
@@ -58,7 +58,8 @@ namespace Gatherer.Database
                         FullArt = card.Value<bool?>("full_art"),
                         Frame = card.Value<string>("frame"),
                         Number = card.Value<string>("collector_number"),
-                        Id = card.Value<string>("id")
+                        Id = card.Value<string>("id"),
+                        Watermark = card.Value<string>("watermark")
                     };
 
                     // Convert to nullable int
@@ -119,14 +120,17 @@ namespace Gatherer.Database
                         value.LegalInFuture = legalities.Value<string>("future") == "legal";
                     }
 
+                    value.Multicolored = value.Colors.Count > 1;
+                    value.MulticoloredIdentity = value.ColorIdentity.Count > 1;
+
                     string rulingsUrl = card.Value<string>("rulings_uri");
                     if(!(rulingsUrl is null))
                     {
+                        // Really slow
                         // CreateRulingsList(rulingsUrl, value.Rulings);
                     }
 
-                    // Need to parse out types if we want to search them. Might be
-                    // able to rely on disjointness though to just search the full string
+                    //Need to populate TcgPlayerId will probably be slow
 
                     // What can we do with this?
                     bool? digital = card.Value<bool?>("digital");

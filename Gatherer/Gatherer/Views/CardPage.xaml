@@ -6,7 +6,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="80"/>
+                <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
@@ -17,39 +17,37 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
             <ScrollView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6">
-                <StackLayout Orientation="Vertical">
-                    <Image Source="{Binding FullImageUrl}" HorizontalOptions="FillAndExpand"/>
-                    <StackLayout Orientation="Vertical">
-                        <StackLayout Padding="0" Orientation="Horizontal" HeightRequest="40">
-                            <Label Text="22"
-                                       FontSize="32" 
-                                       WidthRequest="50" 
-                                       VerticalTextAlignment="Center"/>
-                            <StackLayout Padding="0" Orientation="Vertical" WidthRequest="280">
-                                <Label Text="{Binding Name}" 
-                                               LineBreakMode="WordWrap"
-                                               FontSize="12" />
-                                <Label Text="{Binding TypeLine}"
-                                                    LineBreakMode="WordWrap"
-                                                    FontSize="12" />
-                            </StackLayout>
-                            <StackLayout Padding="0" Orientation="Vertical" WidthRequest="80">
-                                <Label Text="{Binding ManaCost}" 
-                                       LineBreakMode="NoWrap"
-                                       FontSize="12" />
-                                <Label LineBreakMode="WordWrap"
-                                   FontSize="12" Text="{Binding SetName}"/>
-                            </StackLayout>
-                        </StackLayout>
-                        <Label Text="{Binding Text}"/>
-                    </StackLayout>
-                </StackLayout>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding FullImageUrl}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+                    <Label Text="{Binding Name}" Grid.Row="1" Grid.Column="0"
+                                            LineBreakMode="NoWrap"
+                                            FontSize="12" />
+                    <Label Text="{Binding TypeLine}" Grid.Row="2" Grid.Column="0"
+                                        LineBreakMode="NoWrap"
+                                        FontSize="12" />
+                    <Label Text="{Binding ManaCost}" Grid.Row="1" Grid.Column="1" 
+                            LineBreakMode="NoWrap"
+                            FontSize="12" />
+                    <Label LineBreakMode="NoWrap" Grid.Row="2" Grid.Column="1"
+                        FontSize="12" Text="{Binding SetName}"/>
+                    <Label Text="{Binding Text}" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
+                </Grid>
             </ScrollView>
             <Button Grid.Row="1" Grid.Column="0" Clicked="RemoveNormal" Text="-"/>
-            <Label Grid.Row="1" Grid.Column="1" x:Name="NormalLabel"/>
+            <Label Grid.Row="1" Grid.Column="1" x:Name="NormalLabel" LineBreakMode="NoWrap"/>
             <Button Grid.Row="1" Grid.Column="2" Clicked="AddNormal" Text="+"/>
             <Button Grid.Row="1" Grid.Column="3" Clicked="RemoveFoil" Text="-"/>
-            <Label Grid.Row="1" Grid.Column="4" x:Name="FoilLabel"/>
+            <Label Grid.Row="1" Grid.Column="4" x:Name="FoilLabel" LineBreakMode="NoWrap"/>
             <Button Grid.Row="1" Grid.Column="5" Clicked="AddFoil" Text="+"/>
         </Grid>
     </ContentPage.Content>

@@ -33,6 +33,7 @@ namespace Gatherer.Droid
                 }
             }
 
+            Xamarin.Forms.Forms.SetFlags("FastRenderers_Experimental");
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
         }

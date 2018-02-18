@@ -31,18 +31,18 @@ namespace Gatherer.Views
             this.CreateChildren();
         }
 
-        async void AddItem(object sender, EventArgs e)
+        void AddItem(object sender, EventArgs e)
         {
             SearchCriteria criteria = viewModel.AddCriteria();
             this.AddCriteria(criteria);
         }
 
-        async void AddGroup(object sender, EventArgs e)
+        void AddGroup(object sender, EventArgs e)
         {
             SearchViewModel model = viewModel.AddGroup();
             this.AddModel(model);
         }
-        
+
         protected void CreateChildren() { 
             this.StackLayout.Children.Clear();
             foreach(object value in viewModel.Items)

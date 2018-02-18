@@ -14,6 +14,19 @@
                     <x:String>Name</x:String>
                     <x:String>Text</x:String>
                     <x:String>TypeLine</x:String>
+                    <x:String>Colors</x:String>
+                    <x:String>ColorIdentity</x:String>
+                    <x:String>ManaCost</x:String>
+                    <x:String>Rarity</x:String>
+                    <x:String>Watermark</x:String>
+                    <x:String>SetCode</x:String>
+                    <x:String>SetName</x:String>
+                    <x:String>Flavor</x:String>
+                    <x:String>Artist</x:String>
+                    <x:String>Border</x:String>
+                    <x:String>Frame</x:String>
+                    <x:String>Layout</x:String>
+                    <x:String>MultiverseId</x:String>
                 </x:Array>
             </Picker.ItemsSource>
         </Picker>
@@ -22,6 +35,7 @@
                 <x:Array Type="{x:Type x:String}">
                     <x:String>Contains</x:String>
                     <x:String>Equals</x:String>
+                    <x:String>Exists</x:String>
                 </x:Array>
             </Picker.ItemsSource>
         </Picker>

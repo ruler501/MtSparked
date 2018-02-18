@@ -22,21 +22,21 @@ namespace Gatherer.Views
 
             this.BindingContext = Card = card;
 		}
-        async void RemoveFoi(object sender, EventArgs e)
+        void RemoveFoi(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.RemoveCard(Card, false, 1);
         }
-        async void AddFoil(object sender, EventArgs e)
+        void AddFoil(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.RemoveCard(Card, false, 1);
         }
 
-        async void RemoveNormal(object sender, EventArgs e)
+        void RemoveNormal(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.RemoveCard(Card, true, 1);
         }
 
-        async void AddNormal(object sender, EventArgs e)
+        void AddNormal(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.RemoveCard(Card, true, 1);
         }

@@ -33,22 +33,22 @@ namespace Gatherer.Views
             this.FoilLabel.Text = ConfigurationManager.ActiveDeck.GetFoilCount(Card).ToString();
         }
 
-        async void AddNormal(object sender, EventArgs e)
+        void AddNormal(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.AddCard(Card, true, 1);
         }
 
-        async void RemoveNormal(object sender, EventArgs e)
+        void RemoveNormal(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.RemoveCard(Card, true, 1);
         }
 
-        async void AddFoil(object sender, EventArgs e)
+        void AddFoil(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.AddCard(Card, false, 1);
         }
 
-        async void RemoveFoil(object sender, EventArgs e)
+        void RemoveFoil(object sender, EventArgs e)
         {
             ConfigurationManager.ActiveDeck.RemoveCard(Card, false, 1);
         }
