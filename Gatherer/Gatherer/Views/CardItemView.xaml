@@ -1,33 +1,31 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+<ViewCell xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gatherer.Views.CardItemView">
-    <ContentView.Content>
-        <Grid HeightRequest="40">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="40"/>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            <Image Source="{Binding CroppedImageUrl}" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Aspect="Fill"/>
-            <Label x:Name="Count" FontSize="32" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"/>
-            <Label Text="{Binding Name}" Grid.Row="0" Grid.Column="2"
+    <Grid HeightRequest="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="40"/>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Image Source="{Binding CroppedImageUrl}" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Aspect="Fill"/>
+        <Label x:Name="Count" FontSize="32" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"/>
+        <Label Text="{Binding Name}" Grid.Row="0" Grid.Column="2"
                                                LineBreakMode="NoWrap"
                                                FontSize="12" />
-            <Label Text="{Binding TypeLine}" Grid.Row="1" Grid.Column="2"
+        <Label Text="{Binding TypeLine}" Grid.Row="1" Grid.Column="2"
                                                     LineBreakMode="WordWrap"
                                                     FontSize="12" />
-            <Label Text="{Binding ManaCost}" Grid.Row="0" Grid.Column="3"
+        <Label Text="{Binding ManaCost}" Grid.Row="0" Grid.Column="3"
                                         LineBreakMode="NoWrap"
                                         FontSize="12" />
-            <Label LineBreakMode="WordWrap" Grid.Row="1" Grid.Column="3"
+        <Label LineBreakMode="WordWrap" Grid.Row="1" Grid.Column="3"
                                         FontSize="12"
                                         Text="{Binding SetCode}"/>
-        </Grid>
-    </ContentView.Content>
-</ContentView>
+    </Grid>
+</ViewCell>

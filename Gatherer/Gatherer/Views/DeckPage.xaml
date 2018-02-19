@@ -2,11 +2,20 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gatherer.Views.DeckPage"
+             xmlns:views="clr-namespace:Gatherer.Views"
              Title="{Binding Name}">
     <ContentPage.Content>
-        <ScrollView x:Name="ScrollView">
-            <StackLayout Orientation="Vertical" x:Name="StackLayout">
-            </StackLayout>
-        </ScrollView>
+        <ListView x:Name="BoardList"
+                  GroupDisplayBinding="{Binding Name}"
+                  GroupShortNameBinding="{Binding Name}"
+                  IsGroupingEnabled="True"
+                  ItemsSource="{Binding Boards}"
+                  ItemSelected="OnItemSelected">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <views:CardItemView/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </ContentPage.Content>
 </ContentPage>

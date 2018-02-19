@@ -1,5 +1,6 @@
 ﻿using Gatherer.Models;
 using Gatherer.Services;
+using Gatherer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using WeakEvent;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using static Gatherer.ViewModels.DeckViewModel;
 
 namespace Gatherer.Views
 {
@@ -15,63 +17,55 @@ namespace Gatherer.Views
 	public partial class DeckPage : ContentPage
 	{
         Deck Deck;
+        DeckViewModel viewModel;
 
-        public DeckPage ()
+        public DeckPage()
+            : this(null)
+        { }
+
+        public DeckPage (Deck deck = null)
 		{
             InitializeComponent ();
 
-            Deck deck = new Deck
-            {
-                Name = "Lilis"
-            };
-
-            List<Card> cards = CardDataStore.Where("Name", "Contains", "Liliana").ToList();
-            foreach(Card card in cards)
-            {
-                deck.AddCard(card, "Mainboard");
-            }
-            cards = CardDataStore.Where("Name", "Contains", "Nixilis").ToList();
-            foreach(Card card in cards)
-            {
-                deck.AddCard(card, "Sideboard", false, 2);
-            }
-
-            this.BindingContext = Deck = ConfigurationManager.ActiveDeck = deck;
-
-            this.CreateChildren();
-
-            Deck.ChangeEvent += this.CreateChildren;
-        }
-
-        public void CreateChildren(object sender=null, DeckChangedEventArgs args=null)
-        {
-            this.StackLayout.Children.Clear();
-
-            foreach(KeyValuePair<string, IDictionary<string, Deck.BoardItem>> pair in this.Deck.Boards.OrderBy(p => p.Key))
-            {
-                string name = pair.Key;
-                if (name == Deck.MASTER) continue;
-                IEnumerable<Deck.BoardItem> cards = pair.Value.Values.OrderBy(bi => bi.Card.Cmc).ThenBy(bi => bi.Card.Name);
-                StackLayout boardLayout = new StackLayout();
-                boardLayout.Children.Add(new Label
+            if (deck is null) {
+                deck = new Deck
                 {
-                    Text = name,
-                    HorizontalTextAlignment = TextAlignment.Center,
-                    FontSize = 14
-                });
+                    Name = "Lilis"
+                };
 
-                foreach (Deck.BoardItem card in cards)
+                List<Card> cards = CardDataStore.Where("Name", "Contains", "Liliana").ToList();
+                foreach (Card card in cards)
                 {
-                    boardLayout.Children.Add(new CardItemView(card.Card));
+                    deck.AddCard(card, "Mainboard");
                 }
-
-                this.StackLayout.Children.Add(boardLayout);
+                cards = CardDataStore.Where("Name", "Contains", "Nixilis").ToList();
+                foreach (Card card in cards)
+                {
+                    deck.AddCard(card, "Sideboard", false, 2);
+                }
             }
 
-            foreach(Deck.BoardItem card in this.Deck.Master.Values)
+            Deck = ConfigurationManager.ActiveDeck = deck;
+
+            this.BindingContext = viewModel = new DeckViewModel(Deck);
+        }
+
+        async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
+        {
+            if (args.SelectedItem is null)
             {
-                this.StackLayout.Children.Add(new CardItemView(card.Card));
+                return;
+            }
+           // Manually deselect item.
+           ((ListView)sender).SelectedItem = null;
+            if(args.SelectedItem is Card card)
+            {
+                await Navigation.PushAsync(new CardPage(card));
+            }
+            else if(args.SelectedItem is CardWithBoard cwb)
+            {
+                await Navigation.PushAsync(new CardPage(Deck.Boards[cwb.Board][cwb.Id].Card));
             }
         }
-	}
+    }
 }

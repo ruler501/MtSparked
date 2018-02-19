@@ -1,5 +1,6 @@
 ﻿using Gatherer.Models;
 using Gatherer.Services;
+using Gatherer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,24 +13,49 @@ using Xamarin.Forms.Xaml;
 namespace Gatherer.Views
 {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class CardItemView : ContentView
+	public partial class CardItemView : ViewCell
 	{
         Card Card;
+        string Board;
+        public CardItemView()
+            : this(null, Deck.MASTER)
+        {
+        }
 
-		public CardItemView (Card card)
+		public CardItemView (Card card = null, string board=Deck.MASTER)
 		{
 			InitializeComponent ();
 
-            this.BindingContext = Card = card;
+            this.Board = board;
+            // this.BindingContext = Card = card;
 
             this.UpdateCount();
 
             ConfigurationManager.ActiveDeck.ChangeEvent += this.UpdateCount;
 		}
 
+        protected override void OnBindingContextChanged()
+        {
+            base.OnBindingContextChanged();
+
+            this.UpdateCount();
+        }
+
         public void UpdateCount(object sender=null, DeckChangedEventArgs args = null)
         {
-            this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(this.Card).ToString();
+            if (this.BindingContext is null) return;
+            string board = Deck.MASTER;
+            string id = null;
+            if (this.BindingContext is DeckViewModel.CardWithBoard cwb)
+            {
+                board = cwb.Board;
+                id = cwb.Id;
+            }
+            else if(this.BindingContext is Card c)
+            {
+                id = c.Id;
+            }
+            this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(id, Board).ToString();
         }
     }
 }

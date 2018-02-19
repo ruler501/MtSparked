@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using WeakEvent;
 
 namespace Gatherer.Models
 {
-    public class Deck
+    public class Deck : INotifyPropertyChanged
     {
         public const string MASTER = "Master";
 
@@ -21,6 +22,9 @@ namespace Gatherer.Models
 
 
         private readonly WeakEventSource<DeckChangedEventArgs> changeEventSource = new WeakEventSource<DeckChangedEventArgs>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public event EventHandler<DeckChangedEventArgs> ChangeEvent
         {
             add { changeEventSource.Subscribe(value); }
@@ -182,13 +186,13 @@ namespace Gatherer.Models
             return this.Boards[boardName][card.Id].FoilCount;
         }
 
-        public int GetCount(Card card, string boardName = MASTER)
+        public int GetCount(string id, string boardName = MASTER)
         {
-            if (!this.Boards.ContainsKey(boardName) || !this.Boards[boardName].ContainsKey(card.Id))
+            if (!this.Boards.ContainsKey(boardName) || !this.Boards[boardName].ContainsKey(id))
             {
                 return 0;
             }
-            return this.Boards[boardName][card.Id].Count;
+            return this.Boards[boardName][id].Count;
         }
 
         public class BoardItem
