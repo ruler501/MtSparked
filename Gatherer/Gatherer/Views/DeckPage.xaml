@@ -4,14 +4,9 @@
              x:Class="Gatherer.Views.DeckPage"
              Title="{Binding Name}">
     <ContentPage.Content>
-        <StackLayout Orientation="Vertical">
-            <Label Text="{Binding Name}"/>
-            <ScrollView x:Name="ScrollView">
-                <Label Text="Main"/>
-                <StackLayout Orientation="Vertical" x:Name="StackLayout">
-                    
-                </StackLayout>
-            </ScrollView>
-        </StackLayout>
+        <ScrollView x:Name="ScrollView">
+            <StackLayout Orientation="Vertical" x:Name="StackLayout">
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

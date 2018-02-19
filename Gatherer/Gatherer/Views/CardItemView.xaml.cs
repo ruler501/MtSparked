@@ -21,24 +21,15 @@ namespace Gatherer.Views
 			InitializeComponent ();
 
             this.BindingContext = Card = card;
+
+            this.UpdateCount();
+
+            ConfigurationManager.ActiveDeck.ChangeEvent += this.UpdateCount;
 		}
-        void RemoveFoi(object sender, EventArgs e)
-        {
-            ConfigurationManager.ActiveDeck.RemoveCard(Card, false, 1);
-        }
-        void AddFoil(object sender, EventArgs e)
-        {
-            ConfigurationManager.ActiveDeck.RemoveCard(Card, false, 1);
-        }
 
-        void RemoveNormal(object sender, EventArgs e)
+        public void UpdateCount(object sender=null, DeckChangedEventArgs args = null)
         {
-            ConfigurationManager.ActiveDeck.RemoveCard(Card, true, 1);
-        }
-
-        void AddNormal(object sender, EventArgs e)
-        {
-            ConfigurationManager.ActiveDeck.RemoveCard(Card, true, 1);
+            this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(this.Card).ToString();
         }
     }
 }

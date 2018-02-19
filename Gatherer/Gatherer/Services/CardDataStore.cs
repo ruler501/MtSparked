@@ -19,7 +19,11 @@ namespace Gatherer.Services
 
         static CardDataStore()
         {
-            realm = Realm.GetInstance("cards.db");
+            RealmConfiguration config = new RealmConfiguration("cards.db");
+            var t = config.DatabasePath;
+            realm = Realm.GetInstance(config);
+
+            var test = realm.All<Card>();
         }
 
         protected CardDataStore(Expression<Func<Card, bool>> query)
@@ -78,8 +82,12 @@ namespace Gatherer.Services
             static ParameterExpression param = Expression.Parameter(typeof(Card), "card");
             string Connector;
 
-            public CardsQuery Where(string field, string op, object value)
+            public CardsQuery Where(string field, string op, string value)
             {
+                if(value is null || string.IsNullOrWhiteSpace(value))
+                {
+                    return this;
+                }
                 Expression property = Expression.Property(param, field);
                 Expression constant = Expression.Constant(value);
                 Expression fullCombine = null;
@@ -91,6 +99,20 @@ namespace Gatherer.Services
                 {
                     Expression caseInsensitive = Expression.Constant(StringComparison.OrdinalIgnoreCase);
                     fullCombine = Expression.Call(typeof(StringExtensions), "Contains", Type.EmptyTypes, property, constant, caseInsensitive);
+                }
+                else if(op == "Like")
+                {
+                    fullCombine = Expression.Call(typeof(StringExtensions), "Like", Type.EmptyTypes, property, constant);
+                }
+                else if(op == "Starts With")
+                {
+                    Expression caseInsensitive = Expression.Constant(StringComparison.OrdinalIgnoreCase);
+                    fullCombine = Expression.Call(property, "StartsWith", Type.EmptyTypes, constant, caseInsensitive);
+                }
+                else if (op == "Ends With")
+                {
+                    Expression caseInsensitive = Expression.Constant(StringComparison.OrdinalIgnoreCase);
+                    fullCombine = Expression.Call(property, "EndsWith", Type.EmptyTypes, constant, caseInsensitive);
                 }
                 else if(op == "Less Than")
                 {
@@ -104,7 +126,6 @@ namespace Gatherer.Services
                 {
                     Expression nullConstant = Expression.Constant(null);
                     fullCombine = Expression.NotEqual(property, nullConstant);
-                    // fullCombine = Expression.ReferenceNotEqual(property, nullConstant);
                 }
                 else
                 {
@@ -172,14 +193,24 @@ namespace Gatherer.Services
                 return this;
             }
 
+            private Expression<Func<Card, bool>> BuildExpression()
+            {
+                if(this.builtExpression is null)
+                {
+                    return Expression.Lambda<Func<Card, bool>>(Expression.Constant(true), param);
+                }
+
+                return Expression.Lambda<Func<Card, bool>>(this.builtExpression, param);
+            }
+
             public CardDataStore ToDataStore()
             {
-                return new CardDataStore(Expression.Lambda<Func<Card, bool>>(this.builtExpression, param));
+                return new CardDataStore(this.BuildExpression());
             }
 
             public List<Card> ToList()
             {
-                return realm.All<Card>().Where(Expression.Lambda<Func<Card, bool>>(this.builtExpression, param)).ToList();
+                return realm.All<Card>().Where(this.BuildExpression()).ToList();
             }
 
             public CardsQuery(string connector)
@@ -188,7 +219,7 @@ namespace Gatherer.Services
             }
         }
 
-        public static CardsQuery Where(string field, string op, object value, string connector="All")
+        public static CardsQuery Where(string field, string op, string value, string connector="All")
         {
             return new CardsQuery(connector).Where(field, op, value);
         }

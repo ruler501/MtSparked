@@ -21,11 +21,8 @@ namespace Gatherer.Views
         public SearchPage()
         {
             InitializeComponent();
-        }
 
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
+            this.RootGroup.AddItem(null, null);
         }
 
         async void Search(object sender, EventArgs e)

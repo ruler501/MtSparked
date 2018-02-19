@@ -122,6 +122,8 @@ namespace Gatherer.Database
 
                     value.Multicolored = value.Colors.Count > 1;
                     value.MulticoloredIdentity = value.ColorIdentity.Count > 1;
+                    value.Colorless = value.Colors.Count == 0;
+                    value.ColorlessIdentity = value.ColorIdentity.Count == 0;
 
                     string rulingsUrl = card.Value<string>("rulings_uri");
                     if(!(rulingsUrl is null))

@@ -31,7 +31,7 @@ namespace Gatherer.Views
             this.CreateChildren();
         }
 
-        void AddItem(object sender, EventArgs e)
+        public void AddItem(object sender, EventArgs e)
         {
             SearchCriteria criteria = viewModel.AddCriteria();
             this.AddCriteria(criteria);
@@ -67,7 +67,10 @@ namespace Gatherer.Views
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(19, GridUnitType.Star) });
 
-            grid.Children.Add(new Frame(), 0, 0);
+            grid.Children.Add(new Frame()
+            {
+                IsVisible = false
+            }, 0, 0);
             grid.Children.Add(new SearchGroupCell(model), 1, 0);
             this.StackLayout.Children.Add(grid);
         }
