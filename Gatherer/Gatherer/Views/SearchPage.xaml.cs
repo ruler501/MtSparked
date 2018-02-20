@@ -30,5 +30,11 @@ namespace Gatherer.Views
             CardDataStore.CardsQuery query = RootGroup.GetQuery();
             await Navigation.PushAsync(new CardsListPage(query.ToDataStore()));
         }
+
+        void Clear(object sender, EventArgs e)
+        {
+            this.RootGroup.Clear();
+            this.RootGroup.AddItem(null, null);
+        }
     }
 }

@@ -92,6 +92,12 @@ namespace Gatherer.Views
             return model.CreateQuery();
         }
 
+        public void Clear()
+        {
+            this.viewModel.Items.Clear();
+            this.StackLayout.Children.Clear();
+        }
+
         double translatedX = 0;
         void OnPanUpdated(object sender, PanUpdatedEventArgs e)
         {

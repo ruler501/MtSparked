@@ -5,6 +5,7 @@
              x:Class="Gatherer.Views.SearchPage"
              x:Name="SearchPage">
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear" Clicked="Clear" />
         <ToolbarItem Text="Search" Clicked="Search" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
