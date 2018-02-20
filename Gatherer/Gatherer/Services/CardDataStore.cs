@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 using Gatherer.Models;
 using Realms;
 
-[assembly: Xamarin.Forms.Dependency(typeof(Gatherer.Services.CardDataStore))]
 namespace Gatherer.Services
 {
-    public class CardDataStore : IDataStore<Card>
+    public class CardDataStore
     {
         List<Card> items;
         Expression<Func<Card, bool>> Query;
@@ -222,6 +221,11 @@ namespace Gatherer.Services
         public static CardsQuery Where(string field, string op, string value, string connector="All")
         {
             return new CardsQuery(connector).Where(field, op, value);
+        }
+
+        public static Card ById(string id)
+        {
+            return realm.Find<Card>(id);
         }
     }
 }

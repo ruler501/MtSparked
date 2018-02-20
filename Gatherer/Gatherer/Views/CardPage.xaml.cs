@@ -18,8 +18,10 @@ namespace Gatherer.Views
 
         Dictionary<string, Label> FoilCounters;
         Dictionary<string, Label> NormalCounters;
-
-        public CardPage (Card card)
+        List<Card> cards;
+        int index;
+        
+        public CardPage (Card card, List<Card> cards, int index)
 		{
 			InitializeComponent ();
 
@@ -28,11 +30,36 @@ namespace Gatherer.Views
             this.FoilCounters = new Dictionary<string, Label>();
             this.NormalCounters = new Dictionary<string, Label>();
 
+            this.ToolbarItems.Clear();
+            if(!(cards is null))
+            {
+                this.cards = cards;
+                this.index = index;
+                if(index > 0)
+                {
+                    ToolbarItem prev = new ToolbarItem()
+                    {
+                        Text = "Prev"
+                    };
+                    prev.Clicked += this.PrevCard;
+                    this.ToolbarItems.Add(prev);
+                }
+                if(index >=0 && index < cards.Count - 1)
+                {
+                    ToolbarItem next = new ToolbarItem()
+                    {
+                        Text = "Next"
+                    };
+                    next.Clicked += this.NextCard;
+
+                    this.ToolbarItems.Add(next);
+                }
+            }
+
             int row = 2;
             Deck deck = ConfigurationManager.ActiveDeck;
-            foreach(string board in deck.BoardNames)
+            foreach(string board in deck.BoardNames.OrderBy(n => n != Deck.MASTER))
             {
-                if (board == Deck.MASTER) continue;
                 string capturableBoard = board;
 
                 this.GridView.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20) });
@@ -118,6 +145,34 @@ namespace Gatherer.Views
         void AddCard(string board, bool normal)
         {
             ConfigurationManager.ActiveDeck.AddCard(this.Card, board, normal);
+        }
+
+        async void PrevCard(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new CardPage(cards[index - 1], cards, index - 1));
+            Navigation.RemovePage(this);
+        }
+
+        async void NextCard(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new CardPage(cards[index + 1], cards, index + 1));
+            Navigation.RemovePage(this);
+        }
+
+        double translatedX = 0;
+        void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+        {
+            switch (e.StatusType)
+            {
+                case GestureStatus.Running:
+                    this.ScrollView.TranslationX = translatedX + e.TotalX;
+                    break;
+
+                case GestureStatus.Completed:
+                    // Store the translation applied during the pan
+                    this.translatedX = Content.TranslationX;
+                    break;
+            }
         }
     }
 }

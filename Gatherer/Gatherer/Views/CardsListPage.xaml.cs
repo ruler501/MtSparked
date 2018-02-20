@@ -42,7 +42,7 @@ namespace Gatherer.Views
             // Manually deselect item.
             ((ListView)sender).SelectedItem = null;
             Card card = (Card)args.SelectedItem;
-            await Navigation.PushAsync(new CardPage(card));
+            await Navigation.PushAsync(new CardPage(card, viewModel.Items.ToList(), viewModel.Items.IndexOf(card)));
         }
 
         protected override void OnAppearing()

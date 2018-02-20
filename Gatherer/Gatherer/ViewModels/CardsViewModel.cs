@@ -15,7 +15,7 @@ namespace Gatherer.ViewModels
 {
     public class CardsViewModel : INotifyPropertyChanged
     {
-        public IDataStore<Card> DataStore;
+        public CardDataStore DataStore;
 
         bool isBusy = false;
         public bool IsBusy

@@ -2,7 +2,9 @@
 <TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:views="clr-namespace:Gatherer.Views"
-            x:Class="Gatherer.Views.MainPage">
+            x:Class="Gatherer.Views.MainPage"
+            xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
+            android:TabbedPage.IsSwipePagingEnabled="False">
     <TabbedPage.Children>
         <NavigationPage Title="Search">
             <NavigationPage.Icon>

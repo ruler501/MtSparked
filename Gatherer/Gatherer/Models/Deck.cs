@@ -1,12 +1,17 @@
-﻿using System;
+﻿using Gatherer.Services;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Text;
 using WeakEvent;
 
 namespace Gatherer.Models
 {
-    public class Deck : INotifyPropertyChanged
+    public class Deck
     {
         public const string MASTER = "Master";
 
@@ -20,10 +25,10 @@ namespace Gatherer.Models
         public ICollection<BoardItem> Cards => this.Master.Values;
         public ICollection<string> CardNames => this.CardsByName.Keys;
 
+        private bool Loading = false;
+
 
         private readonly WeakEventSource<DeckChangedEventArgs> changeEventSource = new WeakEventSource<DeckChangedEventArgs>();
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public event EventHandler<DeckChangedEventArgs> ChangeEvent
         {
@@ -41,6 +46,102 @@ namespace Gatherer.Models
             };
 
             this.CardsByName = new Dictionary<string, ISet<string>>();
+        }
+
+        public Deck(string path)
+        {
+
+            this.CardsByName = new Dictionary<string, ISet<string>>();
+            if (File.Exists(path))
+            {
+                Loading = true;
+                this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>()
+                {
+                    [MASTER] = new Dictionary<string, BoardItem>()
+                };
+                using (StreamReader file = File.OpenText(path))
+                using(JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JObject deck = (JObject)JToken.ReadFrom(reader);
+
+                    this.Name = (string)deck["Name"];
+                    JArray cards = (JArray)deck["Cards"];
+                    foreach(JObject card in cards)
+                    {
+                        string cardId = (string)card["CardId"];
+
+                        Card cardValue = CardDataStore.ById(cardId);
+
+                        JArray boards = (JArray)card["Boards"];
+                        // Must process Master first to prevent duplication
+                        foreach (JObject board in boards.OrderBy(b => (string)b["BoardName"] != MASTER))
+                        {
+                            string boardName = (string)board["BoardName"];
+                            int normalCount = (int)board["NormalCount"];
+                            int foilCount = (int)board["FoilCount"];
+
+                            this.AddCard(cardValue, boardName, true, normalCount);
+                            this.AddCard(cardValue, boardName, false, foilCount);
+                        }
+                    }
+                }
+                Loading = false;
+            }
+            else
+            {
+                this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>
+                {
+                    [MASTER] = new Dictionary<string, BoardItem>(),
+                    ["Mainboard"] = new Dictionary<string, BoardItem>(),
+                    ["Sideboard"] = new Dictionary<string, BoardItem>()
+                };
+                this.Name = "Unnamed";
+            }
+        }
+
+        public void SaveDeck()
+        {
+            if (Loading) return;
+            JObject result = new JObject
+            {
+                ["Name"] = this.Name
+            };
+            JArray cards = new JArray();
+            foreach(BoardItem bi in this.Boards[MASTER].Values)
+            {
+                JObject card = new JObject();
+                string cardId = bi.Card.Id;
+                card["CardId"] = cardId;
+                card["CardName"] = bi.Card.Name;
+
+                JArray boards = new JArray();
+
+                foreach(KeyValuePair<string, IDictionary<string, BoardItem>> pair in this.Boards.OrderBy(p => p.Key))
+                {
+                    string name = pair.Key;
+                    IDictionary<string, BoardItem> boardValue = pair.Value;
+                    if (boardValue.ContainsKey(cardId))
+                    {
+                        int normalCount = boardValue[cardId].NormalCount;
+                        int foilCount = boardValue[cardId].FoilCount;
+
+                        JObject board = new JObject
+                        {
+                            ["BoardName"] = name,
+                            ["NormalCount"] = normalCount,
+                            ["FoilCount"] = foilCount
+                        };
+                        boards.Add(board);
+                    }
+                }
+                card["Boards"] = boards;
+                cards.Add(card);
+            }
+            result["Cards"] = cards;
+
+
+            string fileContents = result.ToString();
+            File.WriteAllText(this.StoragePath, fileContents);
         }
 
         public void AddBoard(string name)
@@ -100,6 +201,8 @@ namespace Gatherer.Models
             }
 
             changeEventSource.Raise(this, new DeckChangedEventArgs(card, normal, amount));
+
+            this.SaveDeck();
         }
 
         public void RemoveCard(Card card, string boardName=MASTER, bool normal = true, int amount = 1)
@@ -166,6 +269,8 @@ namespace Gatherer.Models
             }
 
             changeEventSource.Raise(this, new DeckChangedEventArgs(card, normal, amount));
+
+            this.SaveDeck();
         }
 
         public int GetNormalCount(Card card, string boardName=MASTER)

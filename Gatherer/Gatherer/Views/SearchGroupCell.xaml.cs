@@ -91,5 +91,21 @@ namespace Gatherer.Views
 
             return model.CreateQuery();
         }
+
+        double translatedX = 0;
+        void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+        {
+            switch (e.StatusType)
+            {
+                case GestureStatus.Running:
+                    this.ControlGrid.TranslationX = translatedX + e.TotalX ;
+                    break;
+
+                case GestureStatus.Completed:
+                    // Store the translation applied during the pan
+                    this.translatedX = Content.TranslationX;
+                    break;
+            }
+        }
     }
 }

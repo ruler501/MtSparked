@@ -20,30 +20,12 @@ namespace Gatherer.Views
         DeckViewModel viewModel;
 
         public DeckPage()
-            : this(null)
+            : this(ConfigurationManager.ActiveDeck)
         { }
 
         public DeckPage (Deck deck = null)
 		{
             InitializeComponent ();
-
-            if (deck is null) {
-                deck = new Deck
-                {
-                    Name = "Lilis"
-                };
-
-                List<Card> cards = CardDataStore.Where("Name", "Contains", "Liliana").ToList();
-                foreach (Card card in cards)
-                {
-                    deck.AddCard(card, "Mainboard");
-                }
-                cards = CardDataStore.Where("Name", "Contains", "Nixilis").ToList();
-                foreach (Card card in cards)
-                {
-                    deck.AddCard(card, "Sideboard", false, 2);
-                }
-            }
 
             Deck = ConfigurationManager.ActiveDeck = deck;
 
@@ -60,11 +42,11 @@ namespace Gatherer.Views
            ((ListView)sender).SelectedItem = null;
             if(args.SelectedItem is Card card)
             {
-                await Navigation.PushAsync(new CardPage(card));
+                await Navigation.PushAsync(new CardPage(card, null, -1));
             }
             else if(args.SelectedItem is CardWithBoard cwb)
             {
-                await Navigation.PushAsync(new CardPage(Deck.Boards[cwb.Board][cwb.Id].Card));
+                await Navigation.PushAsync(new CardPage(Deck.Boards[cwb.Board][cwb.Id].Card, null, -1));
             }
         }
     }

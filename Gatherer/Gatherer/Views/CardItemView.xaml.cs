@@ -15,19 +15,9 @@ namespace Gatherer.Views
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class CardItemView : ViewCell
 	{
-        Card Card;
-        string Board;
-        public CardItemView()
-            : this(null, Deck.MASTER)
-        {
-        }
-
-		public CardItemView (Card card = null, string board=Deck.MASTER)
+		public CardItemView ()
 		{
 			InitializeComponent ();
-
-            this.Board = board;
-            // this.BindingContext = Card = card;
 
             this.UpdateCount();
 
@@ -55,7 +45,7 @@ namespace Gatherer.Views
             {
                 id = c.Id;
             }
-            this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(id, Board).ToString();
+            this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(id, board).ToString();
         }
     }
 }

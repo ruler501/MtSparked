@@ -3,14 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gatherer.Views.SearchGroupCell">
     <StackLayout HorizontalOptions="Fill">
-        <Grid>
+        <Grid x:Name="ControlGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <Picker SelectedItem="{Binding Connector}" HorizontalOptions="Fill" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Picker SelectedItem="{Binding Connector}" HorizontalOptions="Fill" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
                 <Picker.ItemsSource>
                     <x:Array Type="{x:Type x:String}">
                         <x:String>All</x:String>
@@ -18,12 +22,17 @@
                     </x:Array>
                 </Picker.ItemsSource>
             </Picker>
-            <Button Text="Add Criteria" Clicked="AddItem" HorizontalOptions="Fill" Grid.Column="1"/>
-            <Button Text="Add Group" Clicked="AddGroup" HorizontalOptions="Fill" Grid.Column="2"/>
-            <StackLayout Orientation="Vertical" HorizontalOptions="Fill" Grid.Column="3">
-                <Label Text="Negate"/>
-                <Switch HorizontalOptions="Center" IsToggled="{Binding Negated}"/>
-            </StackLayout>
+            <Button Text="Add Criteria" Clicked="AddItem" HorizontalOptions="Fill" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"/>
+            <Button Text="Add Group" Clicked="AddGroup" HorizontalOptions="Fill" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"/>
+            <Label Text="Negate" Grid.Column="3" Grid.Row="0" HorizontalTextAlignment="Center"/>
+            <Switch HorizontalOptions="Center" IsToggled="{Binding Negated}" Grid.Column="3" Grid.Row="1"/>
+            <!--
+            <ContentView Grid.Column="0" Grid.ColumnSpan="4" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Grid.Row="0" Grid.RowSpan="2">
+                <ContentView.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+                </ContentView.GestureRecognizers>
+            </ContentView>
+            -->
         </Grid>
         <StackLayout x:Name="StackLayout" Orientation="Vertical"/>
     </StackLayout>

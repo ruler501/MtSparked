@@ -2,8 +2,17 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gatherer.Views.CardPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Next" Clicked="NextCard" />
+        <ToolbarItem Text="Prev" Clicked="PrevCard" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <Grid x:Name="GridView" RowSpacing="0">
+            <!--
+            <Grid.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+            </Grid.GestureRecognizers>
+            -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="20"/>
@@ -17,7 +26,7 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <ScrollView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7">
+            <ScrollView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" x:Name="ScrollView">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="560"/>
