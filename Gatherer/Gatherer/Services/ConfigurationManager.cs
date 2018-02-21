@@ -4,8 +4,11 @@ using Plugin.Settings;
 using Plugin.Settings.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
+using WeakEvent;
 using Xamarin.Forms;
 
 namespace Gatherer.Services
@@ -13,7 +16,7 @@ namespace Gatherer.Services
     public static class ConfigurationManager
     {
         private const string ACTIVE_DECK_KEY = "ActiveDeck";
-        private const string DEFAULT_DECK_PATH = "temp.jdec";
+        public static string DefaultDeckPath => Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "temp.jdec");
         private static Deck activeDeck = null;
         public static Deck ActiveDeck {
             get
@@ -21,10 +24,9 @@ namespace Gatherer.Services
                 if(activeDeck is null)
                 {
                     string activeDeckPath = AppSettings.GetValueOrDefault(ACTIVE_DECK_KEY, null);
-                    if(activeDeckPath is null)
+                    if(activeDeckPath is null || !FilePicker.PathExists(activeDeckPath))
                     {
-                        var documentsPath = Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
-                        ActiveDeck = new Deck(Path.Combine(documentsPath, DEFAULT_DECK_PATH));
+                        ActiveDeck = new Deck(DefaultDeckPath);
                     }
                     else
                     {
@@ -35,12 +37,16 @@ namespace Gatherer.Services
             }
             set
             {
-                if (!(activeDeck is null)) activeDeck.ChangeEvent -= ConfigurationManager.UpdateDeckPath;
+                string path = null;
+                if (!(activeDeck is null))
+                {
+                    activeDeck.ChangeEvent -= ConfigurationManager.UpdateDeckPath;
+                    path = activeDeck.StoragePath;
+                }
                 activeDeck = value;
                 if(activeDeck is null)
                 {
-                    var documentsPath = Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
-                    activeDeck = new Deck(Path.Combine(documentsPath, DEFAULT_DECK_PATH));
+                    activeDeck = new Deck(DefaultDeckPath);
                 }
 
                 if (FilePicker.PathExists(activeDeck.StoragePath))
@@ -49,13 +55,41 @@ namespace Gatherer.Services
                 }
                 else
                 {
-                    var documentsPath = Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
-                    activeDeck.StoragePath = Path.Combine(documentsPath, DEFAULT_DECK_PATH);
+                    activeDeck.StoragePath = DefaultDeckPath;
                     AppSettings.AddOrUpdateValue(ACTIVE_DECK_KEY, activeDeck.StoragePath);
                 }
-                if (!(activeDeck is null)) activeDeck.ChangeEvent += ConfigurationManager.UpdateDeckPath;
+                if (!(activeDeck is null))
+                {
+                    activeDeck.ChangeEvent += ConfigurationManager.UpdateDeckPath;
+                    OnPropertyChanged();
+                }
             }
         }
+
+        private static string SHOW_UNIQUE_KEY = "ShowUnique";
+        public static bool ShowUnique
+        {
+            get => AppSettings.GetValueOrDefault(SHOW_UNIQUE_KEY, false);
+            set
+            {
+                AppSettings.AddOrUpdateValue(SHOW_UNIQUE_KEY, value);
+                OnPropertyChanged();
+            }
+        }
+
+        #region INotifyPropertyChanged
+        private static WeakEventSource<PropertyChangedEventArgs> propertyChangedSource = new WeakEventSource<PropertyChangedEventArgs>();
+        public static event EventHandler<PropertyChangedEventArgs> PropertyChanged
+        {
+            add { propertyChangedSource.Subscribe(value); }
+            remove { propertyChangedSource.Unsubscribe(value); }
+        }
+
+        private static void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            propertyChangedSource.Raise(null, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
 
         private static IFilePicker filePicker = null;
         public static IFilePicker FilePicker => filePicker ?? (filePicker = DependencyService.Get<IFilePicker>());

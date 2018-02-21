@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using Gatherer.Models;
@@ -11,7 +12,7 @@ namespace Gatherer.Services
 {
     public class CardDataStore
     {
-        List<Card> items;
+        public List<Card> items;
         Expression<Func<Card, bool>> Query;
 
         private static Realm realm = null;
@@ -19,22 +20,31 @@ namespace Gatherer.Services
         static CardDataStore()
         {
             RealmConfiguration config = new RealmConfiguration("cards.db");
-            var t = config.DatabasePath;
             realm = Realm.GetInstance(config);
-
-            var test = realm.All<Card>();
         }
 
         protected CardDataStore(Expression<Func<Card, bool>> query)
         {
             this.Query = query;
-            items = new List<Card>();
-            var mockItems = realm.All<Card>().Where(Query).OrderBy(c => c.Cmc).ThenBy(c => c.Name);
+
+            this.LoadCards();
+        }
+
+        public void LoadCards()
+        {
+            items = new List<Card>(250);
+
+            IEnumerable<Card> mockItems = realm.All<Card>().Where(Query).OrderBy(c => c.Cmc).ThenBy(c => c.Name);
+
+            if (ConfigurationManager.ShowUnique)
+            {
+                mockItems = mockItems.DistinctBy(c => c.Name);
+            }
 
             foreach (var item in mockItems)
             {
                 items.Add(item);
-                if(items.Count > 250)
+                if (items.Count >= 250)
                 {
                     break;
                 }
@@ -69,11 +79,6 @@ namespace Gatherer.Services
         {
             return await Task.FromResult(items.FirstOrDefault(s => s.MultiverseId == id));
         }
-
-        public async Task<IEnumerable<Card>> GetItemsAsync(bool forceRefresh = false)
-        {
-            return await Task.FromResult(realm.All<Card>().Where(Query).OrderBy(c => c.Cmc).ThenBy(c => c.Name));
-        }
         
         public class CardsQuery
         {
@@ -87,8 +92,44 @@ namespace Gatherer.Services
                 {
                     return this;
                 }
+                field = field.Replace(" ", "");
+
+                if (field.Contains("Color"))
+                {
+                    if (value.Equals("White", StringComparison.OrdinalIgnoreCase))
+                    {
+                        value = "W";
+                    }
+                    else if (value.Equals("Blue", StringComparison.OrdinalIgnoreCase))
+                    {
+                        value = "U";
+                    }
+                    else if (value.Equals("Black", StringComparison.OrdinalIgnoreCase))
+                    {
+                        value = "B";
+                    }
+                    else if (value.Equals("Red", StringComparison.OrdinalIgnoreCase))
+                    {
+                        value = "R";
+                    }
+                    else if (value.Equals("Green", StringComparison.OrdinalIgnoreCase))
+                    {
+                        value = "G";
+                    }
+                }
+
                 Expression property = Expression.Property(param, field);
                 Expression constant = Expression.Constant(value);
+                PropertyInfo propertyInfo = typeof(Card).GetProperty(field);
+                if(propertyInfo.PropertyType == typeof(bool))
+                {
+                    bool val = bool.Parse(value);
+                    constant = Expression.Constant(val, propertyInfo.PropertyType);
+                }
+                else if(propertyInfo.PropertyType == typeof(int?))
+                {
+                    constant = Expression.Constant(Int32.Parse(value), typeof(int?));
+                }
                 Expression fullCombine = null;
                 if(op == "Equals")
                 {
@@ -96,8 +137,11 @@ namespace Gatherer.Services
                 }
                 else if(op == "Contains")
                 {
-                    Expression caseInsensitive = Expression.Constant(StringComparison.OrdinalIgnoreCase);
-                    fullCombine = Expression.Call(typeof(StringExtensions), "Contains", Type.EmptyTypes, property, constant, caseInsensitive);
+                    if (propertyInfo.PropertyType == typeof(string))
+                    {
+                        Expression caseInsensitive = Expression.Constant(StringComparison.OrdinalIgnoreCase);
+                        fullCombine = Expression.Call(typeof(StringExtensions), "Contains", Type.EmptyTypes, property, constant, caseInsensitive);
+                    }
                 }
                 else if(op == "Like")
                 {

@@ -31,31 +31,12 @@ namespace Gatherer.ViewModels
             set { SetProperty(ref title, value); }
         }
 
-        protected bool SetProperty<T>(ref T backingStore, T value,
-            [CallerMemberName]string propertyName = "",
-            Action onChanged = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return false;
-
-            backingStore = value;
-            onChanged?.Invoke();
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-
-        public ObservableCollection<Card> Items { get; set; }
+        private ObservableCollection<Card> items;
+        public ObservableCollection<Card> Items { get => items; set => SetProperty(ref items, value); }
         public int CardCount => Items.Count;
         public Command LoadItemsCommand { get; set; }
-
-        public CardsViewModel()
-        {
-            Title = "Cards";
-            Items = new ObservableCollection<Card>();
-            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
-        }
-
-        async Task ExecuteLoadItemsCommand()
+        
+        void ExecuteLoadItemsCommand()
         {
             if (IsBusy)
                 return;
@@ -64,12 +45,10 @@ namespace Gatherer.ViewModels
 
             try
             {
-                Items.Clear();
-                var items = await DataStore.GetItemsAsync(true);
-                foreach (var item in items)
-                {
-                    Items.Add(item);
-                }
+                this.DataStore.LoadCards();
+                
+                ObservableCollection<Card> items = new ObservableCollection<Card>(this.DataStore.items);
+                this.Items = items;
             }
             catch (Exception ex)
             {
@@ -85,8 +64,31 @@ namespace Gatherer.ViewModels
         {
             Title = "Cards";
             Items = new ObservableCollection<Card>();
-            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
+            LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
             this.DataStore = store;
+            ConfigurationManager.PropertyChanged += this.OnUniqueUpdated;
+            this.LoadItemsCommand.Execute(null);
+        }
+
+        private void OnUniqueUpdated(object sender, PropertyChangedEventArgs args)
+        {
+            if(args.PropertyName == nameof(ConfigurationManager.ShowUnique))
+            {
+                this.LoadItemsCommand.Execute(null);
+            }
+        }
+
+        protected bool SetProperty<T>(ref T backingStore, T value,
+            [CallerMemberName]string propertyName = "",
+            Action onChanged = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(backingStore, value))
+                return false;
+
+            backingStore = value;
+            onChanged?.Invoke();
+            OnPropertyChanged(propertyName);
+            return true;
         }
 
         #region INotifyPropertyChanged

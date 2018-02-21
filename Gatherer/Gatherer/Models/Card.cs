@@ -31,8 +31,14 @@ namespace Gatherer.Models
         public string Frame { get; set; }
         [Indexed]
         public string Layout { get; set; }
-        // Should be indexed
+        [Indexed]
         public string TypeLine { get; set; }
+        [Indexed]
+        public string Colors { get; set; }
+        [Indexed]
+        public string ColorIdentity { get; set; }
+        [Indexed]
+        public string ColorIndicatior { get; set; }
 
         // None of the below are able to be searched with yet
         [Indexed]
@@ -65,26 +71,23 @@ namespace Gatherer.Models
         public bool LegalInMtgoCommander { get; set; }
         [Indexed]
         public bool LegalInFuture { get; set; }
-        public int? EdhRank { get; set; }
-        public string Number { get; set; }
-        public bool? FullArt { get; set; }
-        public int? Cmc { get; set; }
-        public int? Hand { get; set; }
-        public int? Life { get; set; }
-        public int? Loyalty { get; set; }
         public bool Multicolored { get; set; }
         public bool MulticoloredIdentity { get; set; }
         public bool Colorless { get; set; }
         public bool ColorlessIdentity { get; set; }
-        public IList<char> Colors { get; }
-        public IList<char> ColorIdentity { get; }
-        public IList<char> ColorIndicator { get; }
+        public bool? FullArt { get; set; }
+        public int? EdhRank { get; set; }
+        public int? Cmc { get; set; }
+        public int? Hand { get; set; }
+        public int? Life { get; set; }
+        public int? Loyalty { get; set; }
 
         [PrimaryKey]
         public string Id { get; set; }
         [Indexed]
         public string MultiverseId { get; set; }
 
+        public string Number { get; set; }
         public string IllustrationId { get; set; }
         public string FullImageUrl { get; set; }
         public string CroppedImageUrl { get; set; }

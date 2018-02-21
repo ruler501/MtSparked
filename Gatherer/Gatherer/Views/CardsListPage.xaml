@@ -5,9 +5,12 @@
               Title="{Binding Title}"
              x:Name="CardsListPage"
              xmlns:views="clr-namespace:Gatherer.Views">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Toggle Unique" Clicked="ToggleUnique"/>
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ListView x:Name="CardsListView" 
-                ItemsSource="{Binding Items}"
+                 ItemsSource="{Binding Items}"
                  ItemSelected="OnItemSelected">
             <ListView.ItemTemplate>
                 <DataTemplate>

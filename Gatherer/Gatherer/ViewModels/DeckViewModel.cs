@@ -1,4 +1,5 @@
 ﻿using Gatherer.Models;
+using Gatherer.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,20 +28,43 @@ namespace Gatherer.ViewModels
             this.UpdateBoards();
 
             this.Deck.ChangeEvent += this.UpdateBoards;
+            ConfigurationManager.PropertyChanged += this.OnUniqueChanged;
         }
-
+        
         public void UpdateBoards(object sender = null, DeckChangedEventArgs args = null)
         {
-            this.Boards.Clear();
-            foreach (KeyValuePair<string, IDictionary<string, Deck.BoardItem>> pair in this.Deck.Boards)
+            if (args is NameChangedEventArgs nameChange)
             {
-                string name = pair.Key;
-                if (name == Deck.MASTER) continue;
+                this.Name = nameChange.Name;
+            }
+            else if (args is null ||
+                     args is CardCountChangedEventArgs ||
+                     args is BoardChangedEventArgs)
+            {
+                ObservableCollection<Board> boards = new ObservableCollection<Board>();
+                foreach (KeyValuePair<string, IDictionary<string, Deck.BoardItem>> pair in this.Deck.Boards)
+                {
+                    string name = pair.Key;
+                    if (name == Deck.MASTER) continue;
 
-                List<Deck.BoardItem> boardItems = new List<Deck.BoardItem>(pair.Value.Values);
-                IEnumerable<CardWithBoard> cards = boardItems.OrderBy(bi => bi.Card.Cmc).ThenBy(bi => bi.Card.Name)
-                                                                   .Select(bi => new CardWithBoard(bi.Card, name));
-                this.Boards.Add(new Board(name, cards));
+                    List<Deck.BoardItem> boardItems = new List<Deck.BoardItem>(pair.Value.Values);
+                    IEnumerable<CardWithBoard> cards = boardItems.OrderBy(bi => bi.Card.Cmc).ThenBy(bi => bi.Card.Name)
+                                                                       .Select(bi => new CardWithBoard(bi.Card, name));
+                    if (ConfigurationManager.ShowUnique)
+                    {
+                        cards = cards.DistinctBy(cwb => cwb.Name);
+                    }
+                    boards.Add(new Board(name, cards));
+                }
+                this.Boards = boards;
+            }
+        }
+
+        public void OnUniqueChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if(args.PropertyName == nameof(ConfigurationManager.ShowUnique))
+            {
+                this.UpdateBoards();
             }
         }
 

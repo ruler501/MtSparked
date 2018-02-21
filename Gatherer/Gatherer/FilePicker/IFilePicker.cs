@@ -16,5 +16,9 @@ namespace Gatherer.FilePicker
         byte[] OpenFile(string path);
 
         bool PathExists(string path);
+
+        void ShareFile(string path, string fileType="text/*");
+
+        void ReleaseFile(string path);
     }
 }

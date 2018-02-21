@@ -6,6 +6,7 @@
              Title="{Binding Name}">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Manage" Clicked="ManageDeck" />
+        <ToolbarItem Text="Toggle Unique" Clicked="ToggleUnique"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ListView x:Name="BoardList"

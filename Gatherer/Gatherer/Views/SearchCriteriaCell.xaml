@@ -13,17 +13,24 @@
                 <x:Array Type="{x:Type x:String}">
                     <x:String>Name</x:String>
                     <x:String>Text</x:String>
-                    <x:String>TypeLine</x:String>
-                    <x:String>ManaCost</x:String>
+                    <x:String>Type Line</x:String>
+                    <x:String>Colors</x:String>
+                    <x:String>Color Identity</x:String>
+                    <x:String>Set Name</x:String>
+                    <x:String>Mana Cost</x:String>
                     <x:String>Rarity</x:String>
+                    <x:String>Cmc</x:String>
                     <x:String>Watermark</x:String>
-                    <x:String>SetCode</x:String>
-                    <x:String>SetName</x:String>
+                    <x:String>Set Code</x:String>
                     <x:String>Flavor</x:String>
                     <x:String>Artist</x:String>
                     <x:String>Border</x:String>
                     <x:String>Frame</x:String>
                     <x:String>Layout</x:String>
+                    <x:String>Edh Rank</x:String>
+                    <x:String>Life</x:String>
+                    <x:String>Loyalty</x:String>
+                    <x:String>Color Indicator</x:String>
                 </x:Array>
             </Picker.ItemsSource>
         </Picker>

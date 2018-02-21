@@ -86,11 +86,11 @@ namespace Gatherer.Database
                     }
 
                     JArray colors = card.Value<JArray>("colors");
-                    CreateColorList(colors, value.Colors);
+                    value.Colors = CreateColorList(colors);
                     JArray colorIdentity = card.Value<JArray>("color_identity");
-                    CreateColorList(colorIdentity, value.ColorIdentity);
+                    value.ColorIdentity = CreateColorList(colorIdentity);
                     JArray colorIndicator = card.Value<JArray>("color_indicator");
-                    CreateColorList(colorIdentity, value.ColorIdentity);
+                    value.ColorIndicatior = CreateColorList(colorIdentity);
 
                     JArray faces = card.Value<JArray>("card_faces");
                     if(!(faces is null))
@@ -120,10 +120,10 @@ namespace Gatherer.Database
                         value.LegalInFuture = legalities.Value<string>("future") == "legal";
                     }
 
-                    value.Multicolored = value.Colors.Count > 1;
-                    value.MulticoloredIdentity = value.ColorIdentity.Count > 1;
-                    value.Colorless = value.Colors.Count == 0;
-                    value.ColorlessIdentity = value.ColorIdentity.Count == 0;
+                    value.Multicolored = value.Colors.Length > 1;
+                    value.MulticoloredIdentity = value.ColorIdentity.Length > 1;
+                    value.Colorless = value.Colors.Length == 0;
+                    value.ColorlessIdentity = value.ColorIdentity.Length == 0;
 
                     string rulingsUrl = card.Value<string>("rulings_uri");
                     if(!(rulingsUrl is null))
@@ -166,12 +166,12 @@ namespace Gatherer.Database
             realm.WriteCopy(config2);
         }
 
-        static void CreateColorList(JArray colors, IList<char> result)
+        static string CreateColorList(JArray colors)
         {
-            result.Clear();
+            string result = "";
             if (colors is null || colors.Count == 0)
             {
-                return;
+                return "";
             }
             HashSet<string> colorsSet = new HashSet<string>();
             foreach (JToken color in colors)
@@ -184,24 +184,26 @@ namespace Gatherer.Database
             }
             if (colorsSet.Contains("W"))
             {
-                result.Add('W');
+                result += "W";
             }
             if (colorsSet.Contains("U"))
             {
-                result.Add('U');
+                result += "U";
             }
             if (colorsSet.Contains("B"))
             {
-                result.Add('B');
+                result += "B";
             }
             if (colorsSet.Contains("R"))
             {
-                result.Add('R');
+                result += "R";
             }
             if (colorsSet.Contains("G"))
             {
-                result.Add('G');
+                result += "G";
             }
+
+            return result;
         }
 
         static void CreateRulingsList(string url, IList<Ruling> rulingsList)

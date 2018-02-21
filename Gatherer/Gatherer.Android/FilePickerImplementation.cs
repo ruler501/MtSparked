@@ -112,14 +112,39 @@ namespace Gatherer.Droid
             {
 
                 Context ctx = this.context;
-
-                ContentResolver cr = ctx.ContentResolver;
-                ICursor cursor = cr.Query(Android.Net.Uri.Parse(path), null, null, null, null);
-                return (!(cursor is null) && cursor.MoveToFirst());
+                try
+                {
+                    ContentResolver cr = ctx.ContentResolver;
+                    ICursor cursor = cr.Query(Android.Net.Uri.Parse(path), null, null, null, null);
+                    return (!(cursor is null) && cursor.MoveToFirst());
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             }
             else
             {
                 return System.IO.File.Exists(path);
+            }
+        }
+
+        public void ShareFile(string path, string fileType = "text/*")
+        {
+            Intent sharingIntent = new Intent(Intent.ActionSend);
+            sharingIntent.SetType(fileType);
+            sharingIntent.PutExtra(Intent.ExtraStream, Android.Net.Uri.Parse(path));
+
+            this.context.StartActivity(Intent.CreateChooser(sharingIntent, "Share Deck With"));
+        }
+
+        public void ReleaseFile(string path)
+        {
+            if (path.StartsWith("content://"))
+            {
+                this.context.ContentResolver.ReleasePersistableUriPermission(Android.Net.Uri.Parse(path),
+                                                                             ActivityFlags.GrantReadUriPermission |
+                                                                              ActivityFlags.GrantWriteUriPermission);
             }
         }
 

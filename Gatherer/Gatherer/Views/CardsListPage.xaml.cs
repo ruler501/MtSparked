@@ -16,21 +16,14 @@ namespace Gatherer.Views
 	public partial class CardsListPage : ContentPage
 	{
         CardsViewModel viewModel;
-
-        public CardsListPage()
-        {
-            InitializeComponent();
-
-            var query = CardDataStore.Where("TypeLine", "Contains", "Planeswalker").ToDataStore();
-
-            BindingContext = viewModel = new CardsViewModel(query);
-        }
+        CardDataStore Cards;
 
         public CardsListPage(CardDataStore cards)
         {
             InitializeComponent();
+            this.Cards = cards;
             
-            BindingContext = viewModel = new CardsViewModel(cards);
+            BindingContext = viewModel = new CardsViewModel(this.Cards);
         }
 
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
@@ -51,6 +44,11 @@ namespace Gatherer.Views
 
             if (viewModel.Items.Count == 0)
                 viewModel.LoadItemsCommand.Execute(null);
+        }
+
+        public void ToggleUnique(object sender, EventArgs args)
+        {
+            ConfigurationManager.ShowUnique = !ConfigurationManager.ShowUnique;
         }
     }
 }

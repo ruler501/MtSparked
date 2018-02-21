@@ -14,9 +14,19 @@ namespace Gatherer.Models
 {
     public class Deck
     {
-        public const string MASTER = "Master";
+        public const string MASTER = "Total";
 
-        public string Name { get; set; }
+        private string name;
+        public string Name
+        {
+            get => name;
+            set
+            {
+                this.name = value;
+                this.SaveDeck();
+                this.changeEventSource.Raise(this, new NameChangedEventArgs(value));
+            }
+        }
         public string StoragePath { get; set; }
         public IDictionary<string, IDictionary<string, BoardItem>> Boards;
         public IDictionary<string, ISet<string>> CardsByName { get; set; }
@@ -113,26 +123,30 @@ namespace Gatherer.Models
 
         public async void SaveDeckAs()
         {
-            if (Loading) return;
+            if (Loading || this.StoragePath is null) return;
 
             string text = this.ToString();
             byte[] fileContents = Encoding.UTF8.GetBytes(text);
 
-            FileData file = await ConfigurationManager.FilePicker.SaveFileAs(fileContents, this.Name);
+            FileData file = await ConfigurationManager.FilePicker.SaveFileAs(fileContents, this.Name + ".jdec");
             if(file is null)
             {
                 // Note failed save
                 return;
             }
 
-            this.StoragePath = file.FilePath;
-
+            if(this.StoragePath != file.FilePath)
+            {
+                ConfigurationManager.FilePicker.ReleaseFile(this.StoragePath);
+                this.StoragePath = file.FilePath;
+            }
+            
             this.changeEventSource.Raise(this, new PathChangedEventArgs(this.StoragePath));
         }
 
         public void SaveDeck()
         {
-            if (Loading) return;
+            if (Loading || this.StoragePath is null) return;
 
             string text = this.ToString();
             byte[] fileContents = Encoding.UTF8.GetBytes(text);
@@ -328,29 +342,60 @@ namespace Gatherer.Models
 
         public int GetNormalCount(Card card, string boardName=MASTER)
         {
-            if (!this.Boards.ContainsKey(boardName) || !this.Boards[boardName].ContainsKey(card.Id))
-            {
-                return 0;
-            }
-            return this.Boards[boardName][card.Id].NormalCount;
+            return this.GetCountInternal(card.Id, boardName, bi => bi.NormalCount);
         }
 
         public int GetFoilCount(Card card, string boardName=MASTER)
         {
-            if (!this.Boards.ContainsKey(boardName) || !this.Boards[boardName].ContainsKey(card.Id))
-            {
-                return 0;
-            }
-            return this.Boards[boardName][card.Id].FoilCount;
+            return this.GetCountInternal(card.Id, boardName, bi => bi.FoilCount);
         }
 
         public int GetCount(string id, string boardName = MASTER)
         {
-            if (!this.Boards.ContainsKey(boardName) || !this.Boards[boardName].ContainsKey(id))
+            return this.GetCountInternal(id, boardName, bi => bi.Count);
+        }
+
+        private int GetCountInternal(string id, string boardName, Func<BoardItem, int> toCount)
+        {
+            if (!this.BoardNames.Contains(boardName) || !this.Boards[boardName].ContainsKey(id))
             {
                 return 0;
             }
-            return this.Boards[boardName][id].Count;
+            return toCount(this.Boards[boardName][id]);
+        }
+
+        private int GetCountByNameInternal(string name, string boardName, Func<BoardItem, int> toCount)
+        {
+            if (!this.BoardNames.Contains(boardName) || !this.CardNames.Contains(name))
+            {
+                return 0;
+            }
+            IDictionary<string, BoardItem> board = this.Boards[boardName];
+            ISet<string> ids = this.CardsByName[name];
+            int sum = 0;
+            foreach(string id in ids)
+            {
+                if (board.ContainsKey(id))
+                {
+                    sum += toCount(board[id]);
+                }
+            }
+            return sum;
+        }
+
+        public int GetCountByName(string id, string boardName = MASTER)
+        {
+            return this.GetCountByNameInternal(id, boardName, bi => bi.Count);
+        }
+
+        public int GetNormalCountByName(Card card, string boardName = MASTER)
+        {
+            return this.GetCountByNameInternal(card.Id, boardName, bi => bi.NormalCount);
+        }
+
+        public int GetFoilCountByName(Card card, string boardName = MASTER)
+        {
+            return this.GetCountInternal(card.Id, boardName, bi => bi.FoilCount);
         }
 
         public class BoardItem
@@ -423,5 +468,17 @@ namespace Gatherer.Models
         }
 
         public string Path => path;
+    }
+
+    public class NameChangedEventArgs : DeckChangedEventArgs
+    {
+        private string name;
+
+        public NameChangedEventArgs(string name)
+        {
+            this.name = name;
+        }
+
+        public string Name => name;
     }
 }

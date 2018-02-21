@@ -46,6 +46,9 @@ namespace Gatherer.Droid
                 intent = new Intent(Intent.ActionOpenDocument);
                 requestCode = READ_REQUEST_CODE;
             }
+            intent.AddFlags(ActivityFlags.GrantPersistableUriPermission |
+                            ActivityFlags.GrantReadUriPermission |
+                            ActivityFlags.GrantWriteUriPermission);
             intent.SetType("*/*");
             intent.AddCategory(Intent.CategoryOpenable);
 
@@ -73,11 +76,16 @@ namespace Gatherer.Droid
             {
                 try
                 {
+                    ActivityFlags takeFlags = data.Flags & (ActivityFlags.GrantReadUriPermission |
+                                                            ActivityFlags.GrantWriteUriPermission);
+                    this.context.ContentResolver.TakePersistableUriPermission(data.Data, takeFlags);
+
                     FilePickerEventArgs args = new FilePickerEventArgs(data.Data.ToString(), this.GetFileName(data.Data), this.ReadData(data.Data));
                     OnFilePicked(args);
                 }
-                catch (Exception)
+                catch (Exception exc)
                 {
+                    System.Diagnostics.Debug.Write(exc);
                     // Notify user file picking failed.
                     OnFilePickCancelled();
                 }

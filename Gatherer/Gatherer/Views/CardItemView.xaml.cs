@@ -36,16 +36,26 @@ namespace Gatherer.Views
             if (this.BindingContext is null) return;
             string board = Deck.MASTER;
             string id = null;
+            string name = null;
             if (this.BindingContext is DeckViewModel.CardWithBoard cwb)
             {
                 board = cwb.Board;
                 id = cwb.Id;
+                name = cwb.Name;
             }
             else if(this.BindingContext is Card c)
             {
                 id = c.Id;
+                name = c.Name;
             }
-            this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(id, board).ToString();
+            if (ConfigurationManager.ShowUnique)
+            {
+                this.Count.Text = ConfigurationManager.ActiveDeck.GetCountByName(name, board).ToString();
+            }
+            else
+            {
+                this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(id, board).ToString();
+            }
         }
     }
 }
