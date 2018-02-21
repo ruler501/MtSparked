@@ -31,6 +31,7 @@ namespace Gatherer.ViewModels
 
         public void UpdateBoards(object sender = null, DeckChangedEventArgs args = null)
         {
+            this.Boards.Clear();
             foreach (KeyValuePair<string, IDictionary<string, Deck.BoardItem>> pair in this.Deck.Boards)
             {
                 string name = pair.Key;

@@ -7,6 +7,8 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using System.IO;
+using Acr.UserDialogs;
+using Xamarin.Forms;
 
 namespace Gatherer.Droid
 {
@@ -33,8 +35,11 @@ namespace Gatherer.Droid
                 }
             }
 
-            Xamarin.Forms.Forms.SetFlags("FastRenderers_Experimental");
-            global::Xamarin.Forms.Forms.Init(this, bundle);
+            //Forms.SetFlags("FastRenderers_Experimental");
+            Forms.Init(this, bundle);
+
+            UserDialogs.Init(this);
+
             LoadApplication(new App());
         }
     }

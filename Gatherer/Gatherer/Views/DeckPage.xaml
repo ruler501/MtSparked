@@ -4,6 +4,9 @@
              x:Class="Gatherer.Views.DeckPage"
              xmlns:views="clr-namespace:Gatherer.Views"
              Title="{Binding Name}">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Manage" Clicked="ManageDeck" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ListView x:Name="BoardList"
                   GroupDisplayBinding="{Binding Name}"

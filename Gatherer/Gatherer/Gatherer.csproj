@@ -8,6 +8,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
     <PackageReference Include="Realm.Database" Version="2.1.0" />
     <PackageReference Include="ThomasLevesque.WeakEvent" Version="2.1.0" />

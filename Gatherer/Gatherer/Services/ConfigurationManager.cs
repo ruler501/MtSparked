@@ -1,10 +1,12 @@
-﻿using Gatherer.Models;
+﻿using Gatherer.FilePicker;
+using Gatherer.Models;
 using Plugin.Settings;
 using Plugin.Settings.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Xamarin.Forms;
 
 namespace Gatherer.Services
 {
@@ -18,21 +20,22 @@ namespace Gatherer.Services
             {
                 if(activeDeck is null)
                 {
-                    string activeDeckName = AppSettings.GetValueOrDefault(ACTIVE_DECK_KEY, null);
-                    if(activeDeckName is null)
+                    string activeDeckPath = AppSettings.GetValueOrDefault(ACTIVE_DECK_KEY, null);
+                    if(activeDeckPath is null)
                     {
                         var documentsPath = Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
                         ActiveDeck = new Deck(Path.Combine(documentsPath, DEFAULT_DECK_PATH));
                     }
                     else
                     {
-                        ActiveDeck = new Deck(activeDeckName);
+                        ActiveDeck = new Deck(activeDeckPath);
                     }
                 }
                 return activeDeck;
             }
             set
             {
+                if (!(activeDeck is null)) activeDeck.ChangeEvent -= ConfigurationManager.UpdateDeckPath;
                 activeDeck = value;
                 if(activeDeck is null)
                 {
@@ -40,7 +43,7 @@ namespace Gatherer.Services
                     activeDeck = new Deck(Path.Combine(documentsPath, DEFAULT_DECK_PATH));
                 }
 
-                if (File.Exists(activeDeck.StoragePath))
+                if (FilePicker.PathExists(activeDeck.StoragePath))
                 {
                     AppSettings.AddOrUpdateValue(ACTIVE_DECK_KEY, activeDeck.StoragePath);
                 }
@@ -50,7 +53,12 @@ namespace Gatherer.Services
                     activeDeck.StoragePath = Path.Combine(documentsPath, DEFAULT_DECK_PATH);
                     AppSettings.AddOrUpdateValue(ACTIVE_DECK_KEY, activeDeck.StoragePath);
                 }
-            } }
+                if (!(activeDeck is null)) activeDeck.ChangeEvent += ConfigurationManager.UpdateDeckPath;
+            }
+        }
+
+        private static IFilePicker filePicker = null;
+        public static IFilePicker FilePicker => filePicker ?? (filePicker = DependencyService.Get<IFilePicker>());
 
         private static ISettings AppSettings
         {
@@ -60,23 +68,11 @@ namespace Gatherer.Services
             }
         }
 
-        #region Setting Constants
-
-        private const string SettingsKey = "settings_key";
-        private static readonly string SettingsDefault = string.Empty;
-
-        #endregion
-
-
-        public static string GeneralSettings
+        private static void UpdateDeckPath(object sender, DeckChangedEventArgs args)
         {
-            get
+            if(args is PathChangedEventArgs pathChange)
             {
-                return AppSettings.GetValueOrDefault(SettingsKey, SettingsDefault);
-            }
-            set
-            {
-                AppSettings.AddOrUpdateValue(SettingsKey, value);
+                AppSettings.AddOrUpdateValue(ACTIVE_DECK_KEY, pathChange.Path);
             }
         }
     }

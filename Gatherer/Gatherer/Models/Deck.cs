@@ -1,4 +1,5 @@
-﻿using Gatherer.Services;
+﻿using Gatherer.FilePicker;
+using Gatherer.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -52,21 +53,31 @@ namespace Gatherer.Models
         {
 
             this.CardsByName = new Dictionary<string, ISet<string>>();
-            if (File.Exists(path))
+            if (ConfigurationManager.FilePicker.PathExists(path))
             {
                 Loading = true;
                 this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>()
                 {
                     [MASTER] = new Dictionary<string, BoardItem>()
                 };
-                using (StreamReader file = File.OpenText(path))
-                using(JsonTextReader reader = new JsonTextReader(file))
+
+                byte[] fileData = ConfigurationManager.FilePicker.OpenFile(path);
+
+                using (MemoryStream file = new MemoryStream(fileData))
+                using (StreamReader textFile = new StreamReader(file, Encoding.UTF8))
+                using (JsonTextReader reader = new JsonTextReader(textFile))
                 {
                     JObject deck = (JObject)JToken.ReadFrom(reader);
 
                     this.Name = (string)deck["Name"];
+                    JArray boardNames = (JArray)deck["BoardNames"];
+                    foreach (string boardName in boardNames)
+                    {
+                        this.Boards[boardName] = new Dictionary<string, BoardItem>();
+                    }
+
                     JArray cards = (JArray)deck["Cards"];
-                    foreach(JObject card in cards)
+                    foreach (JObject card in cards)
                     {
                         string cardId = (string)card["CardId"];
 
@@ -85,6 +96,7 @@ namespace Gatherer.Models
                         }
                     }
                 }
+                this.StoragePath = path;
                 Loading = false;
             }
             else
@@ -99,20 +111,51 @@ namespace Gatherer.Models
             }
         }
 
+        public async void SaveDeckAs()
+        {
+            if (Loading) return;
+
+            string text = this.ToString();
+            byte[] fileContents = Encoding.UTF8.GetBytes(text);
+
+            FileData file = await ConfigurationManager.FilePicker.SaveFileAs(fileContents, this.Name);
+            if(file is null)
+            {
+                // Note failed save
+                return;
+            }
+
+            this.StoragePath = file.FilePath;
+
+            this.changeEventSource.Raise(this, new PathChangedEventArgs(this.StoragePath));
+        }
+
         public void SaveDeck()
         {
             if (Loading) return;
+
+            string text = this.ToString();
+            byte[] fileContents = Encoding.UTF8.GetBytes(text);
+
+            ConfigurationManager.FilePicker.SaveFile(fileContents, this.StoragePath);
+        }
+
+        public override string ToString()
+        {
             JObject result = new JObject
             {
-                ["Name"] = this.Name
+                ["Name"] = this.Name,
+                ["BoardNames"] = new JArray(this.BoardNames)
             };
             JArray cards = new JArray();
             foreach(BoardItem bi in this.Boards[MASTER].Values)
             {
-                JObject card = new JObject();
                 string cardId = bi.Card.Id;
-                card["CardId"] = cardId;
-                card["CardName"] = bi.Card.Name;
+                JObject card = new JObject
+                {
+                    ["CardId"] = cardId,
+                    ["CardName"] = bi.Card.Name
+                };
 
                 JArray boards = new JArray();
 
@@ -138,10 +181,8 @@ namespace Gatherer.Models
                 cards.Add(card);
             }
             result["Cards"] = cards;
-
-
-            string fileContents = result.ToString();
-            File.WriteAllText(this.StoragePath, fileContents);
+            
+            return result.ToString();
         }
 
         public void AddBoard(string name)
@@ -152,6 +193,18 @@ namespace Gatherer.Models
             }
 
             this.Boards[name] = new Dictionary<string, BoardItem>();
+            this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, true));
+            this.SaveDeck();
+        }
+
+        public void RemoveBoard(string name)
+        {
+            if (Boards.ContainsKey(name) && name != MASTER)
+            {
+                this.Boards.Remove(name);
+            }
+            this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, false));
+            this.SaveDeck();
         }
 
         public void AddCard(Card card, string boardName=MASTER, bool normal = true, int amount=1)
@@ -200,7 +253,7 @@ namespace Gatherer.Models
                 Master[card.Id].FoilCount = boardItem.FoilCount;
             }
 
-            changeEventSource.Raise(this, new DeckChangedEventArgs(card, normal, amount));
+            changeEventSource.Raise(this, new CardCountChangedEventArgs(card, boardName, normal, amount));
 
             this.SaveDeck();
         }
@@ -268,7 +321,7 @@ namespace Gatherer.Models
                 }
             }
 
-            changeEventSource.Raise(this, new DeckChangedEventArgs(card, normal, amount));
+            changeEventSource.Raise(this, new CardCountChangedEventArgs(card, boardName, normal, -amount));
 
             this.SaveDeck();
         }
@@ -322,19 +375,53 @@ namespace Gatherer.Models
 
     public class DeckChangedEventArgs : EventArgs
     {
+    }
+
+    public class CardCountChangedEventArgs : DeckChangedEventArgs
+    {
         private Card card;
         private int amount;
         private bool normal;
+        private string board;
 
-        public DeckChangedEventArgs(Card card, bool normal, int amount)
+        public CardCountChangedEventArgs(Card card, string board, bool normal, int amount)
         {
             this.card = card;
+            this.board = board;
             this.amount = amount;
             this.normal = normal;
         }
 
         public Card Card => card;
         public int Amount => amount;
-        public bool Normal => Normal;
+        public bool Normal => normal;
+        public string Board => board;
+    }
+
+    public class BoardChangedEventArgs : DeckChangedEventArgs
+    {
+        private string board;
+        private bool added;
+
+        public BoardChangedEventArgs(string board, bool added)
+        {
+            this.board = board;
+            this.added = added;
+        }
+
+        public string Board => this.board;
+        public bool Added => this.Added;
+    }
+
+    public class PathChangedEventArgs : DeckChangedEventArgs
+    {
+        private string path;
+
+        public PathChangedEventArgs(string path)
+        {
+            this.path = path;
+        }
+
+        public string Path => path;
     }
 }
