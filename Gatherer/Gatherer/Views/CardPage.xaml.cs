@@ -31,6 +31,12 @@ namespace Gatherer.Views
             this.NormalCounters = new Dictionary<string, Label>();
 
             this.ToolbarItems.Clear();
+            ToolbarItem allWithArt = new ToolbarItem()
+            {
+                Text = "All With Same Art"
+            };
+            allWithArt.Clicked += this.AllWithArt;
+            this.ToolbarItems.Add(allWithArt);
             if(!(cards is null))
             {
                 this.cards = cards;
@@ -157,6 +163,11 @@ namespace Gatherer.Views
         {
             await Navigation.PushAsync(new CardPage(cards[index + 1], cards, index + 1));
             Navigation.RemovePage(this);
+        }
+
+        async void AllWithArt(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new CardsListPage(CardDataStore.Where("IllustrationId", "Equals", this.Card.IllustrationId).ToDataStore()));
         }
 
         double translatedX = 0;
