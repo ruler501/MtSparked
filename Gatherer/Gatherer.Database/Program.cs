@@ -129,18 +129,13 @@ namespace Gatherer.Database
                     if(!(rulingsUrl is null))
                     {
                         // Really slow
-                        // CreateRulingsList(rulingsUrl, value.Rulings);
+                        CreateRulingsList(rulingsUrl, value.Rulings);
                     }
 
                     //Need to populate TcgPlayerId will probably be slow
 
                     // What can we do with this?
                     bool? digital = card.Value<bool?>("digital");
-
-                    if(value.MultiverseId == "420967")
-                    {
-                        continue;
-                    }
 
                     cardsArray.Add(value);
                 }

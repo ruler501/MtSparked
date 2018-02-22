@@ -45,12 +45,12 @@ namespace Gatherer.ViewModels
             {
                 this.BoardByName.Clear();
                 ObservableCollection<Board> boards = new ObservableCollection<Board>();
-                foreach (KeyValuePair<string, IDictionary<string, Deck.BoardItem>> pair in this.Deck.Boards)
+                foreach (Deck.BoardInfo boardInfo in this.Deck.BoardInfos)
                 {
-                    string name = pair.Key;
-                    if (name == Deck.MASTER) continue;
+                    string name = boardInfo.Name;
+                    if (!boardInfo.Viewable) continue;
 
-                    List<Deck.BoardItem> boardItems = new List<Deck.BoardItem>(pair.Value.Values);
+                    List<Deck.BoardItem> boardItems = new List<Deck.BoardItem>(this.Deck.Boards[name].Values);
                     IEnumerable<CardWithBoard> cards = boardItems.OrderBy(bi => bi.Card.Cmc).ThenBy(bi => bi.Card.Name)
                                                                        .Select(bi => new CardWithBoard(bi.Card, name));
                     if (ConfigurationManager.ShowUnique)

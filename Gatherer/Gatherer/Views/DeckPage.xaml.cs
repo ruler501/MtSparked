@@ -6,9 +6,6 @@ using Gatherer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WeakEvent;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using static Gatherer.ViewModels.DeckViewModel;
@@ -69,7 +66,7 @@ namespace Gatherer.Views
             const string IMPORT_FROM_DEC = "Import from .dec(Unsupported)";
             const string EXPORT_TO_DEC = "Export to .dec(Unsupported)";
             const string SHARE_AS_DEC = "Share as .dec(Unsupported)";
-            const string MANAGE_BOARDS = "Manage Visible Boards(Unsupported)";
+            const string MANAGE_BOARDS = "Manage Visible Boards";
             const string ADD_BOARD = "Add Board";
             const string REMOVE_BOARD_PREFIX = "Remove Board: ";
             List<string> actions = new List<string>()
@@ -120,6 +117,10 @@ namespace Gatherer.Views
             else if(action == SHARE_DECK)
             {
                 ConfigurationManager.FilePicker.ShareFile(this.Deck.StoragePath);
+            }
+            else if(action == MANAGE_BOARDS)
+            {
+                await Navigation.PushAsync(new BoardEditing(this.Deck));
             }
             else if(action == ADD_BOARD)
             {

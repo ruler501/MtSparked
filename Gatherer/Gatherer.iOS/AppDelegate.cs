@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using Foundation;
+using Syncfusion.SfDataGrid.XForms.iOS;
 using UIKit;
 
 namespace Gatherer.iOS
@@ -24,7 +25,10 @@ namespace Gatherer.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
-            LoadApplication(new App());
+            
+            SfDataGridRenderer.Init();
+
+            LoadApplication(new Gatherer.App());
 
             var prepopulated = "cards.db.cache";
             var realmDB = "cards.db";

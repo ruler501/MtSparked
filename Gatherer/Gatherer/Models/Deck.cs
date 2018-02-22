@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -29,8 +31,9 @@ namespace Gatherer.Models
             }
         }
         public string StoragePath { get; set; }
-        public IDictionary<string, IDictionary<string, BoardItem>> Boards;
+        public IDictionary<string, IDictionary<string, BoardItem>> Boards { get; set; }
         public IDictionary<string, ISet<string>> CardsByName { get; set; }
+        public ObservableCollection<BoardInfo> BoardInfos { get; set; }
 
         public ICollection<string> BoardNames => this.Boards.Keys;
         public IDictionary<string, BoardItem> Master => this.Boards[MASTER];
@@ -56,6 +59,12 @@ namespace Gatherer.Models
                 ["Mainboard"] = new Dictionary<string, BoardItem>(),
                 ["Sideboard"] = new Dictionary<string, BoardItem>()
             };
+            this.BoardInfos = new ObservableCollection<BoardInfo>()
+            {
+                new BoardInfo(MASTER),
+                new BoardInfo("Mainboard"),
+                new BoardInfo("Sideboard")
+            };
             this.Name = "Unnamed";
 
             this.CardsByName = new Dictionary<string, ISet<string>>();
@@ -73,6 +82,7 @@ namespace Gatherer.Models
                     {
                         [MASTER] = new Dictionary<string, BoardItem>()
                     };
+                    this.BoardInfos = new ObservableCollection<BoardInfo>();
 
                     byte[] fileData = ConfigurationManager.FilePicker.OpenFile(path);
 
@@ -83,10 +93,20 @@ namespace Gatherer.Models
                         JObject deck = (JObject)JToken.ReadFrom(reader);
 
                         this.Name = (string)deck["Name"];
-                        JArray boardNames = (JArray)deck["BoardNames"];
-                        foreach (string boardName in boardNames)
+                        JArray boardInfos = (JArray)deck["Boards"];
+                        bool containedMaster = false;
+                        foreach (JObject boardInfo in boardInfos)
                         {
-                            this.Boards[boardName] = new Dictionary<string, BoardItem>();
+                            string name = (string)boardInfo["Name"];
+                            bool viewable = (bool)boardInfo["Viewable"];
+                            bool editable = (bool)boardInfo["Editable"];
+                            this.BoardInfos.Add(new BoardInfo(name, viewable, editable));
+                            this.Boards[name] = new Dictionary<string, BoardItem>();
+                            containedMaster |= name == MASTER;
+                        }
+                        if (!containedMaster)
+                        {
+                            this.BoardInfos.Add(new BoardInfo(MASTER));
                         }
 
                         JArray cards = (JArray)deck["Cards"];
@@ -120,6 +140,12 @@ namespace Gatherer.Models
                         ["Mainboard"] = new Dictionary<string, BoardItem>(),
                         ["Sideboard"] = new Dictionary<string, BoardItem>()
                     };
+                    this.BoardInfos = new ObservableCollection<BoardInfo>()
+                    {
+                        new BoardInfo(MASTER),
+                        new BoardInfo("Mainboard"),
+                        new BoardInfo("Sideboard")
+                    };
                     this.Name = "Unnamed";
                 }
                 finally
@@ -134,6 +160,12 @@ namespace Gatherer.Models
                     [MASTER] = new Dictionary<string, BoardItem>(),
                     ["Mainboard"] = new Dictionary<string, BoardItem>(),
                     ["Sideboard"] = new Dictionary<string, BoardItem>()
+                };
+                this.BoardInfos = new ObservableCollection<BoardInfo>()
+                {
+                    new BoardInfo(MASTER),
+                    new BoardInfo("Mainboard"),
+                    new BoardInfo("Sideboard")
                 };
                 this.Name = "Unnamed";
             }
@@ -179,8 +211,19 @@ namespace Gatherer.Models
             JObject result = new JObject
             {
                 ["Name"] = this.Name,
-                ["BoardNames"] = new JArray(this.BoardNames)
             };
+            JArray boardInfos = new JArray();
+            foreach(BoardInfo info in this.BoardInfos)
+            {
+                boardInfos.Add(new JObject
+                {
+                    ["Name"] = info.Name,
+                    ["Viewable"] = info.Viewable,
+                    ["Editable"] = info.Editable
+                });
+            }
+            result["Boards"] = boardInfos;
+
             JArray cards = new JArray();
             foreach(BoardItem bi in this.Boards[MASTER].Values.OrderBy(bi => bi.Card.Name).ThenBy(bi => bi.Card.Id))
             {
@@ -228,7 +271,10 @@ namespace Gatherer.Models
             }
             preliminary = next;
 
-            // Make a board one line
+            // Make BoardInfo one line
+            preliminary = Regex.Replace(preliminary, @"(\{)\r?\n\s+(""Name"": "".*"",)\r?\n\s+(""Viewable"": (?:true|false),)\r?\n\s+(""Editable"": (?:true|false))\r?\n\s+(\},?)",
+                                     "$1 $2 $3 $4 $5");
+            // Make a BoardItem one line
             preliminary = Regex.Replace(preliminary, @"(\{)\r?\n\s+(""Name"": "".*"",)\r?\n\s+(""Normal"": [0-9]+,)\r?\n\s+(""Foil"": [0-9]+)\r?\n\s+(\},?)", "$1 $2 $3 $4 $5");
 
             // Remove newline after open bracket
@@ -259,6 +305,7 @@ namespace Gatherer.Models
             }
 
             this.Boards[name] = new Dictionary<string, BoardItem>();
+            this.BoardInfos.Add(new BoardInfo(name));
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, true));
             this.SaveDeck();
         }
@@ -268,6 +315,14 @@ namespace Gatherer.Models
             if (Boards.ContainsKey(name) && name != MASTER)
             {
                 this.Boards.Remove(name);
+            }
+            for(int i=0; i < this.BoardInfos.Count; i++)
+            {
+                if(this.BoardInfos[i].Name == name)
+                {
+                    this.BoardInfos.RemoveAt(i);
+                    break;
+                }
             }
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, false));
             this.SaveDeck();
@@ -467,6 +522,12 @@ namespace Gatherer.Models
             return this.GetCountInBoardInternal(name, bi => bi.Count);
         }
 
+        public void BoardInfoRefreshed()
+        {
+            this.changeEventSource.Raise(this, new BoardChangedEventArgs(null, false));
+            this.SaveDeck();
+        }
+
         public class BoardItem
         {
             public Card Card { get; set; }
@@ -483,6 +544,29 @@ namespace Gatherer.Models
                     FoilCount = FoilCount,
                     NormalCount = NormalCount
                 };
+            }
+        }
+
+        public class BoardInfo : Model
+        {
+            private string name = "";
+            public string Name { get => name; set => SetProperty(ref name, value); }
+            private bool viewable = true; 
+            public bool Viewable { get => viewable; set => SetProperty(ref viewable, value); }
+            private bool editable = true;
+            public bool Editable { get => editable; set => SetProperty(ref editable, value); }
+            
+            public BoardInfo() { }
+
+            public BoardInfo(string name)
+                : this(name, true, true)
+            { }
+
+            public BoardInfo(string name, bool viewable, bool editable)
+            {
+                this.name = name;
+                this.viewable = viewable;
+                this.editable = editable;
             }
         }
     }

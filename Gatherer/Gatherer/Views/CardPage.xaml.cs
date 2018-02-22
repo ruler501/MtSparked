@@ -64,9 +64,11 @@ namespace Gatherer.Views
 
             int row = 3;
             Deck deck = ConfigurationManager.ActiveDeck;
-            foreach(string board in deck.BoardNames.OrderBy(n => n != Deck.MASTER))
+            foreach(Deck.BoardInfo boardInfo in deck.BoardInfos)
             {
-                string capturableBoard = board;
+                if (!boardInfo.Editable) continue;
+                
+                string name = boardInfo.Name;
 
                 this.GridView.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(20) });
                 Button minus = new Button()
@@ -75,7 +77,7 @@ namespace Gatherer.Views
                     FontSize = 10,
                     Margin = 0
                 };
-                minus.Clicked += (_s, _e) => this.RemoveCard(capturableBoard, false);
+                minus.Clicked += (_s, _e) => this.RemoveCard(name, false);
                 this.GridView.Children.Add(minus, 0, row);
                 Label foil = new Label()
                 {
@@ -83,19 +85,19 @@ namespace Gatherer.Views
                     HorizontalTextAlignment = TextAlignment.Center
                 };
                 this.GridView.Children.Add(foil, 1, row);
-                this.FoilCounters[board] = foil;
+                this.FoilCounters[name] = foil;
                 Button plus = new Button()
                 {
                     Text = "+",
                     FontSize = 10,
                     Margin = 0
                 };
-                plus.Clicked += (_s, _e) => this.AddCard(capturableBoard, false);
+                plus.Clicked += (_s, _e) => this.AddCard(name, false);
                 this.GridView.Children.Add(plus, 2, row);
 
                 this.GridView.Children.Add(new Label()
                 {
-                    Text = board,
+                    Text = name,
                     FontSize = 14,
                     HorizontalTextAlignment = TextAlignment.Center
                 }, 3, row);
@@ -106,7 +108,7 @@ namespace Gatherer.Views
                     FontSize = 10,
                     Margin = 0
                 };
-                minus.Clicked += (_s, _e) => this.RemoveCard(capturableBoard, true);
+                minus.Clicked += (_s, _e) => this.RemoveCard(name, true);
                 this.GridView.Children.Add(minus, 4, row);
                 Label normal = new Label()
                 {
@@ -114,14 +116,14 @@ namespace Gatherer.Views
                     HorizontalTextAlignment = TextAlignment.Center
                 };
                 this.GridView.Children.Add(normal, 5, row);
-                this.NormalCounters[board] = normal;
+                this.NormalCounters[name] = normal;
                 plus = new Button()
                 {
                     Text = "+",
                     FontSize = 10,
                     Margin = 0
                 };
-                plus.Clicked += (_s, _e) => this.AddCard(capturableBoard, true);
+                plus.Clicked += (_s, _e) => this.AddCard(name, true);
                 this.GridView.Children.Add(plus, 6, row);
                 row += 1;
             }

@@ -21,6 +21,8 @@ namespace Gatherer.UWP
         {
             this.InitializeComponent();
 
+            SfDataGridRenderer.Init();
+
             LoadApplication(new Gatherer.App());
         }
     }
