@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using WeakEvent;
 
 namespace Gatherer.Models
@@ -55,59 +56,76 @@ namespace Gatherer.Models
                 ["Mainboard"] = new Dictionary<string, BoardItem>(),
                 ["Sideboard"] = new Dictionary<string, BoardItem>()
             };
+            this.Name = "Unnamed";
 
             this.CardsByName = new Dictionary<string, ISet<string>>();
         }
 
         public Deck(string path)
         {
-
             this.CardsByName = new Dictionary<string, ISet<string>>();
             if (ConfigurationManager.FilePicker.PathExists(path))
             {
-                Loading = true;
-                this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>()
+                try
                 {
-                    [MASTER] = new Dictionary<string, BoardItem>()
-                };
-
-                byte[] fileData = ConfigurationManager.FilePicker.OpenFile(path);
-
-                using (MemoryStream file = new MemoryStream(fileData))
-                using (StreamReader textFile = new StreamReader(file, Encoding.UTF8))
-                using (JsonTextReader reader = new JsonTextReader(textFile))
-                {
-                    JObject deck = (JObject)JToken.ReadFrom(reader);
-
-                    this.Name = (string)deck["Name"];
-                    JArray boardNames = (JArray)deck["BoardNames"];
-                    foreach (string boardName in boardNames)
+                    Loading = true;
+                    this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>()
                     {
-                        this.Boards[boardName] = new Dictionary<string, BoardItem>();
-                    }
+                        [MASTER] = new Dictionary<string, BoardItem>()
+                    };
 
-                    JArray cards = (JArray)deck["Cards"];
-                    foreach (JObject card in cards)
+                    byte[] fileData = ConfigurationManager.FilePicker.OpenFile(path);
+
+                    using (MemoryStream file = new MemoryStream(fileData))
+                    using (StreamReader textFile = new StreamReader(file, Encoding.UTF8))
+                    using (JsonTextReader reader = new JsonTextReader(textFile))
                     {
-                        string cardId = (string)card["CardId"];
+                        JObject deck = (JObject)JToken.ReadFrom(reader);
 
-                        Card cardValue = CardDataStore.ById(cardId);
-
-                        JArray boards = (JArray)card["Boards"];
-                        // Must process Master first to prevent duplication
-                        foreach (JObject board in boards.OrderBy(b => (string)b["BoardName"] != MASTER))
+                        this.Name = (string)deck["Name"];
+                        JArray boardNames = (JArray)deck["BoardNames"];
+                        foreach (string boardName in boardNames)
                         {
-                            string boardName = (string)board["BoardName"];
-                            int normalCount = (int)board["NormalCount"];
-                            int foilCount = (int)board["FoilCount"];
+                            this.Boards[boardName] = new Dictionary<string, BoardItem>();
+                        }
 
-                            this.AddCard(cardValue, boardName, true, normalCount);
-                            this.AddCard(cardValue, boardName, false, foilCount);
+                        JArray cards = (JArray)deck["Cards"];
+                        foreach (JObject card in cards)
+                        {
+                            string cardId = (string)card["Id"];
+
+                            Card cardValue = CardDataStore.ById(cardId);
+
+                            JArray boards = (JArray)card["Boards"];
+                            // Must process Master first to prevent duplication
+                            foreach (JObject board in boards.OrderBy(b => (string)b["Name"] != MASTER))
+                            {
+                                string boardName = (string)board["Name"];
+                                int normalCount = (int)board["Normal"];
+                                int foilCount = (int)board["Foil"];
+
+                                this.AddCard(cardValue, boardName, true, normalCount);
+                                this.AddCard(cardValue, boardName, false, foilCount);
+                            }
                         }
                     }
+                    this.StoragePath = path;
                 }
-                this.StoragePath = path;
-                Loading = false;
+                catch(Exception exc)
+                {
+                    System.Diagnostics.Debug.WriteLine(exc);
+                    this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>
+                    {
+                        [MASTER] = new Dictionary<string, BoardItem>(),
+                        ["Mainboard"] = new Dictionary<string, BoardItem>(),
+                        ["Sideboard"] = new Dictionary<string, BoardItem>()
+                    };
+                    this.Name = "Unnamed";
+                }
+                finally
+                {
+                    Loading = false;
+                }
             }
             else
             {
@@ -146,7 +164,9 @@ namespace Gatherer.Models
 
         public void SaveDeck()
         {
-            if (Loading || this.StoragePath is null) return;
+            if (Loading) return;
+
+            if (this.StoragePath is null) this.StoragePath = ConfigurationManager.DefaultDeckPath;
 
             string text = this.ToString();
             byte[] fileContents = Encoding.UTF8.GetBytes(text);
@@ -162,13 +182,13 @@ namespace Gatherer.Models
                 ["BoardNames"] = new JArray(this.BoardNames)
             };
             JArray cards = new JArray();
-            foreach(BoardItem bi in this.Boards[MASTER].Values)
+            foreach(BoardItem bi in this.Boards[MASTER].Values.OrderBy(bi => bi.Card.Name).ThenBy(bi => bi.Card.Id))
             {
                 string cardId = bi.Card.Id;
                 JObject card = new JObject
                 {
-                    ["CardId"] = cardId,
-                    ["CardName"] = bi.Card.Name
+                    ["Name"] = bi.Card.Name,
+                    ["Id"] = cardId
                 };
 
                 JArray boards = new JArray();
@@ -184,9 +204,9 @@ namespace Gatherer.Models
 
                         JObject board = new JObject
                         {
-                            ["BoardName"] = name,
-                            ["NormalCount"] = normalCount,
-                            ["FoilCount"] = foilCount
+                            ["Name"] = name,
+                            ["Normal"] = normalCount,
+                            ["Foil"] = foilCount
                         };
                         boards.Add(board);
                     }
@@ -196,7 +216,39 @@ namespace Gatherer.Models
             }
             result["Cards"] = cards;
             
-            return result.ToString();
+            string preliminary = result.ToString();
+
+            // Collapse BoardNames to one line by combining lines one at a time
+            string prev = null;
+            string next = preliminary;
+            while(prev != next)
+            {
+                prev = next;
+                next = Regex.Replace(prev, @"(\[[^\]\r?\n]*)\r?\n\s+(""|\])", "$1 $2");
+            }
+            preliminary = next;
+
+            // Make a board one line
+            preliminary = Regex.Replace(preliminary, @"(\{)\r?\n\s+(""Name"": "".*"",)\r?\n\s+(""Normal"": [0-9]+,)\r?\n\s+(""Foil"": [0-9]+)\r?\n\s+(\},?)", "$1 $2 $3 $4 $5");
+
+            // Remove newline after open bracket
+            preliminary = Regex.Replace(preliminary, @"(\[)\r?\n\s+(\{[^\]\n]*\},?)", "$1 $2");
+            // Remove newline before close bracket
+            preliminary = Regex.Replace(preliminary, @"(\{[^\]\n]*\},?)\r?\n\s+(\])", "$1, $2");
+
+            // Remove newline after open brace
+            preliminary = Regex.Replace(preliminary, @"(\{)\r?\n\s+", "$1 ");
+            // Remove newline before close bace
+            preliminary = Regex.Replace(preliminary, @"\r?\n\s*(\},?)", " $1");
+
+            // Remove two indents from everything
+            preliminary = Regex.Replace(preliminary, @"\n(?:  ){1,2}", "\n");
+            // Remove space after colon
+            preliminary = Regex.Replace(preliminary, ": ", ":");
+            // Line up board definitions
+            preliminary = Regex.Replace(preliminary, @"\},\n    \{", "},\n             {");
+
+            return preliminary;
         }
 
         public void AddBoard(string name)
@@ -383,19 +435,36 @@ namespace Gatherer.Models
             return sum;
         }
 
-        public int GetCountByName(string id, string boardName = MASTER)
+        public int GetCountByName(string name, string boardName = MASTER)
         {
-            return this.GetCountByNameInternal(id, boardName, bi => bi.Count);
+            return this.GetCountByNameInternal(name, boardName, bi => bi.Count);
         }
 
         public int GetNormalCountByName(Card card, string boardName = MASTER)
         {
-            return this.GetCountByNameInternal(card.Id, boardName, bi => bi.NormalCount);
+            return this.GetCountByNameInternal(card.Name, boardName, bi => bi.NormalCount);
         }
 
         public int GetFoilCountByName(Card card, string boardName = MASTER)
         {
-            return this.GetCountInternal(card.Id, boardName, bi => bi.FoilCount);
+            return this.GetCountByNameInternal(card.Name, boardName, bi => bi.FoilCount);
+        }
+        
+        private int GetCountInBoardInternal(string name, Func<BoardItem, int> toCount)
+        {
+            if (!this.BoardNames.Contains(name)) return 0;
+
+            int sum = 0;
+            foreach(BoardItem boardItem in this.Boards[name].Values)
+            {
+                sum += toCount(boardItem);
+            }
+            return sum;
+        }
+
+        public int GetCountInBoard(string name)
+        {
+            return this.GetCountInBoardInternal(name, bi => bi.Count);
         }
 
         public class BoardItem

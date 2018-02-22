@@ -3,14 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Gatherer.Views.CardPage">
     <ContentPage.Content>
-        <Grid x:Name="GridView" RowSpacing="0">
-            <!--
-            <Grid.GestureRecognizers>
-                <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
-            </Grid.GestureRecognizers>
-            -->
+        <Grid RowSpacing="0" Margin="0" x:Name="GridView">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="1"/>
                 <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -23,9 +19,12 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
             <ScrollView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" x:Name="ScrollView">
-                <Grid>
+                <Grid RowSpacing="0" Margin="0">
+                    <Grid.GestureRecognizers>
+                        <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+                    </Grid.GestureRecognizers>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="560"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="Auto"/>
@@ -34,7 +33,7 @@
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Source="{Binding FullImageUrl}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+                    <Image Source="{Binding FullImageUrl}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HeightRequest="500" MinimumWidthRequest="400"/>
                     <Label Text="{Binding Name}" Grid.Row="1" Grid.Column="0"
                                             LineBreakMode="NoWrap"
                                             FontSize="12" />
@@ -49,10 +48,11 @@
                     <Label Text="{Binding Text}" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
                 </Grid>
             </ScrollView>
-            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+            <BoxView BackgroundColor="Black" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7"/>
+            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                   Text="Foil" HorizontalTextAlignment="Center" FontSize="14"/>
+            <Label Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="3"
                    Text="Normal" HorizontalTextAlignment="Center" FontSize="14"/>
-            <Label Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="3"
-                   Text="Foils" HorizontalTextAlignment="Center" FontSize="14"/>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

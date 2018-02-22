@@ -62,7 +62,7 @@ namespace Gatherer.Views
                 }
             }
 
-            int row = 2;
+            int row = 3;
             Deck deck = ConfigurationManager.ActiveDeck;
             foreach(string board in deck.BoardNames.OrderBy(n => n != Deck.MASTER))
             {
@@ -72,23 +72,25 @@ namespace Gatherer.Views
                 Button minus = new Button()
                 {
                     Text = "-",
-                    FontSize = 16
+                    FontSize = 10,
+                    Margin = 0
                 };
-                minus.Clicked += (_s, _e) => this.RemoveCard(capturableBoard, true);
+                minus.Clicked += (_s, _e) => this.RemoveCard(capturableBoard, false);
                 this.GridView.Children.Add(minus, 0, row);
-                Label normal = new Label()
+                Label foil = new Label()
                 {
-                    FontSize = 14,
+                    FontSize = 16,
                     HorizontalTextAlignment = TextAlignment.Center
                 };
-                this.GridView.Children.Add(normal, 1, row);
-                this.NormalCounters[board] = normal;
+                this.GridView.Children.Add(foil, 1, row);
+                this.FoilCounters[board] = foil;
                 Button plus = new Button()
                 {
                     Text = "+",
-                    FontSize = 16
+                    FontSize = 10,
+                    Margin = 0
                 };
-                plus.Clicked += (_s, _e) => this.AddCard(capturableBoard, true);
+                plus.Clicked += (_s, _e) => this.AddCard(capturableBoard, false);
                 this.GridView.Children.Add(plus, 2, row);
 
                 this.GridView.Children.Add(new Label()
@@ -101,23 +103,25 @@ namespace Gatherer.Views
                 minus = new Button()
                 {
                     Text = "-",
-                    FontSize = 16
+                    FontSize = 10,
+                    Margin = 0
                 };
-                minus.Clicked += (_s, _e) => this.RemoveCard(capturableBoard, false);
+                minus.Clicked += (_s, _e) => this.RemoveCard(capturableBoard, true);
                 this.GridView.Children.Add(minus, 4, row);
-                Label foil = new Label()
+                Label normal = new Label()
                 {
-                    FontSize = 14,
+                    FontSize = 16,
                     HorizontalTextAlignment = TextAlignment.Center
                 };
-                this.GridView.Children.Add(foil, 5, row);
-                this.FoilCounters[board] = foil;
+                this.GridView.Children.Add(normal, 5, row);
+                this.NormalCounters[board] = normal;
                 plus = new Button()
                 {
                     Text = "+",
-                    FontSize = 16
+                    FontSize = 10,
+                    Margin = 0
                 };
-                plus.Clicked += (_s, _e) => this.AddCard(capturableBoard, false);
+                plus.Clicked += (_s, _e) => this.AddCard(capturableBoard, true);
                 this.GridView.Children.Add(plus, 6, row);
                 row += 1;
             }
@@ -129,17 +133,31 @@ namespace Gatherer.Views
 
         public void UpdateCounts(object sender=null, DeckChangedEventArgs args=null)
         {
-            foreach(KeyValuePair<string, Label> pair in NormalCounters)
+            foreach (KeyValuePair<string, Label> pair in NormalCounters)
             {
                 string board = pair.Key;
                 Label counter = pair.Value;
-                counter.Text = ConfigurationManager.ActiveDeck.GetNormalCount(Card, board).ToString();
+                if (ConfigurationManager.ShowUnique)
+                {
+                    counter.Text = ConfigurationManager.ActiveDeck.GetNormalCountByName(Card, board).ToString();
+                }
+                else
+                {
+                    counter.Text = ConfigurationManager.ActiveDeck.GetNormalCount(Card, board).ToString();
+                }
             }
             foreach (KeyValuePair<string, Label> pair in FoilCounters)
             {
                 string board = pair.Key;
                 Label counter = pair.Value;
-                counter.Text = ConfigurationManager.ActiveDeck.GetFoilCount(Card, board).ToString();
+                if (ConfigurationManager.ShowUnique)
+                {
+                    counter.Text = ConfigurationManager.ActiveDeck.GetFoilCountByName(Card, board).ToString();
+                }
+                else
+                {
+                    counter.Text = ConfigurationManager.ActiveDeck.GetFoilCount(Card, board).ToString();
+                }
             }
         }
 
@@ -155,14 +173,24 @@ namespace Gatherer.Views
 
         async void PrevCard(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new CardPage(cards[index - 1], cards, index - 1));
-            Navigation.RemovePage(this);
+            if (index <= 0) return;
+            if (Navigation.NavigationStack.Count == 0 ||
+                !(Navigation.NavigationStack.Last() is CardPage cp && cp.index == index - 1))
+            {
+                await Navigation.PushAsync(new CardPage(cards[index - 1], cards, index - 1));
+                Navigation.RemovePage(this);
+            }
         }
 
         async void NextCard(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new CardPage(cards[index + 1], cards, index + 1));
-            Navigation.RemovePage(this);
+            if (index < 0 || index >= cards.Count - 1) return;
+            if (Navigation.NavigationStack.Count == 0 ||
+                !(Navigation.NavigationStack.Last() is CardPage cp && cp.index == index + 1))
+            {
+                await Navigation.PushAsync(new CardPage(cards[index + 1], cards, index + 1));
+                Navigation.RemovePage(this);
+            }
         }
 
         async void AllWithArt(object sender, EventArgs e)
@@ -170,19 +198,22 @@ namespace Gatherer.Views
             await Navigation.PushAsync(new CardsListPage(CardDataStore.Where("IllustrationId", "Equals", this.Card.IllustrationId).ToDataStore()));
         }
 
-        double translatedX = 0;
         void OnPanUpdated(object sender, PanUpdatedEventArgs e)
         {
-            switch (e.StatusType)
+            if (e.StatusType == GestureStatus.Running)
             {
-                case GestureStatus.Running:
-                    this.ScrollView.TranslationX = translatedX + e.TotalX;
-                    break;
-
-                case GestureStatus.Completed:
-                    // Store the translation applied during the pan
-                    this.translatedX = Content.TranslationX;
-                    break;
+                if (e.TotalY < 40 && e.TotalY > -40)
+                {
+                    // this.ScrollView.TranslationX = translatedX + e.TotalX;
+                    if (e.TotalX > 80)
+                    {
+                        this.PrevCard(null, null);
+                    }
+                    if (e.TotalX < -80)
+                    {
+                        this.NextCard(null, null);
+                    }
+                }
             }
         }
     }

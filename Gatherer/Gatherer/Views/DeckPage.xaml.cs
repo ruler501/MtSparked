@@ -45,13 +45,17 @@ namespace Gatherer.Views
             }
            // Manually deselect item.
            ((ListView)sender).SelectedItem = null;
-            if(args.SelectedItem is Card card)
+            if (args.SelectedItem is CardWithBoard cwb)
             {
-                await Navigation.PushAsync(new CardPage(card, null, -1));
+                Board board = viewModel.BoardByName[cwb.Board];
+                int index = board.IndexOf(cwb);
+                List<Card> cards = board.Select(icwb => Deck.Boards[icwb.Board][icwb.Id].Card).ToList();
+
+                await Navigation.PushAsync(new CardPage(Deck.Boards[cwb.Board][cwb.Id].Card, cards, index));
             }
-            else if(args.SelectedItem is CardWithBoard cwb)
+            else
             {
-                await Navigation.PushAsync(new CardPage(Deck.Boards[cwb.Board][cwb.Id].Card, null, -1));
+                System.Diagnostics.Debug.WriteLine("Strangeness is happeneing");
             }
         }
 

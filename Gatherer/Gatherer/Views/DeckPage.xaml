@@ -5,8 +5,8 @@
              xmlns:views="clr-namespace:Gatherer.Views"
              Title="{Binding Name}">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Manage" Clicked="ManageDeck" />
         <ToolbarItem Text="Toggle Unique" Clicked="ToggleUnique"/>
+        <ToolbarItem Text="Manage" Clicked="ManageDeck" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ListView x:Name="BoardList"

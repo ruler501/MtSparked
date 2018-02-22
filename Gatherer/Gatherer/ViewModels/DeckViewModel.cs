@@ -15,6 +15,8 @@ namespace Gatherer.ViewModels
         ObservableCollection<Board> boards = new ObservableCollection<Board>();
         public ObservableCollection<Board> Boards { get => boards; set => SetProperty(ref boards, value); }
 
+        public IDictionary<string, Board> BoardByName = new Dictionary<string, Board>();
+
         Deck Deck;
 
         string name = "Unnamed";
@@ -41,6 +43,7 @@ namespace Gatherer.ViewModels
                      args is CardCountChangedEventArgs ||
                      args is BoardChangedEventArgs)
             {
+                this.BoardByName.Clear();
                 ObservableCollection<Board> boards = new ObservableCollection<Board>();
                 foreach (KeyValuePair<string, IDictionary<string, Deck.BoardItem>> pair in this.Deck.Boards)
                 {
@@ -54,7 +57,9 @@ namespace Gatherer.ViewModels
                     {
                         cards = cards.DistinctBy(cwb => cwb.Name);
                     }
-                    boards.Add(new Board(name, cards));
+                    Board board = new Board(name + ": " + this.Deck.GetCountInBoard(name).ToString(), cards);
+                    boards.Add(board);
+                    this.BoardByName[name] = board;
                 }
                 this.Boards = boards;
             }
