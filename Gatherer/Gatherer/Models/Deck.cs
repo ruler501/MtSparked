@@ -42,7 +42,6 @@ namespace Gatherer.Models
 
         private bool Loading = false;
 
-
         private readonly WeakEventSource<DeckChangedEventArgs> changeEventSource = new WeakEventSource<DeckChangedEventArgs>();
 
         public event EventHandler<DeckChangedEventArgs> ChangeEvent
@@ -70,19 +69,19 @@ namespace Gatherer.Models
             this.CardsByName = new Dictionary<string, ISet<string>>();
         }
 
-        public Deck(string path)
+        public static Deck FromJdec(string path)
         {
-            this.CardsByName = new Dictionary<string, ISet<string>>();
+            Deck self = new Deck();
             if (ConfigurationManager.FilePicker.PathExists(path))
             {
                 try
                 {
-                    Loading = true;
-                    this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>()
+                    self.Loading = true;
+                    self.Boards = new Dictionary<string, IDictionary<string, BoardItem>>()
                     {
                         [MASTER] = new Dictionary<string, BoardItem>()
                     };
-                    this.BoardInfos = new ObservableCollection<BoardInfo>();
+                    self.BoardInfos = new ObservableCollection<BoardInfo>();
 
                     byte[] fileData = ConfigurationManager.FilePicker.OpenFile(path);
 
@@ -92,7 +91,7 @@ namespace Gatherer.Models
                     {
                         JObject deck = (JObject)JToken.ReadFrom(reader);
 
-                        this.Name = (string)deck["Name"];
+                        self.Name = (string)deck["Name"];
                         JArray boardInfos = (JArray)deck["Boards"];
                         bool containedMaster = false;
                         foreach (JObject boardInfo in boardInfos)
@@ -100,13 +99,13 @@ namespace Gatherer.Models
                             string name = (string)boardInfo["Name"];
                             bool viewable = (bool)boardInfo["Viewable"];
                             bool editable = (bool)boardInfo["Editable"];
-                            this.BoardInfos.Add(new BoardInfo(name, viewable, editable));
-                            this.Boards[name] = new Dictionary<string, BoardItem>();
+                            self.BoardInfos.Add(new BoardInfo(name, viewable, editable));
+                            self.Boards[name] = new Dictionary<string, BoardItem>();
                             containedMaster |= name == MASTER;
                         }
                         if (!containedMaster)
                         {
-                            this.BoardInfos.Add(new BoardInfo(MASTER));
+                            self.BoardInfos.Add(new BoardInfo(MASTER));
                         }
 
                         JArray cards = (JArray)deck["Cards"];
@@ -124,51 +123,98 @@ namespace Gatherer.Models
                                 int normalCount = (int)board["Normal"];
                                 int foilCount = (int)board["Foil"];
 
-                                this.AddCard(cardValue, boardName, true, normalCount);
-                                this.AddCard(cardValue, boardName, false, foilCount);
+                                self.AddCard(cardValue, boardName, true, normalCount);
+                                self.AddCard(cardValue, boardName, false, foilCount);
                             }
                         }
                     }
-                    this.StoragePath = path;
+                    self.StoragePath = path;
                 }
-                catch(Exception exc)
+                catch (Exception exc)
                 {
                     System.Diagnostics.Debug.WriteLine(exc);
-                    this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>
-                    {
-                        [MASTER] = new Dictionary<string, BoardItem>(),
-                        ["Mainboard"] = new Dictionary<string, BoardItem>(),
-                        ["Sideboard"] = new Dictionary<string, BoardItem>()
-                    };
-                    this.BoardInfos = new ObservableCollection<BoardInfo>()
-                    {
-                        new BoardInfo(MASTER),
-                        new BoardInfo("Mainboard"),
-                        new BoardInfo("Sideboard")
-                    };
-                    this.Name = "Unnamed";
+                    self = new Deck();
                 }
                 finally
                 {
-                    Loading = false;
+                    self.Loading = false;
                 }
             }
-            else
+
+            return self;
+        }
+
+        public static Deck FromDec(string path)
+        {
+            Deck self = new Deck
             {
-                this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>
+                Name = "Unnamed",
+                StoragePath = ConfigurationManager.DefaultDeckPath
+            };
+            if (ConfigurationManager.FilePicker.PathExists(path))
+            {
+                try
                 {
-                    [MASTER] = new Dictionary<string, BoardItem>(),
-                    ["Mainboard"] = new Dictionary<string, BoardItem>(),
-                    ["Sideboard"] = new Dictionary<string, BoardItem>()
-                };
-                this.BoardInfos = new ObservableCollection<BoardInfo>()
+                    self.Loading = true;
+                    self.Boards = new Dictionary<string, IDictionary<string, BoardItem>>()
+                    {
+                        [MASTER] = new Dictionary<string, BoardItem>()
+                    };
+                    self.BoardInfos = new ObservableCollection<BoardInfo> { new BoardInfo(MASTER) };
+
+                    byte[] fileData = ConfigurationManager.FilePicker.OpenFile(path);
+
+                    string data = Encoding.UTF8.GetString(fileData);
+
+                    string[] lines = data.Split('\n');
+                    foreach (string linePreTrim in lines)
+                    {
+                        string line = linePreTrim.Trim();
+                        const string MVID = "mvid:";
+                        const string QTY = "qty:";
+                        const string LOC = "loc:";
+                        int mvidIndex = line.IndexOf(MVID);
+                        int qtyIndex = line.IndexOf(QTY);
+                        int locIndex = line.IndexOf(LOC);
+                        if (mvidIndex < 0 || qtyIndex < 0 || locIndex < 0)
+                        {
+                            continue;
+                        }
+
+                        int nextSpaceIndex = line.IndexOf(' ', mvidIndex);
+                        string mvid = line.Substring(mvidIndex + MVID.Length,
+                                                     nextSpaceIndex - mvidIndex - MVID.Length);
+
+                        nextSpaceIndex = line.IndexOf(' ', qtyIndex);
+                        string qty = line.Substring(qtyIndex + QTY.Length,
+                                                    nextSpaceIndex - qtyIndex - QTY.Length);
+
+                        string loc = line.Substring(locIndex + LOC.Length);
+
+                        Card card = CardDataStore.ByMvid(mvid);
+                        if(card is null)
+                        {
+                            continue;
+                        }
+
+                        int count = Int32.Parse(qty);
+
+                        if (loc == MASTER) loc = MASTER + "-1";
+
+                        self.AddCard(card, loc, true, count);
+                    }
+                }
+                catch (Exception exc)
                 {
-                    new BoardInfo(MASTER),
-                    new BoardInfo("Mainboard"),
-                    new BoardInfo("Sideboard")
-                };
-                this.Name = "Unnamed";
+                    System.Diagnostics.Debug.WriteLine(exc);
+                    self = new Deck();
+                }
+                finally
+                {
+                    self.Loading = false;
+                }
             }
+            return self;
         }
 
         public async void SaveDeckAs()
@@ -194,6 +240,32 @@ namespace Gatherer.Models
             this.changeEventSource.Raise(this, new PathChangedEventArgs(this.StoragePath));
         }
 
+        public async void SaveAsDec()
+        {
+            if (Loading) return;
+
+            string text = this.AsDec();
+            byte[] fileContents = Encoding.UTF8.GetBytes(text);
+
+            FileData file = await ConfigurationManager.FilePicker.SaveFileAs(fileContents, this.Name + ".dec");
+            if (file is null)
+            {
+                // Note failed save
+                return;
+            }
+        }
+
+        public void SaveTempDec()
+        {
+            if (Loading) return;
+
+            string text = this.AsDec();
+
+            byte[] fileContents = Encoding.UTF8.GetBytes(text);
+
+            ConfigurationManager.FilePicker.SaveFile(fileContents, ConfigurationManager.DefaultTempDecPath);
+        }
+
         public void SaveDeck()
         {
             if (Loading) return;
@@ -201,6 +273,7 @@ namespace Gatherer.Models
             if (this.StoragePath is null) this.StoragePath = ConfigurationManager.DefaultDeckPath;
 
             string text = this.ToString();
+
             byte[] fileContents = Encoding.UTF8.GetBytes(text);
 
             ConfigurationManager.FilePicker.SaveFile(fileContents, this.StoragePath);
@@ -236,10 +309,10 @@ namespace Gatherer.Models
 
                 JArray boards = new JArray();
 
-                foreach(KeyValuePair<string, IDictionary<string, BoardItem>> pair in this.Boards.OrderBy(p => p.Key))
+                foreach(BoardInfo boardInfo in this.BoardInfos)
                 {
-                    string name = pair.Key;
-                    IDictionary<string, BoardItem> boardValue = pair.Value;
+                    string name = boardInfo.Name;
+                    IDictionary<string, BoardItem> boardValue = this.Boards[name];
                     if (boardValue.ContainsKey(cardId))
                     {
                         int normalCount = boardValue[cardId].NormalCount;
@@ -295,6 +368,32 @@ namespace Gatherer.Models
             preliminary = Regex.Replace(preliminary, @"\},\n    \{", "},\n             {");
 
             return preliminary;
+        }
+
+        public string AsDec()
+        {
+            string result = "";
+            foreach(BoardInfo boardInfo in this.BoardInfos)
+            {
+                string name = boardInfo.Name;
+                if (name == MASTER) continue;
+                string loc;
+                if (name == "Sideboard" || name == "Commander") loc = "SB";
+                else loc = "Deck";
+
+                foreach (BoardItem bi in this.Boards[name].Values) {
+                    Card card = bi.Card;
+
+                    string line = "///mvid:" + card.MultiverseId + " qty:" + bi.Count.ToString() + " name:" + card.Name + " loc:" + loc;
+                    line += "\n";
+                    if (loc == "SB") line += "SB: ";
+                    line += bi.Count.ToString() + " " + card.Name;
+                    if (line.Length != 0) line += "\n";
+                    result += line;
+                }
+            }
+
+            return result;
         }
 
         public void AddBoard(string name)

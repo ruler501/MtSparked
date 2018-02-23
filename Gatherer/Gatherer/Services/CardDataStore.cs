@@ -93,7 +93,7 @@ namespace Gatherer.Services
                     return this;
                 }
                 field = field.Replace(" ", "");
-
+                value = value.Trim();
                 if (field.Contains("Color"))
                 {
                     if (value.Equals("White", StringComparison.OrdinalIgnoreCase))
@@ -270,6 +270,11 @@ namespace Gatherer.Services
         public static Card ById(string id)
         {
             return realm.Find<Card>(id);
+        }
+
+        public static Card ByMvid(string mvid)
+        {
+            return realm.All<Card>().Where(c => c.MultiverseId == mvid).FirstOrDefault();
         }
     }
 }

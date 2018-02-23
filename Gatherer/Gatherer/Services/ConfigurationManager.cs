@@ -17,6 +17,7 @@ namespace Gatherer.Services
     {
         private const string ACTIVE_DECK_KEY = "ActiveDeck";
         public static string DefaultDeckPath => Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "temp.jdec");
+        public static string DefaultTempDecPath => Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "temp.dec");
         private static Deck activeDeck = null;
         public static Deck ActiveDeck {
             get
@@ -26,11 +27,11 @@ namespace Gatherer.Services
                     string activeDeckPath = AppSettings.GetValueOrDefault(ACTIVE_DECK_KEY, null);
                     if(activeDeckPath is null || !FilePicker.PathExists(activeDeckPath))
                     {
-                        ActiveDeck = new Deck(DefaultDeckPath);
+                        ActiveDeck = Deck.FromJdec(DefaultDeckPath);
                     }
                     else
                     {
-                        ActiveDeck = new Deck(activeDeckPath);
+                        ActiveDeck = Deck.FromJdec(activeDeckPath);
                     }
                 }
                 return activeDeck;
@@ -46,7 +47,7 @@ namespace Gatherer.Services
                 activeDeck = value;
                 if(activeDeck is null)
                 {
-                    activeDeck = new Deck(DefaultDeckPath);
+                    activeDeck = Deck.FromJdec(DefaultDeckPath);
                 }
 
                 if (FilePicker.PathExists(activeDeck.StoragePath))

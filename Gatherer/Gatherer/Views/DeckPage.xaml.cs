@@ -62,16 +62,16 @@ namespace Gatherer.Views
             const string NAME_DECK = "Name Deck";
             const string OPEN_DECK = "Open Deck";
             const string SAVE_DECK_AS = "Save Deck As";
-            const string SHARE_DECK = "Share Deck";
-            const string IMPORT_FROM_DEC = "Import from .dec(Unsupported)";
-            const string EXPORT_TO_DEC = "Export to .dec(Unsupported)";
-            const string SHARE_AS_DEC = "Share as .dec(Unsupported)";
+            // const string SHARE_DECK = "Share Deck";
+            const string IMPORT_FROM_DEC = "Import from .dec";
+            const string EXPORT_TO_DEC = "Export to .dec";
+            // const string SHARE_AS_DEC = "Share as .dec(Unsupported)";
             const string MANAGE_BOARDS = "Manage Visible Boards";
             const string ADD_BOARD = "Add Board";
             const string REMOVE_BOARD_PREFIX = "Remove Board: ";
             List<string> actions = new List<string>()
             {
-                NEW_DECK, NAME_DECK, OPEN_DECK, SAVE_DECK_AS, SHARE_DECK, IMPORT_FROM_DEC, EXPORT_TO_DEC, SHARE_AS_DEC, MANAGE_BOARDS, ADD_BOARD
+                NEW_DECK, NAME_DECK, OPEN_DECK, SAVE_DECK_AS, IMPORT_FROM_DEC, EXPORT_TO_DEC, MANAGE_BOARDS, ADD_BOARD
             };
             foreach(string name in Deck.BoardNames.Where(n => n != Deck.MASTER))
             {
@@ -104,7 +104,7 @@ namespace Gatherer.Views
                     if (fileData.FilePath != this.Deck.StoragePath)
                     {
                         string toRelease = this.Deck.StoragePath;
-                        ConfigurationManager.ActiveDeck = this.Deck = new Deck(fileData.FilePath);
+                        ConfigurationManager.ActiveDeck = this.Deck = Deck.FromJdec(fileData.FilePath);
                         this.BindingContext = viewModel = new DeckViewModel(this.Deck);
                         ConfigurationManager.FilePicker.ReleaseFile(toRelease);
                     }
@@ -114,11 +114,29 @@ namespace Gatherer.Views
             {
                 this.Deck.SaveDeckAs();
             }
-            else if(action == SHARE_DECK)
+            else if(action == IMPORT_FROM_DEC)
             {
-                ConfigurationManager.FilePicker.ShareFile(this.Deck.StoragePath);
+                FileData fileData = await ConfigurationManager.FilePicker.OpenFileAs();
+                if (fileData is null)
+                {
+                    await DisplayAlert("Error", "Failed to import .dec File", "OK");
+                }
+                else
+                {
+                    if (fileData.FilePath != this.Deck.StoragePath)
+                    {
+                        string toRelease = this.Deck.StoragePath;
+                        ConfigurationManager.ActiveDeck = this.Deck = Deck.FromDec(fileData.FilePath);
+                        this.BindingContext = viewModel = new DeckViewModel(this.Deck);
+                        ConfigurationManager.FilePicker.ReleaseFile(toRelease);
+                    }
+                }
             }
-            else if(action == MANAGE_BOARDS)
+            else if(action == EXPORT_TO_DEC)
+            {
+                this.Deck.SaveAsDec();
+            }
+            else if (action == MANAGE_BOARDS)
             {
                 await Navigation.PushAsync(new BoardEditing(this.Deck));
             }

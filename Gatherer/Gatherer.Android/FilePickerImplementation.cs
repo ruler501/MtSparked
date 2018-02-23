@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Database;
+using Android.Media;
 using Android.Runtime;
 using Gatherer.FilePicker;
 using Java.IO;
@@ -14,6 +15,7 @@ using Java.IO;
 [assembly: Xamarin.Forms.Dependency(typeof(Gatherer.Droid.FilePickerImplementation))]
 namespace Gatherer.Droid
 {
+    using Android.Net;
     using File = Java.IO.File;
     using Uri = Android.Net.Uri;
 
@@ -26,6 +28,8 @@ namespace Gatherer.Droid
         private readonly Context context;
         private int requestId;
         private TaskCompletionSource<FileData> completionSource;
+
+        public MediaScannerConnection.IOnScanCompletedListener ShareFileCallback { get; private set; }
 
         public FilePickerImplementation()
         {
@@ -129,10 +133,22 @@ namespace Gatherer.Droid
             }
         }
 
-        public void ShareFile(string path, string fileType = "text/*")
+        public async void ShareFile(string path, string fileType = "text/*")
         {
+            int id = this.GetRequestId();
+
+            TaskCompletionSource<Android.Net.Uri> taskCompletionSource = new TaskCompletionSource<Android.Net.Uri>(id);
+
+            MediaScannerConnection.ScanFile(this.context, new[] { path }, new[] { fileType },
+                                            new ShareFileCallbackImplementation(taskCompletionSource));
+
+            Android.Net.Uri uri = await taskCompletionSource.Task;
+
+            byte[] data = this.OpenFile(uri.ToString());
+
             Intent sharingIntent = new Intent(Intent.ActionSend);
             sharingIntent.SetType(fileType);
+
             sharingIntent.PutExtra(Intent.ExtraStream, Android.Net.Uri.Parse(path));
 
             this.context.StartActivity(Intent.CreateChooser(sharingIntent, "Share Deck With"));
@@ -155,7 +171,7 @@ namespace Gatherer.Droid
             ContentResolver cr = ctx.ContentResolver;
 
             byte[] buffer = new byte[16 * 1024];
-            using (Stream stream = cr.OpenInputStream(uri))
+            using (System.IO.Stream stream = cr.OpenInputStream(uri))
             using (MemoryStream ms = new MemoryStream())
             {
                 int read;
@@ -173,7 +189,7 @@ namespace Gatherer.Droid
 
             ContentResolver cr = ctx.ContentResolver;
 
-            using (Stream stream = cr.OpenOutputStream(uri, "w"))
+            using (System.IO.Stream stream = cr.OpenOutputStream(uri, "w"))
             {
                 stream.Write(data, 0, data.Length);
             }
@@ -207,6 +223,21 @@ namespace Gatherer.Droid
             FilePickerActivity.FilePickCancelled -= this.OnCancelled;
 
             tcs?.SetResult(null);
+        }
+    }
+    
+    public class ShareFileCallbackImplementation : Java.Lang.Object, MediaScannerConnection.IOnScanCompletedListener
+    {
+        public TaskCompletionSource<Uri> Task { get; private set; }
+
+        public void OnScanCompleted(string path, Uri uri)
+        {
+            this.Task.SetResult(uri);
+        }
+
+        public ShareFileCallbackImplementation(TaskCompletionSource<Android.Net.Uri> task)
+        {
+            this.Task = task;
         }
     }
 }
