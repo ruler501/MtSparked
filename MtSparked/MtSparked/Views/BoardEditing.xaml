@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MtSparked.Views.BoardEditing"
+             xmlns:sfgrid="clr-namespace:Syncfusion.SfDataGrid.XForms;assembly=Syncfusion.SfDataGrid.XForms">
+    <ContentPage.Content>
+        <sfgrid:SfDataGrid
+             ItemsSource="{Binding BoardInfos}"
+             AllowDraggingRow="True"
+             AutoGenerateColumns="False"
+             VerticalOverScrollMode="None"
+             SelectionMode="Single"
+             EditTapAction="OnTap"
+             QueryRowDragging="OnRowDragging">
+            <sfgrid:SfDataGrid.Columns>
+                <sfgrid:GridTextColumn HeaderText="Board Name" MappingName="Name" AllowEditing="False" MinimumWidth="160"/>
+                <sfgrid:GridSwitchColumn HeaderText="Is Viewable" MappingName="Viewable" />
+                <sfgrid:GridSwitchColumn HeaderText="Is Editable" MappingName="Editable"/>
+            </sfgrid:SfDataGrid.Columns>
+        </sfgrid:SfDataGrid>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ViewCell xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MtSparked.Views.CardItemView"
+             xmlns:xfg="clr-namespace:XFGloss;assembly=XFGloss"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+             Height="64">
+    <xfg:CellGloss.BackgroundGradient>
+        <xfg:Gradient x:Name="ColorGradient" StartColor="Red" EndColor="Blue" Rotation="90"/>
+    </xfg:CellGloss.BackgroundGradient>
+    <Grid HeightRequest="60" BackgroundColor="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="96"/>
+            <ColumnDefinition Width="32"/>
+            <ColumnDefinition Width="14*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+        <ffimageloading:CachedImage x:Name="Image" Aspect="AspectFill"
+                                    Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" 
+                                    DownsampleToViewSize="True" LoadingPlaceholder="resource://MtSparked.Embedded.loadingcropped.png"/>
+        <Label x:Name="Count" FontSize="28" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"/>
+        <Label Text="{Binding Name}" Grid.Row="0" Grid.Column="2"
+                                               LineBreakMode="WordWrap"
+                                               FontSize="12"  BackgroundColor="Transparent"/>
+        <Label Text="{Binding TypeLine}" Grid.Row="1" Grid.Column="2"
+                                                    LineBreakMode="WordWrap"
+                                                    FontSize="12" />
+        <Label Text="{Binding ManaCost}" Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2"
+                                        LineBreakMode="NoWrap"
+                                        FontSize="12" />
+        <Label LineBreakMode="NoWrap" Grid.Row="1" Grid.Column="3"
+                                        FontSize="12"
+                                        Text="{Binding SetCode}"/>
+        <Label LineBreakMode="NoWrap" Grid.Row="1" Grid.Column="4"
+                                        FontSize="12"
+                                        Text="{Binding Rarity}"/>
+    </Grid>
+</ViewCell>

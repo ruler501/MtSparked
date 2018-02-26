@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MtSparked.Views.CardCarousel"
+             xmlns:controls="clr-namespace:CarouselView.FormsPlugin.Abstractions;assembly=CarouselView.FormsPlugin.Abstractions"
+             xmlns:local="clr-namespace:MtSparked.Views">
+    <ContentPage.Content>
+        <controls:CarouselViewControl x:Name="Carousel"
+                                      Orientation="Horizontal" InterPageSpacing="20">
+            <controls:CarouselViewControl.ItemTemplate>
+                <DataTemplate>
+                    <local:CardView/>
+                </DataTemplate>
+            </controls:CarouselViewControl.ItemTemplate>
+        </controls:CarouselViewControl>
+    </ContentPage.Content>
+</ContentPage>

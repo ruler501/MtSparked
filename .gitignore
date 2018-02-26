@@ -260,4 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /Tools/RealmWeaver.Fody.dll
-/Gatherer/Gatherer.Database/cards.db
+/MtSparked/MtSparked.Database/cards.db

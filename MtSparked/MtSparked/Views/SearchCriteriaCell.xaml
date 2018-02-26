@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MtSparked.Views.SearchCriteriaCell">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+        <Picker x:Name="FieldPicker" SelectedItem="{Binding Field}" WidthRequest="100"
+                HorizontalOptions="Fill" Grid.Column="0" SelectedIndexChanged="FieldIndexChanged"
+                SelectedIndex="0">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Name</x:String>
+                    <x:String>Text</x:String>
+                    <x:String>Type Line</x:String>
+                    <x:String>Colors</x:String>
+                    <x:String>Color Identity</x:String>
+                    <x:String>Set Name</x:String>
+                    <x:String>Mana Cost</x:String>
+                    <x:String>Rarity</x:String>
+                    <x:String>Cmc</x:String>
+                    <x:String>Watermark</x:String>
+                    <x:String>Set Code</x:String>
+                    <x:String>Flavor</x:String>
+                    <x:String>Artist</x:String>
+                    <x:String>Border</x:String>
+                    <x:String>Frame</x:String>
+                    <x:String>Layout</x:String>
+                    <x:String>Edh Rank</x:String>
+                    <x:String>Life</x:String>
+                    <x:String>Loyalty</x:String>
+                    <x:String>Color Indicator</x:String>
+                    <x:String>Full Art</x:String>
+                    <x:String>Reserved List</x:String>
+                    <x:String>Reprint</x:String>
+                    <x:String>Online Only</x:String>
+                    <x:String>Multicolored</x:String>
+                    <x:String>Colorless</x:String>
+                    <x:String>Market Price</x:String>
+                    <x:String>Legal In Standard</x:String>
+                    <x:String>Legal In Modern</x:String>
+                    <x:String>Legal In Commander</x:String>
+                    <x:String>Legal In Legacy</x:String>
+                    <x:String>Legal In Pauper</x:String>
+                    <x:String>Legal In Penny Dreadful</x:String>
+                    <x:String>Legal In Duel Commander</x:String>
+                    <x:String>Legal In Mtgo Commander</x:String>
+                    <x:String>Legal In Frontier</x:String>
+                    <x:String>Legal In Next Standard</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+        <Picker x:Name="OperationPicker" ItemsSource="{Binding Operations}" SelectedItem="{Binding Operation}" SelectedIndex="0" 
+                HorizontalOptions="Fill" Grid.Column="1" SelectedIndexChanged="OperationIndexChanged"/>
+        <Entry x:Name="ValueEntry" Text="{Binding Value}" HorizontalOptions="Fill" Grid.Column="2"/>
+        <Switch x:Name="SetSwitch" IsVisible="False" Grid.Column="2" IsToggled="{Binding Set}" HorizontalOptions="Start"/>
+        <Picker x:Name="ColorPicker" SelectedItem="{Binding Color}" HorizontalOptions="Fill" IsVisible="False" Grid.Column="2" ItemsSource="{Binding Colors}">
+        </Picker>
+    </Grid>
+</ContentView>
