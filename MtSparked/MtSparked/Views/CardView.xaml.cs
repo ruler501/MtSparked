@@ -15,7 +15,9 @@ namespace MtSparked.Views
 	public partial class CardView : ContentView
 	{
         Card Card;
-        
+        Dictionary<string, Label> FoilLabels = new Dictionary<string, Label>();
+        Dictionary<string, Label> NormalLabels = new Dictionary<string, Label>();
+
         public CardView()
 		{
 			InitializeComponent ();
@@ -91,13 +93,27 @@ namespace MtSparked.Views
             this.NextStandardLabel.BackgroundColor = this.Card.LegalInNextStandard ? legal : notLegal;
             this.NextStandardLabel.Text = "Next Standard: " + (this.Card.LegalInNextStandard ? "Y" : "N");
 
-            this.UpdateCounts();
+            this.UpdateCounters();
 
-            ConfigurationManager.ActiveDeck.ChangeEvent += this.UpdateCounts;
+            ConfigurationManager.ActiveDeck.ChangeEvent += this.OnDeckUpdated;
         }
 
-        public void UpdateCounts(object sender=null, DeckChangedEventArgs args=null)
+        public void OnDeckUpdated(object sender, DeckChangedEventArgs args)
         {
+            if(args is BoardChangedEventArgs)
+            {
+                this.UpdateCounters();
+            }
+            else if(args is CardCountChangedEventArgs)
+            {
+                this.UpdateCounts();
+            }
+        }
+
+        public void UpdateCounters()
+        {
+            this.FoilLabels.Clear();
+            this.NormalLabels.Clear();
             int row = 3;
             foreach (View child in this.GridView.Children.Where(c => Grid.GetRow(c) >= row).ToList())
             {
@@ -137,6 +153,7 @@ namespace MtSparked.Views
                 {
                     foil.Text = ConfigurationManager.ActiveDeck.GetFoilCount(this.Card, name).ToString();
                 }
+                this.FoilLabels.Add(name, foil);
                 this.GridView.Children.Add(foil, 1, row);
                 Button plus = new Button()
                 {
@@ -176,6 +193,7 @@ namespace MtSparked.Views
                 {
                     normal.Text = ConfigurationManager.ActiveDeck.GetNormalCount(this.Card, name).ToString();
                 }
+                this.NormalLabels.Add(name, normal);
                 plus = new Button()
                 {
                     Text = "+",
@@ -185,6 +203,39 @@ namespace MtSparked.Views
                 plus.Clicked += (_s, _e) => this.AddCard(name, true);
                 this.GridView.Children.Add(plus, 6, row);
                 row += 1;
+            }
+        }
+
+        public void UpdateCounts()
+        {
+            foreach(KeyValuePair<string, Label> pair in this.FoilLabels)
+            {
+                string name = pair.Key;
+                Label foil = pair.Value;
+
+                if (ConfigurationManager.ShowUnique)
+                {
+                    foil.Text = ConfigurationManager.ActiveDeck.GetFoilCountByName(this.Card, name).ToString();
+                }
+                else
+                {
+                    foil.Text = ConfigurationManager.ActiveDeck.GetFoilCount(this.Card, name).ToString();
+                }
+            }
+
+            foreach (KeyValuePair<string, Label> pair in this.NormalLabels)
+            {
+                string name = pair.Key;
+                Label normal = pair.Value;
+
+                if (ConfigurationManager.ShowUnique)
+                {
+                    normal.Text = ConfigurationManager.ActiveDeck.GetNormalCountByName(this.Card, name).ToString();
+                }
+                else
+                {
+                    normal.Text = ConfigurationManager.ActiveDeck.GetNormalCount(this.Card, name).ToString();
+                }
             }
         }
 
