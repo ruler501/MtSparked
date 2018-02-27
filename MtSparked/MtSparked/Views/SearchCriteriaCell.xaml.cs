@@ -85,11 +85,22 @@ namespace MtSparked.Views
                     int index = SearchCriteria.StringOperations.IndexOf(selection);
                     index = index >= 0 ? index : 0;
                     this.SearchCriteria.Operations = SearchCriteria.StringOperations;
-                    this.ValueEntry.IsVisible = true;
-                    this.ValueEntry.Keyboard = Keyboard.Plain;
-                    this.ColorPicker.IsVisible = false;
-                    this.SetSwitch.IsVisible = false;
-                    this.OperationPicker.IsVisible = true;
+
+                    if (selection == "Exists")
+                    {
+                        this.ValueEntry.IsVisible = false;
+                        this.ColorPicker.IsVisible = false;
+                        this.SetSwitch.IsVisible = true;
+                        this.OperationPicker.IsVisible = true;
+                    }
+                    else
+                    {
+                        this.ValueEntry.IsVisible = true;
+                        this.ValueEntry.Keyboard = Keyboard.Plain;
+                        this.ColorPicker.IsVisible = false;
+                        this.SetSwitch.IsVisible = false;
+                        this.OperationPicker.IsVisible = true;
+                    }
                     this.OperationPicker.SelectedItem = SearchCriteria.StringOperations[index];
                 }
             }

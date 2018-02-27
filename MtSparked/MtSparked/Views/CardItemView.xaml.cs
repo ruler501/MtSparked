@@ -78,9 +78,10 @@ namespace MtSparked.Views
                 lastColor = new Color(225 / 255.0, 228 / 255.0, 230 / 255.0);
                 colorGradient.AddStep(lastColor, 0);
             }
-            colorGradient.AddStep(lastColor, 1);
-
-            CellGloss.SetBackgroundGradient(this, colorGradient);
+            if (colorIdentity.Length < 2)
+            {
+                colorGradient.AddStep(lastColor, 1);
+            }
 
             this.UpdateCount();
         }

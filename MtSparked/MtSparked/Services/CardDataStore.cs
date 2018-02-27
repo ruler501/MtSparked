@@ -172,7 +172,7 @@ namespace MtSparked.Services
                     if (propertyInfo.PropertyType == typeof(string))
                     {
                         Expression caseInsensitive = Expression.Constant(StringComparison.OrdinalIgnoreCase);
-                        fullCombine = Expression.Call(property, "Equals", Type.EmptyTypes, new[] { caseInsensitive });
+                        fullCombine = Expression.Call(property, "Equals", Type.EmptyTypes, new[] { constant, caseInsensitive });
                     }
                     else
                     {
@@ -212,7 +212,15 @@ namespace MtSparked.Services
                 else if(op == "Exists")
                 {
                     Expression nullConstant = Expression.Constant(null);
-                    fullCombine = Expression.NotEqual(property, nullConstant);
+                    bool exists = Boolean.Parse(value);
+                    if (exists)
+                    {
+                        fullCombine = Expression.NotEqual(property, nullConstant);
+                    }
+                    else
+                    {
+                        fullCombine = Expression.Equal(property, nullConstant);
+                    }
                 }
                 else
                 {

@@ -27,7 +27,70 @@ namespace MtSparked.Views
             this.Card = this.BindingContext as Card;
 
             if (this.Card is null) return;
-            
+
+            this.SetLabel.Text = this.Card.SetName + " / " + this.Card.SetCode;
+
+            this.ColorIdentityLabel.Text = "ColorIdentity: " + (this.Card.ColorIdentity.Length > 0 ? this.Card.ColorIdentity : "Colorless");
+            this.EdhRankLabel.Text = this.Card.EdhRank is null ? "" : "EDHRank: " + this.Card.EdhRank.ToString();
+            if (!String.IsNullOrWhiteSpace(this.Card.Power))
+            {
+                this.PowerToughnessLabel.Text = this.Card.Power + "/" + this.Card.Toughness;
+            }
+            else if (!(this.Card.Life is null))
+            {
+                this.PowerToughnessLabel.Text = (this.Card.Hand < 0 ? "-" : "+") + this.Card.Hand + "/" + (this.Card.Life < 0 ? "-" : "+") + this.Card.Life;
+            }
+            else if (!(this.Card.Loyalty is null))
+            {
+                this.PowerToughnessLabel.Text = this.Card.Loyalty.ToString();
+            }
+
+            if (!(this.Card.Watermark is null))
+            {
+                this.WatermarkLabel.Text = "Watermark: " + this.Card.Watermark;
+            }
+
+            this.ArtistLabel.Text = "Illustrated by " + this.Card.Artist;
+            this.MarketLabel.Text = this.Card.MarketPrice is null ? "No Pricing" : ("Market: $" + this.Card.MarketPrice.ToString());
+
+            this.BorderLabel.Text = this.Card.Border ?? "No" + " Bordered";
+
+            this.FrameLabel.Text = "Frame: " + this.Card.Frame ?? "None";
+            this.LayoutLabel.Text = "Layout: " + this.Card.Layout ?? "None";
+
+            Color legal = new Color(117 / 255.0, 152 / 255.0, 110 / 255.0);
+            Color notLegal = new Color(204 / 255.0, 125 / 255.0, 131 / 255.0);
+
+            this.StandardLabel.BackgroundColor = this.Card.LegalInStandard ? legal : notLegal;
+            this.StandardLabel.Text = "Standard: " + (this.Card.LegalInStandard ? "Y" : "N");
+
+            this.ModernLabel.BackgroundColor = this.Card.LegalInModern ? legal : notLegal;
+            this.ModernLabel.Text = "Modern: " + (this.Card.LegalInModern ? "Y" : "N");
+
+            this.LegacyLabel.BackgroundColor = this.Card.LegalInLegacy ? legal : notLegal;
+            this.LegacyLabel.Text = "Legacy: " + (this.Card.LegalInLegacy ? "Y" : "N");
+
+            this.CommanderLabel.BackgroundColor = this.Card.LegalInCommander ? legal : notLegal;
+            this.CommanderLabel.Text = "Commander: " + (this.Card.LegalInCommander ? "Y" : "N");
+
+            this.DuelCommanderLabel.BackgroundColor = this.Card.LegalInDuelCommander ? legal : notLegal;
+            this.DuelCommanderLabel.Text = "Duel Commander: " + (this.Card.LegalInDuelCommander ? "Y" : "N");
+
+            this.MtgoCommanderLabel.BackgroundColor = this.Card.LegalInMtgoCommander ? legal : notLegal;
+            this.MtgoCommanderLabel.Text = "Mtgo Commander: " + (this.Card.LegalInMtgoCommander ? "Y" : "N");
+
+            this.PauperLabel.BackgroundColor = this.Card.LegalInPauper ? legal : notLegal;
+            this.PauperLabel.Text = "Pauper: " + (this.Card.LegalInPauper ? "Y" : "N");
+
+            this.PennyDreadfulLabel.BackgroundColor = this.Card.LegalInPennyDreadful ? legal : notLegal;
+            this.PennyDreadfulLabel.Text = "Penny Dreadful: " + (this.Card.LegalInPennyDreadful ? "Y" : "N");
+
+            this.FrontierLabel.BackgroundColor = this.Card.LegalInFrontier ? legal : notLegal;
+            this.FrontierLabel.Text = "Frontier: " + (this.Card.LegalInFrontier ? "Y" : "N");
+
+            this.NextStandardLabel.BackgroundColor = this.Card.LegalInNextStandard ? legal : notLegal;
+            this.NextStandardLabel.Text = "Next Standard: " + (this.Card.LegalInNextStandard ? "Y" : "N");
+
             this.UpdateCounts();
 
             ConfigurationManager.ActiveDeck.ChangeEvent += this.UpdateCounts;

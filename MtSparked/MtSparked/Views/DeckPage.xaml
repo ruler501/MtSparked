@@ -14,7 +14,8 @@
                   GroupShortNameBinding="{Binding Name}"
                   IsGroupingEnabled="True"
                   ItemsSource="{Binding Boards}"
-                  ItemSelected="OnItemSelected">
+                  ItemSelected="OnItemSelected"
+                  RowHeight="64">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <views:CardItemView/>

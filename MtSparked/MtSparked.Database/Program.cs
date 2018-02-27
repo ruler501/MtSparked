@@ -42,12 +42,13 @@ namespace MtSparked.Database
                         TypeLine = card.Value<string>("type_line"),
                         Text = card.Value<string>("oracle_text"),
                         ManaCost = card.Value<string>("mana_cost"),
-                        ReservedList = card.Value<bool>("reserved"),
+                        ReservedList = card.Value<bool?>("reserved") ?? false,
+                        Reprint = card.Value<bool?>("reprint") ?? false,
                         SetCode = card.Value<string>("set")?.ToUpper(),
                         SetName = card.Value<string>("set_name"),
                         Rarity = card.Value<string>("rarity"),
                         Artist = card.Value<string>("artist"),
-                        Border = card.Value<string>("border"),
+                        Border = card.Value<string>("border_color"),
                         EdhRank = card.Value<int?>("edhrec_rank"),
                         Flavor = card.Value<string>("flavor_text"),
                         Power = card.Value<string>("power"),
@@ -206,6 +207,7 @@ namespace MtSparked.Database
         {
             RestClient client = new RestClient(BASE_URL);
             string next = url;
+            int count = 0;
 
             JToken json = null;
             do
@@ -229,7 +231,8 @@ namespace MtSparked.Database
                     };
                     rulingsList.Add(value);
                 }
-
+                count += rulings.Count;
+                Console.Write(count.ToString() + ' ');
             } while ((bool)json["has_more"]);
         }
     }
