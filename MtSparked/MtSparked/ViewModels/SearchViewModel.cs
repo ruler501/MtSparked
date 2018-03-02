@@ -11,10 +11,11 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using MtSparked.Services;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace MtSparked.ViewModels
 {
-    public class SearchViewModel : INotifyPropertyChanged
+    public class SearchViewModel : Model
     {
         public ObservableCollection<object> Items { get; set; }
         public string Connector { get; set; }
@@ -43,9 +44,9 @@ namespace MtSparked.ViewModels
             return model;
         }
 
-        public CardDataStore.CardsQuery CreateQuery()
+        public CardDataStore.CardsQuery CreateQuery(IEnumerable<Card> domain = null)
         {
-            CardDataStore.CardsQuery query = new CardDataStore.CardsQuery(Connector);
+            CardDataStore.CardsQuery query = new CardDataStore.CardsQuery(Connector, domain);
             foreach (object item in Items)
             {
                 if (item is SearchCriteria criteria)
@@ -71,7 +72,7 @@ namespace MtSparked.ViewModels
                 }
                 if (item is SearchViewModel model)
                 {
-                    CardDataStore.CardsQuery query2 = model.CreateQuery();
+                    CardDataStore.CardsQuery query2 = model.CreateQuery(domain);
                     query.Where(query2);
                 }
             }
@@ -81,17 +82,5 @@ namespace MtSparked.ViewModels
             }
             return query;
         }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            var changed = PropertyChanged;
-            if (changed == null)
-                return;
-
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
     }
 }

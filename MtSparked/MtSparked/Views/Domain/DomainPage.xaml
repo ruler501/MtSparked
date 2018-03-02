@@ -2,15 +2,15 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MtSparked.Views"
-             x:Class="MtSparked.Views.SearchPage"
+             x:Class="MtSparked.Views.DomainPage"
              x:Name="SearchPage">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Clear" Clicked="Clear" />
-        <ToolbarItem Text="Search" Clicked="Search" />
+        <ToolbarItem Text="Confirm" Clicked="Confirm" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ScrollView>
-            <local:SearchGroupCell x:Name="RootGroup"/>
+            <local:DomainGroupCell x:Name="RootGroup"/>
         </ScrollView>
     </ContentPage.Content>
 </ContentPage>

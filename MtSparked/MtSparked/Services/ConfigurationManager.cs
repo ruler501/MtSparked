@@ -86,6 +86,39 @@ namespace MtSparked.Services
         }
         public const int CurrentDatabaseVersion = 2;
 
+        private static string SORT_CRITERIA_KEY = "SortCriteria";
+        public static string SortCriteria
+        {
+            get => AppSettings.GetValueOrDefault(SORT_CRITERIA_KEY, "Cmc");
+            set
+            {
+                AppSettings.AddOrUpdateValue(SORT_CRITERIA_KEY, value);
+                OnPropertyChanged();
+            }
+        }
+
+        private static string COUNT_BY_GROUP_KEY = "CountByGroup";
+        public static bool CountByGroup
+        {
+            get => AppSettings.GetValueOrDefault(COUNT_BY_GROUP_KEY, false);
+            set
+            {
+                AppSettings.AddOrUpdateValue(COUNT_BY_GROUP_KEY, value);
+                OnPropertyChanged();
+            }
+        }
+
+        private static string DESCENDING_SORT_KEY = "DescendingSort";
+        public static bool DescendingSort
+        {
+            get => AppSettings.GetValueOrDefault(DESCENDING_SORT_KEY, false);
+            set
+            {
+                AppSettings.AddOrUpdateValue(DESCENDING_SORT_KEY, value);
+                OnPropertyChanged();
+            }
+        }
+
         #region INotifyPropertyChanged
         private static WeakEventSource<PropertyChangedEventArgs> propertyChangedSource = new WeakEventSource<PropertyChangedEventArgs>();
         public static event EventHandler<PropertyChangedEventArgs> PropertyChanged

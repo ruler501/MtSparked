@@ -12,17 +12,17 @@ using Xamarin.Forms.Xaml;
 
 namespace MtSparked.Views
 {
-	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class SearchGroupCell : ContentView, IQueryable
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class DomainGroupCell : ContentView
     {
-        SearchViewModel viewModel;
+        DomainViewModel viewModel;
 
-        public SearchGroupCell ()
-            : this(new SearchViewModel())
-		{
+        public DomainGroupCell()
+            : this(new DomainViewModel())
+        {
         }
 
-        public SearchGroupCell(SearchViewModel model)
+        public DomainGroupCell(DomainViewModel model)
         {
             InitializeComponent();
 
@@ -33,25 +33,27 @@ namespace MtSparked.Views
 
         public void AddItem(object sender, EventArgs e)
         {
-            SearchCriteria criteria = viewModel.AddCriteria();
+            DomainCriteria criteria = viewModel.AddCriteria();
             this.AddCriteria(criteria);
         }
 
         void AddGroup(object sender, EventArgs e)
         {
-            SearchViewModel model = viewModel.AddGroup();
+            DomainViewModel model = viewModel.AddGroup();
             this.AddModel(model);
         }
 
-        protected void CreateChildren() { 
+        protected void CreateChildren()
+        {
             this.StackLayout.Children.Clear();
-            foreach(object value in viewModel.Items)
+            foreach (object value in viewModel.Items)
             {
-                if(value is SearchViewModel model)
+                if (value is DomainViewModel model)
                 {
                     this.AddModel(model);
                 }
-                else if(value is SearchCriteria criteria){
+                else if (value is DomainCriteria criteria)
+                {
                     this.AddCriteria(criteria);
                 }
                 else
@@ -61,7 +63,7 @@ namespace MtSparked.Views
             }
         }
 
-        protected void AddModel(SearchViewModel model)
+        protected void AddModel(DomainViewModel model)
         {
             var grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -71,47 +73,31 @@ namespace MtSparked.Views
             {
                 IsVisible = false
             }, 0, 0);
-            grid.Children.Add(new SearchGroupCell(model), 1, 0);
+            grid.Children.Add(new DomainGroupCell(model), 1, 0);
             this.StackLayout.Children.Add(grid);
         }
 
-        protected void AddCriteria(SearchCriteria criteria)
+        protected void AddCriteria(DomainCriteria criteria)
         {
-            this.StackLayout.Children.Add(new SearchCriteriaCell(criteria));
+            this.StackLayout.Children.Add(new DomainCriteriaCell(criteria));
         }
 
-        public CardDataStore.CardsQuery GetQuery()
+        public IEnumerable<Card> CreateDomain()
         {
-            if ((BindingContext as SearchViewModel) is null)
+            if ((BindingContext as DomainViewModel) is null)
             {
                 throw new Exception("Invalid Binding Context");
             }
 
-            SearchViewModel model = (SearchViewModel)BindingContext;
+            DomainViewModel model = (DomainViewModel)BindingContext;
 
-            return model.CreateQuery();
+            return model.CreateDomain();
         }
 
         public void Clear()
         {
             this.viewModel.Items.Clear();
             this.StackLayout.Children.Clear();
-        }
-
-        double translatedX = 0;
-        void OnPanUpdated(object sender, PanUpdatedEventArgs e)
-        {
-            switch (e.StatusType)
-            {
-                case GestureStatus.Running:
-                    this.ControlGrid.TranslationX = translatedX + e.TotalX ;
-                    break;
-
-                case GestureStatus.Completed:
-                    // Store the translation applied during the pan
-                    this.translatedX = Content.TranslationX;
-                    break;
-            }
         }
     }
 }

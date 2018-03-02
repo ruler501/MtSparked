@@ -31,11 +31,11 @@ namespace MtSparked.ViewModels
             set { SetProperty(ref title, value); }
         }
 
-        private ObservableCollection<Card> items;
-        public ObservableCollection<Card> Items { get => items; set => SetProperty(ref items, value); }
+        private ObservableCollection<EnhancedGrouping<Card>> items;
+        public ObservableCollection<EnhancedGrouping<Card>> Items { get => items; set => SetProperty(ref items, value); }
         public int CardCount => Items.Count;
         public Command LoadItemsCommand { get; set; }
-        
+
         void ExecuteLoadItemsCommand()
         {
             if (IsBusy)
@@ -46,9 +46,8 @@ namespace MtSparked.ViewModels
             try
             {
                 this.DataStore.LoadCards();
-                
-                ObservableCollection<Card> items = new ObservableCollection<Card>(this.DataStore.items);
-                this.Items = items;
+
+                this.Items = new ObservableCollection<EnhancedGrouping<Card>>(this.DataStore.Items);
             }
             catch (Exception ex)
             {
@@ -63,7 +62,7 @@ namespace MtSparked.ViewModels
         public CardsViewModel(CardDataStore store)
         {
             Title = "Cards";
-            Items = new ObservableCollection<Card>();
+            Items = new ObservableCollection<EnhancedGrouping<Card>>();
             LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
             this.DataStore = store;
             ConfigurationManager.PropertyChanged += this.OnUniqueUpdated;
@@ -72,7 +71,10 @@ namespace MtSparked.ViewModels
 
         private void OnUniqueUpdated(object sender, PropertyChangedEventArgs args)
         {
-            if(args.PropertyName == nameof(ConfigurationManager.ShowUnique))
+            if (args.PropertyName == nameof(ConfigurationManager.ShowUnique)
+                || args.PropertyName == nameof(ConfigurationManager.SortCriteria)
+                || args.PropertyName == nameof(ConfigurationManager.DescendingSort)
+                || args.PropertyName == nameof(ConfigurationManager.CountByGroup))
             {
                 this.LoadItemsCommand.Execute(null);
             }

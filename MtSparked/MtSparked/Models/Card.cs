@@ -116,4 +116,17 @@ namespace MtSparked.Models
         public DateTimeOffset PublishDate { get; set; }
         public string Comment { get; set; }
     }
+
+    public class CardEqualityComparer : EqualityComparer<Card>
+    {
+        public override bool Equals(Card a, Card b)
+        {
+            return a.Id == b.Id;
+        }
+
+        public override int GetHashCode(Card c)
+        {
+            return c.Id.GetHashCode();
+        }
+    }
 }

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MtSparked.Views.DomainCriteriaCell">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+        <Picker x:Name="FieldPicker" SelectedItem="{Binding Field}" WidthRequest="100"
+                HorizontalOptions="Fill" Grid.Column="0" SelectedIndex="0" ItemsSource="{Binding Fields}"/>
+        <Label Text="Contains Card" Grid.Column="1"/>
+        <Switch x:Name="SetSwitch" Grid.Column="2" IsToggled="{Binding Set}" HorizontalOptions="Start"/>
+    </Grid>
+</ContentView>

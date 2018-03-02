@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MtSparked.Views.SortPage"
+             Title="Sort By">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Confirm" Clicked="OnConfirm"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <Grid HeightRequest="40">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="6*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Picker x:Name="CriteriaPicker" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Cmc</x:String>
+                        <x:String>Name</x:String>
+                        <x:String>Set Name</x:String>
+                        <x:String>Colors</x:String>
+                        <x:String>Color Identity</x:String>
+                        <x:String>Power</x:String>
+                        <x:String>Toughness</x:String>
+                        <x:String>Market Price</x:String>
+                        <x:String>Rarity</x:String>
+                        <x:String>Life</x:String>
+                        <x:String>Hand</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+            <Label Text="Count By Criteria" Grid.Column="1" Grid.Row="0"/>
+            <Switch x:Name="CountByGroupSwitch" Grid.Column="1" Grid.Row="1"/>
+            <Label Text="Descending" Grid.Column="2" Grid.Row="0"/>
+            <Switch x:Name="DescendingSortSwitch" Grid.Column="2" Grid.Row="1"/>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

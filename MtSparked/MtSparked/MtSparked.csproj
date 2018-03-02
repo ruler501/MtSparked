@@ -33,10 +33,10 @@
     <Compile Update="Views\CardView.xaml.cs">
       <DependentUpon>CardView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\SearchCriteriaCell.xaml.cs">
+    <Compile Update="Views\Search\SearchCriteriaCell.xaml.cs">
       <DependentUpon>SearchCriteriaCell.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\SearchPage.xaml.cs">
+    <Compile Update="Views\Search\SearchPage.xaml.cs">
       <SubType>Code</SubType>
       <DependentUpon>SearchPage.xaml</DependentUpon>
     </Compile>
@@ -46,12 +46,12 @@
     <Compile Update="Views\CardsListPage.xaml.cs">
       <DependentUpon>CardsListPage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\SearchGroupCell.xaml.cs">
+    <Compile Update="Views\Search\SearchGroupCell.xaml.cs">
       <DependentUpon>SearchGroupCell.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Views\BoardEditing.xaml">
+    <EmbeddedResource Update="Views\Decks\BoardEditing.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\CardCarousel.xaml">
@@ -66,10 +66,22 @@
     <EmbeddedResource Update="Views\CardsListPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\DeckPage.xaml">
+    <EmbeddedResource Update="Views\Decks\DeckPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\SearchGroupCell.xaml">
+    <EmbeddedResource Update="Views\Domain\DomainCriteriaCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Domain\DomainGroupCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Domain\DomainPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Search\SearchGroupCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Search\SortPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

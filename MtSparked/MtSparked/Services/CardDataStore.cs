@@ -6,16 +6,18 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using MtSparked.Models;
+using MtSparked.ViewModels;
 using Realms;
 
 namespace MtSparked.Services
 {
     public class CardDataStore
     {
-        public List<Card> items;
+        public List<EnhancedGrouping<Card>> Items { get; set; }
         Expression<Func<Card, bool>> Query;
+        IEnumerable<Card> Domain;
 
-        private static Realm realm = null;
+        public static Realm realm = null;
 
         static CardDataStore()
         {
@@ -23,57 +25,243 @@ namespace MtSparked.Services
             realm = Realm.GetInstance(config);
         }
 
-        protected CardDataStore(Expression<Func<Card, bool>> query)
+        protected CardDataStore(Expression<Func<Card, bool>> query, IEnumerable<Card> domain = null)
         {
             this.Query = query;
+            this.Domain = domain;
 
             this.LoadCards();
         }
 
         public void LoadCards()
         {
-            items = new List<Card>(250);
-
-            IEnumerable<Card> mockItems = realm.All<Card>().Where(Query).OrderBy(c => c.Cmc).ThenBy(c => c.Name);
+            IEnumerable<Card> mockItems;
+            if (this.Domain is null)
+            {
+                mockItems = realm.All<Card>().Where(Query);
+            }
+            else
+            {
+                mockItems = Domain.Where(Query.Compile());
+            }
 
             if (ConfigurationManager.ShowUnique)
             {
                 mockItems = mockItems.DistinctBy(c => c.Name);
             }
 
-            foreach (var item in mockItems)
+            IEnumerable<IGrouping<string, Card>> grouping = null;
+            Func<string, string> labelFunc = null;
+            if(ConfigurationManager.SortCriteria == "Cmc")
             {
-                items.Add(item);
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.Cmc.ToString());
+                }
             }
-        }
+            else if (ConfigurationManager.SortCriteria == "Name")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => new string(c.Name.FirstOrDefault(), 1));
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Set Name")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.SetName).ThenBy(c => c.Cmc).ThenBy(c => c.Name); ;
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.SetName).ThenBy(c => c.Cmc).ThenBy(c => c.Name); ;
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.SetName);
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Colors")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.Colors.Length).ThenByDescending(c => c.Colors)
+                        .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.Colors.Length).ThenBy(c => c.Colors)
+                        .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.Colors);
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Color Identity")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.ColorIdentity.Length).ThenByDescending(c => c.ColorIdentity)
+                        .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.ColorIdentity.Length).ThenBy(c => c.ColorIdentity)
+                        .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.ColorIdentity);
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Power")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c =>
+                   {
+                       if (c.Power is null) return 0;
+                       bool valid = Int32.TryParse(c.Power, out int power);
+                       if (valid) return power;
+                       else return 0;
+                   }).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c =>
+                    {
+                        if (c.Power is null) return 0;
+                        bool valid = Int32.TryParse(c.Power, out int power);
+                        if (valid) return power;
+                        else return 0;
+                    }).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.Power ?? "");
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Toughness")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c =>
+                    {
+                        if (c.Toughness is null) return 0;
+                        bool valid = Int32.TryParse(c.Toughness, out int toughness);
+                        if (valid) return toughness;
+                        else return 0;
+                    }).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c =>
+                    {
+                        if (c.Toughness is null) return 0;
+                        bool valid = Int32.TryParse(c.Toughness, out int toughness);
+                        if (valid) return toughness;
+                        else return 0;
+                    }).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.Toughness ?? "");
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Market Price")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.MarketPrice ?? Double.PositiveInfinity)
+                                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.MarketPrice ?? Double.PositiveInfinity)
+                                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.MarketPrice?.ToString() ?? "N/A");
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Rarity")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.Rarity).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.Rarity).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.Rarity);
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Life")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.Life ?? Int32.MaxValue)
+                                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.Life ?? Int32.MaxValue)
+                                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.Life?.ToString() ?? "N/A");
+                }
+            }
+            else if (ConfigurationManager.SortCriteria == "Hand")
+            {
+                if (ConfigurationManager.DescendingSort)
+                {
+                    mockItems = mockItems.OrderByDescending(c => c.Hand ?? Int32.MaxValue)
+                                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                else
+                {
+                    mockItems = mockItems.OrderBy(c => c.Hand ?? Int32.MaxValue)
+                                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
+                }
+                if (ConfigurationManager.CountByGroup)
+                {
+                    grouping = mockItems.GroupBy(c => c.Hand?.ToString() ?? "N/A");
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
 
-        public async Task<bool> AddItemAsync(Card item)
-        {
-            items.Add(item);
+            if (!ConfigurationManager.CountByGroup)
+            {
+                grouping = mockItems.GroupBy(c => "Total");
+            }
 
-            return await Task.FromResult(true);
-        }
-
-        public async Task<bool> UpdateItemAsync(Card item)
-        {
-            var _item = items.Where((Card arg) => arg.MultiverseId == item.MultiverseId).FirstOrDefault();
-            items.Remove(_item);
-            items.Add(item);
-
-            return await Task.FromResult(true);
-        }
-
-        public async Task<bool> DeleteItemAsync(Card item)
-        {
-            var _item = items.Where((Card arg) => arg.MultiverseId == item.MultiverseId).FirstOrDefault();
-            items.Remove(_item);
-
-            return await Task.FromResult(true);
-        }
-
-        public async Task<Card> GetItemAsync(string id)
-        {
-            return await Task.FromResult(items.FirstOrDefault(s => s.MultiverseId == id));
+            Items = grouping.Select(g => new EnhancedGrouping<Card>(g, labelFunc)).ToList();
         }
         
         public class CardsQuery
@@ -81,6 +269,8 @@ namespace MtSparked.Services
             Expression builtExpression = null;
             static ParameterExpression param = Expression.Parameter(typeof(Card), "card");
             string Connector;
+
+            public IEnumerable<Card> Domain { get; private set; }
 
             public CardsQuery Where(string field, bool set)
             {
@@ -145,10 +335,10 @@ namespace MtSparked.Services
                 Expression property = Expression.Property(param, field);
                 Expression constant = Expression.Constant(value);
                 PropertyInfo propertyInfo = typeof(Card).GetProperty(field);
-                if(propertyInfo.PropertyType == typeof(bool))
+                if(propertyInfo.PropertyType == typeof(bool) || op == "Exists")
                 {
                     bool val = bool.Parse(value);
-                    constant = Expression.Constant(val, propertyInfo.PropertyType);
+                    constant = Expression.Constant(val, typeof(bool));
                 }
                 else if(propertyInfo.PropertyType == typeof(int?))
                 {
@@ -300,17 +490,25 @@ namespace MtSparked.Services
 
             public CardDataStore ToDataStore()
             {
-                return new CardDataStore(this.BuildExpression());
+                return new CardDataStore(this.BuildExpression(), this.Domain);
             }
 
             public List<Card> ToList()
             {
-                return realm.All<Card>().Where(this.BuildExpression()).ToList();
+                if(this.Domain is null)
+                {
+                    return realm.All<Card>().Where(this.BuildExpression()).ToList();
+                }
+                else
+                {
+                    return this.Domain.Where(this.BuildExpression().Compile()).ToList();
+                }
             }
 
-            public CardsQuery(string connector)
+            public CardsQuery(string connector, IEnumerable<Card> domain = null)
             {
                 this.Connector = connector;
+                this.Domain = domain;
             }
         }
 

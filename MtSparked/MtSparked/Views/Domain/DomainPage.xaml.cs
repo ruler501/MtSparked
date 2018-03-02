@@ -14,21 +14,27 @@ using MtSparked.Services;
 
 namespace MtSparked.Views
 {
-	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class SearchPage : ContentPage
-	{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class DomainPage : ContentPage
+    {
+        Action<IEnumerable<Card>> OnConfirm { get; set; }
 
-        public SearchPage()
+        public DomainPage(Action<IEnumerable<Card>> onComplete)
         {
             InitializeComponent();
+
+            this.OnConfirm = onComplete;
 
             this.RootGroup.AddItem(null, null);
         }
 
-        async void Search(object sender, EventArgs e)
+        void Confirm(object sender, EventArgs e)
         {
-            CardDataStore.CardsQuery query = RootGroup.GetQuery();
-            await Navigation.PushAsync(new CardsListPage(query.ToDataStore()));
+            IEnumerable<Card> domain = this.RootGroup.CreateDomain();
+
+            this.OnConfirm(domain);
+
+            Navigation.RemovePage(this);
         }
 
         void Clear(object sender, EventArgs e)

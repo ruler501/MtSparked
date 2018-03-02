@@ -502,11 +502,11 @@ namespace MtSparked.Models
             if(boardItem.NormalCount < 0) boardItem.NormalCount = 0;
             if (boardItem.FoilCount < 0) boardItem.FoilCount = 0;
 
-            if(boardName == "Master")
+            if(boardName == MASTER)
             {
                 foreach(KeyValuePair<string, IDictionary<string, BoardItem>> pair in Boards)
                 {
-                    if (pair.Key == "Master") continue;
+                    if (pair.Key == MASTER) continue;
 
                     IDictionary<string, BoardItem> cards = pair.Value;
                     if (!cards.ContainsKey(card.Id)) continue;

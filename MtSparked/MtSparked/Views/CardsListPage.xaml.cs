@@ -35,7 +35,13 @@ namespace MtSparked.Views
             // Manually deselect item.
             ((ListView)sender).SelectedItem = null;
             Card card = (Card)args.SelectedItem;
-            await Navigation.PushAsync(new CardCarousel(viewModel.Items.ToList(), viewModel.Items.IndexOf(card)));
+            IEnumerable<Card> cards = new List<Card>();
+            foreach(EnhancedGrouping<Card> grouping in viewModel.Items)
+            {
+                cards = cards.Concat(grouping);
+            }
+            List<Card> cardsList = cards.ToList();
+            await Navigation.PushAsync(new CardCarousel(cardsList, cardsList.IndexOf(card)));
         }
 
         protected override void OnAppearing()
@@ -49,6 +55,11 @@ namespace MtSparked.Views
         public void ToggleUnique(object sender, EventArgs args)
         {
             ConfigurationManager.ShowUnique = !ConfigurationManager.ShowUnique;
+        }
+
+        public async void SortBy(object sender, EventArgs args)
+        {
+            await Navigation.PushAsync(new SortPage());
         }
     }
 }
