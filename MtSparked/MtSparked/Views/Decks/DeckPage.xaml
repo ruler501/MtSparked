@@ -6,6 +6,7 @@
              Title="{Binding Name}">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Toggle Unique" Clicked="ToggleUnique"/>
+        <ToolbarItem Text="Stats" Clicked="OpenStats"/>
         <ToolbarItem Text="Manage" Clicked="ManageDeck" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>

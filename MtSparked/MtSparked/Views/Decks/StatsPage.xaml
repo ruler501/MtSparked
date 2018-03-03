@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:microcharts="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms" 
+             x:Class="MtSparked.Views.StatsPage">
+    <ContentPage.Content>
+        <ScrollView>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition Height="160"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Picker ItemsSource="{Binding BoardNames}" SelectedItem="{Binding BoardName}" Grid.Row="0" Grid.Column="0"/>
+                <microcharts:ChartView Chart="{Binding CmcChart}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"/>
+                <Label Text="{Binding ManaCounts}" LineBreakMode="WordWrap" Grid.Row="2" Grid.Column="0"/>
+                <Entry x:Name="PopulationEntry" Grid.Row="3" Grid.Column="0"
+                   Placeholder="Deck Size" Keyboard="Numeric" TextChanged="OnPopulationChanged"/>
+                <Entry x:Name="SuccessesEntry" Grid.Row="3" Grid.Column="1"
+                   Placeholder="Successes" Keyboard="Numeric" TextChanged="OnSuccessesChanged"/>
+                <Entry x:Name="SamplesEntry" Grid.Row="3" Grid.Column="2"
+                   Placeholder="Sample Size" Keyboard="Numeric" TextChanged="OnSamplesChanged"/>
+                <microcharts:ChartView x:Name="HyperGeometricCdfChart" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"/>
+                <microcharts:ChartView x:Name="HyperGeometricPdfChart" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"/>
+            </Grid>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

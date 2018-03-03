@@ -160,5 +160,10 @@ namespace MtSparked.Views
         {
             ConfigurationManager.ShowUnique = !ConfigurationManager.ShowUnique;
         }
+
+        public async void OpenStats(object sender, EventArgs args)
+        {
+            await Navigation.PushAsync(new StatsPage(this.Deck));
+        }
     }
 }

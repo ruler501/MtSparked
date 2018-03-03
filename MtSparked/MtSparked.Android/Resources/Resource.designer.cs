@@ -2266,6 +2266,7 @@ namespace MtSparked.Droid
 			global::Com.ViewPagerIndicator.Resource.Styleable.CirclePageIndicator_vpiStrokeWidth = global::MtSparked.Droid.Resource.Styleable.CirclePageIndicator_vpiStrokeWidth;
 			global::Com.ViewPagerIndicator.Resource.Styleable.ViewPagerIndicator = global::MtSparked.Droid.Resource.Styleable.ViewPagerIndicator;
 			global::Com.ViewPagerIndicator.Resource.Styleable.ViewPagerIndicator_vpiCirclePageIndicatorStyle = global::MtSparked.Droid.Resource.Styleable.ViewPagerIndicator_vpiCirclePageIndicatorStyle;
+			global::Microcharts.Droid.Resource.String.library_name = global::MtSparked.Droid.Resource.String.library_name;
 			global::Syncfusion.SfDataGrid.XForms.Droid.Resource.Layout.ScrollViewer = global::MtSparked.Droid.Resource.Layout.ScrollViewer;
 			global::Syncfusion.SfDataGrid.XForms.Droid.Resource.String.library_name = global::MtSparked.Droid.Resource.String.library_name;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::MtSparked.Droid.Resource.Attribute.actionBarSize;
