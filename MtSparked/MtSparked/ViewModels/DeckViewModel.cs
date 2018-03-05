@@ -52,7 +52,7 @@ namespace MtSparked.ViewModels
 
                     List<Deck.BoardItem> boardItems = new List<Deck.BoardItem>(this.Deck.Boards[name].Values);
                     IEnumerable<CardWithBoard> cards = boardItems.OrderBy(bi => bi.Card.Cmc).ThenBy(bi => bi.Card.Name)
-                                                                       .Select(bi => new CardWithBoard(bi.Card, name));
+                                                                       .Select(bi => new CardWithBoard(bi.Card, name, this.Deck));
                     if (ConfigurationManager.ShowUnique)
                     {
                         cards = cards.DistinctBy(cwb => cwb.Name);
@@ -120,8 +120,9 @@ namespace MtSparked.ViewModels
             public string CroppedImageUrl { get; set; }
             public string ColorIdentity { get; set; }
             public string Rarity { get; set; }
+            public Deck Deck { get; set; }
 
-            public CardWithBoard(Card card, string board)
+            public CardWithBoard(Card card, string board, Deck deck)
             {
                 this.Id = card.Id;
                 this.Name = card.Name;
@@ -132,6 +133,7 @@ namespace MtSparked.ViewModels
                 this.ColorIdentity = card.ColorIdentity;
                 this.Rarity = card.Rarity;
                 this.Board = board;
+                this.Deck = deck;
             }
 
             public string Board { get; set; }

@@ -17,21 +17,27 @@ namespace MtSparked.Views
 	{
         Deck Deck;
         DeckViewModel viewModel;
+        bool Active = false;
         IUserDialogs Dialogs { get; set; }
 
         public DeckPage()
             : this(ConfigurationManager.ActiveDeck)
         { }
 
-        public DeckPage (Deck deck = null)
+        public DeckPage (Deck deck, bool active = true)
 		{
             InitializeComponent ();
 
-            Deck = ConfigurationManager.ActiveDeck = deck;
+            if (active)
+            {
+                Deck = ConfigurationManager.ActiveDeck = deck;
+            }
+            else
+            {
+                Deck = deck;
+            }
 
             this.BindingContext = viewModel = new DeckViewModel(Deck);
-
-            this.Dialogs = UserDialogs.Instance;
         }
 
         async void OnItemSelected(object sender, SelectedItemChangedEventArgs args)
@@ -58,6 +64,7 @@ namespace MtSparked.Views
 
         async void ManageDeck(object sender, EventArgs args)
         {
+            if (!Active) return;
             const string NEW_DECK = "New Deck";
             const string NAME_DECK = "Name Deck";
             const string OPEN_DECK = "Open Deck";
@@ -98,7 +105,7 @@ namespace MtSparked.Views
                 FileData fileData = await ConfigurationManager.FilePicker.OpenFileAs();
                 if(fileData is null)
                 {
-                    await DisplayAlert("Error", "Failed to open Deck File", "OK");
+                    await DisplayAlert("Error", "Failed to open Deck File", "Okay");
                 }
                 else
                 {
@@ -120,7 +127,7 @@ namespace MtSparked.Views
                 FileData fileData = await ConfigurationManager.FilePicker.OpenFileAs();
                 if (fileData is null)
                 {
-                    await DisplayAlert("Error", "Failed to import .dec File", "OK");
+                    await DisplayAlert("Error", "Failed to import .dec File", "Okay");
                 }
                 else
                 {

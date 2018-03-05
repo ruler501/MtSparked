@@ -92,11 +92,13 @@ namespace MtSparked.Views
             string board = Deck.MASTER;
             string id = null;
             string name = null;
+            Deck deck = ConfigurationManager.ActiveDeck;
             if (this.BindingContext is DeckViewModel.CardWithBoard cwb)
             {
                 board = cwb.Board;
                 id = cwb.Id;
                 name = cwb.Name;
+                deck = cwb.Deck;
             }
             else if(this.BindingContext is Card c)
             {
@@ -105,11 +107,11 @@ namespace MtSparked.Views
             }
             if (ConfigurationManager.ShowUnique)
             {
-                this.Count.Text = ConfigurationManager.ActiveDeck.GetCountByName(name, board).ToString();
+                this.Count.Text = deck.GetCountByName(name, board).ToString();
             }
             else
             {
-                this.Count.Text = ConfigurationManager.ActiveDeck.GetCount(id, board).ToString();
+                this.Count.Text = deck.GetCount(id, board).ToString();
             }
         }
     }

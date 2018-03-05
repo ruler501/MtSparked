@@ -26,10 +26,11 @@ namespace MtSparked.Models
             set
             {
                 this.name = value;
-                // this.SaveDeck();
+                // Can't save deck here because of the constructor.
                 this.changeEventSource.Raise(this, new NameChangedEventArgs(value));
             }
         }
+        public bool AutoSave { get; set; }
         public string StoragePath { get; set; }
         public IDictionary<string, IDictionary<string, BoardItem>> Boards { get; set; }
         public IDictionary<string, ISet<string>> CardsByName { get; set; }
@@ -50,8 +51,9 @@ namespace MtSparked.Models
             remove { changeEventSource.Unsubscribe(value); }
         }
 
-        public Deck()
+        public Deck(bool autoSave = true)
         {
+            this.AutoSave = autoSave;
             this.Boards = new Dictionary<string, IDictionary<string, BoardItem>>
             {
                 [MASTER] = new Dictionary<string, BoardItem>(),
@@ -406,7 +408,7 @@ namespace MtSparked.Models
             this.Boards[name] = new Dictionary<string, BoardItem>();
             this.BoardInfos.Add(new BoardInfo(name));
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, true));
-            this.SaveDeck();
+            if(this.AutoSave) this.SaveDeck();
         }
 
         public void RemoveBoard(string name)
@@ -424,7 +426,7 @@ namespace MtSparked.Models
                 }
             }
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, false));
-            this.SaveDeck();
+            if (this.AutoSave) this.SaveDeck();
         }
 
         public void AddCard(Card card, string boardName=MASTER, bool normal = true, int amount=1)

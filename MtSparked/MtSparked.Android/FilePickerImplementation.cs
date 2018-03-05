@@ -156,7 +156,7 @@ namespace MtSparked.Droid
 
         public void ReleaseFile(string path)
         {
-            if (path.StartsWith("content://"))
+            if (!(path is null) && path.StartsWith("content://"))
             {
                 this.context.ContentResolver.ReleasePersistableUriPermission(Android.Net.Uri.Parse(path),
                                                                              ActivityFlags.GrantReadUriPermission |

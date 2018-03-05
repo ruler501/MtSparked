@@ -67,6 +67,38 @@ namespace MtSparked.Services
             }
         }
 
+        private const string ACTIVE_CUBE_DEF_KEY = "ActiveCubeDefPath";
+        public static string DefaultCubeDefPath => Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "temp.cdef");
+        private static string activeCubePath = null;
+        public static string ActiveCubePath
+        {
+            get
+            {
+                if(activeCubePath is null)
+                {
+                    ActiveCubePath = AppSettings.GetValueOrDefault(ACTIVE_CUBE_DEF_KEY, DefaultCubeDefPath);
+                }
+                return activeCubePath;
+            }
+            set
+            {
+                if (activeCubePath != value)
+                {
+                    FilePicker.ReleaseFile(activeCubePath);
+
+                    if (FilePicker.PathExists(value))
+                    {
+                        activeCubePath = value;
+                    }
+                    else
+                    {
+                        activeCubePath = value;
+                        AppSettings.AddOrUpdateValue(ACTIVE_CUBE_DEF_KEY, value);
+                    }
+                }
+            }
+        }
+
         private static string SHOW_UNIQUE_KEY = "ShowUnique";
         public static bool ShowUnique
         {
