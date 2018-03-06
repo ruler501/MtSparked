@@ -99,6 +99,7 @@ namespace MtSparked.Views
             {
                 foreach(PackCard card in cards[i])
                 {
+                    generated.AddCard(card.Card, Deck.MASTER, !card.Foil);
                     generated.AddCard(card.Card, $"Pack {i+1}", !card.Foil);
                 }
             }

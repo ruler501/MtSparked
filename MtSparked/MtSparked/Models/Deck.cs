@@ -221,7 +221,7 @@ namespace MtSparked.Models
 
         public async void SaveDeckAs()
         {
-            if (Loading || this.StoragePath is null) return;
+            if (Loading) return;
 
             string text = this.ToString();
             byte[] fileContents = Encoding.UTF8.GetBytes(text);
@@ -413,10 +413,9 @@ namespace MtSparked.Models
 
         public void RemoveBoard(string name)
         {
-            if (Boards.ContainsKey(name) && name != MASTER)
-            {
-                this.Boards.Remove(name);
-            }
+            if (name is null || !Boards.ContainsKey(name) || name == MASTER) return;
+
+            this.Boards.Remove(name);
             for(int i=0; i < this.BoardInfos.Count; i++)
             {
                 if(this.BoardInfos[i].Name == name)
@@ -477,7 +476,7 @@ namespace MtSparked.Models
 
             changeEventSource.Raise(this, new CardCountChangedEventArgs(card, boardName, normal, amount));
 
-            this.SaveDeck();
+            if(this.AutoSave) this.SaveDeck();
         }
 
         public void RemoveCard(Card card, string boardName=MASTER, bool normal = true, int amount = 1)
@@ -545,7 +544,7 @@ namespace MtSparked.Models
 
             changeEventSource.Raise(this, new CardCountChangedEventArgs(card, boardName, normal, -amount));
 
-            this.SaveDeck();
+            if(this.AutoSave) this.SaveDeck();
         }
 
         public int GetNormalCount(Card card, string boardName=MASTER)
@@ -626,7 +625,7 @@ namespace MtSparked.Models
         public void BoardInfoRefreshed()
         {
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(null, false));
-            this.SaveDeck();
+            if(this.AutoSave) this.SaveDeck();
         }
 
         public class BoardItem

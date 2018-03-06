@@ -28,6 +28,9 @@ namespace MtSparked.Views
 		{
             InitializeComponent ();
 
+            this.Dialogs = UserDialogs.Instance;
+
+            this.Active = active;
             if (active)
             {
                 Deck = ConfigurationManager.ActiveDeck = deck;
@@ -35,6 +38,7 @@ namespace MtSparked.Views
             else
             {
                 Deck = deck;
+                this.ManageToolbarItem.Text = "Save As";
             }
 
             this.BindingContext = viewModel = new DeckViewModel(Deck);
@@ -64,7 +68,11 @@ namespace MtSparked.Views
 
         async void ManageDeck(object sender, EventArgs args)
         {
-            if (!Active) return;
+            if (!Active)
+            {
+                this.Deck.SaveDeckAs();
+                return;
+            }
             const string NEW_DECK = "New Deck";
             const string NAME_DECK = "Name Deck";
             const string OPEN_DECK = "Open Deck";

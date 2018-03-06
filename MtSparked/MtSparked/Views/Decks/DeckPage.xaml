@@ -7,7 +7,7 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Toggle Unique" Clicked="ToggleUnique"/>
         <ToolbarItem Text="Stats" Clicked="OpenStats"/>
-        <ToolbarItem Text="Manage" Clicked="ManageDeck" />
+        <ToolbarItem Text="Manage" Clicked="ManageDeck" x:Name="ManageToolbarItem"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <ListView x:Name="BoardList"
