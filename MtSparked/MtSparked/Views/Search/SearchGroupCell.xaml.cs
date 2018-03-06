@@ -83,12 +83,7 @@ namespace MtSparked.Views
 
         public CardDataStore.CardsQuery GetQuery()
         {
-            if ((BindingContext as SearchViewModel) is null)
-            {
-                throw new Exception("Invalid Binding Context");
-            }
-
-            SearchViewModel model = (SearchViewModel)BindingContext;
+            SearchViewModel model = viewModel;
 
             return model.CreateQuery(this.domain);
         }

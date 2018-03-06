@@ -64,6 +64,10 @@ namespace MtSparked.ViewModels
                     {
                         otherSet = ConfigurationManager.ActiveDeck.Cards.Select(bi => bi.Card);
                     }
+                    else if(criteria.Field is null)
+                    {
+                        continue;
+                    }
                     else
                     {
                         otherSet = ConfigurationManager.ActiveDeck.Boards[criteria.Field].Values.Select(bi => bi.Card);
@@ -79,14 +83,13 @@ namespace MtSparked.ViewModels
                     otherSet = model.CreateDomain();
                 }
 
-                if(otherSet is null)
-                {
-                    throw new NotImplementedException();
-                }
-
                 if(result is null)
                 {
                     result = otherSet;
+                }
+                else if(otherSet is null)
+                {
+                    continue;
                 }
                 else if(Connector == "All")
                 {

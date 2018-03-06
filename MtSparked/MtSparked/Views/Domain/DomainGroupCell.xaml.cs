@@ -84,12 +84,7 @@ namespace MtSparked.Views
 
         public IEnumerable<Card> CreateDomain()
         {
-            if ((BindingContext as DomainViewModel) is null)
-            {
-                throw new Exception("Invalid Binding Context");
-            }
-
-            DomainViewModel model = (DomainViewModel)BindingContext;
+            DomainViewModel model = viewModel;
 
             return model.CreateDomain();
         }
