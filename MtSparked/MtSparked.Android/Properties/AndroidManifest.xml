@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.0.8a" package="com.mtsparked" android:installLocation="auto" android:versionCode="9">
-	<uses-sdk android:minSdkVersion="19" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<application android:label="MtSparked">
-		<meta-data android:name="io.fabric.ApiKey" android:value="bed8ce42-e0d3-4b5f-bd11-10645f9c3e7f" />
-	</application>
-</manifest>
