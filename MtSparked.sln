@@ -15,11 +15,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.UpdateDatabase", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.Core", "MtSparked\MtSparked.Core\MtSparked.Core.csproj", "{FFFD302D-29E6-4613-A549-C881ACB49B98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtSparked.Interop", "MtSparked\MtSparked.Interop\MtSparked.Interop.csproj", "{D507266F-35CF-4A19-A01E-C9A590B25879}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.Interop", "MtSparked\MtSparked.Interop\MtSparked.Interop.csproj", "{D507266F-35CF-4A19-A01E-C9A590B25879}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "MtSparked\Platforms", "{E6356629-7814-44E5-81B5-3ACD26D2F9E5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{E6356629-7814-44E5-81B5-3ACD26D2F9E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtSparked.Platforms.Wasm", "MtSparked\Platforms\MtSparked.Platforms.Wasm\MtSparked.Platforms.Wasm.csproj", "{B462A0E3-450E-4EC7-B44D-BAF2E682F308}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.Platforms.Wasm", "MtSparked\Platforms\MtSparked.Platforms.Wasm\MtSparked.Platforms.Wasm.csproj", "{B462A0E3-450E-4EC7-B44D-BAF2E682F308}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E58BE1E2-D798-4311-9B7B-32E774C51597}"
+	ProjectSection(SolutionItems) = preProject
+		MtSparked.editorconfig = MtSparked.editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
