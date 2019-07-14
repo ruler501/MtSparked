@@ -1,86 +1,60 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
-using Xamarin.Forms;
-
-using MtSparked.Models;
-using MtSparked.Views;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using MtSparked.Services;
+using MtSparked.Interop.Models;
+using MtSparked.Core.Services;
 using System.Reflection;
 using System.Collections.Generic;
+using MtSparked.UI.Models;
 
-namespace MtSparked.ViewModels
-{
-    public class SearchViewModel : Model
-    {
-        public ObservableCollection<object> Items { get; set; }
-        public string Connector { get; set; }
-        public bool Negated { get; set; }
+namespace MtSparked.UI.ViewModels {
+    public class SearchViewModel : Model {
 
-        public SearchViewModel()
-        {
-            Items = new ObservableCollection<object>();
-            this.Connector = "All";
-        }
+        // TODO: Better restriction on typing for items.
+        public ObservableCollection<object> Items { get; private set; } = new ObservableCollection<object>();
+        public string Connector { get; private set; } = "All";
+        public bool Negated { get; private set; } = false;
 
-        public SearchCriteria AddCriteria()
-        {
+        public SearchCriteria AddCriteria() {
             SearchCriteria criteria = new SearchCriteria();
             this.Items.Add(criteria);
             return criteria;
         }
 
-        public SearchViewModel AddGroup()
-        {
+        public SearchViewModel AddGroup() {
             SearchViewModel model = new SearchViewModel();
-            model.AddCriteria();
+            _ = model.AddCriteria();
 
             this.Items.Add(model);
 
             return model;
         }
 
-        public CardDataStore.CardsQuery CreateQuery(IEnumerable<Card> domain = null)
-        {
-            CardDataStore.CardsQuery query = new CardDataStore.CardsQuery(Connector, domain);
-            foreach (object item in Items)
-            {
-                if (item is SearchCriteria criteria)
-                {
+        public CardDataStore.CardsQuery CreateQuery(IEnumerable<Card> domain = null) {
+            CardDataStore.CardsQuery query = new CardDataStore.CardsQuery(this.Connector, domain);
+            foreach (object item in this.Items) {
+                if (item is SearchCriteria criteria) {
                     string field = criteria.Field.Replace(" ", "");
                     PropertyInfo property = typeof(Card).GetProperty(field);
-                    if (property.PropertyType == typeof(bool))
-                    {
-                        query.Where(criteria.Field, criteria.Set);
+                    if (property.PropertyType == typeof(bool)) {
+                        query = query.Where(criteria.Field, criteria.Set);
+                    } else if (criteria.Operation == "Exists") {
+                        query = query.Where(criteria.Field, criteria.Operation, criteria.Set.ToString());
+                    } else if (criteria.Operation == "Contains" &&
+                            property.PropertyType == typeof(string) && field.Contains("Color")) {
+                        query = query.Where(criteria.Field, criteria.Operation, criteria.Color);
+                    } else {
+                        query = query.Where(criteria.Field, criteria.Operation, criteria.Value);
                     }
-                    else if (criteria.Operation == "Exists")
-                    {
-                        query.Where(criteria.Field, criteria.Operation, criteria.Set.ToString());
-                    }
-                    else if (criteria.Operation == "Contains" && property.PropertyType == typeof(string) && field.Contains("Color"))
-                    {
-                        query.Where(criteria.Field, criteria.Operation, criteria.Color);
-                    }
-                    else
-                    {
-                        query.Where(criteria.Field, criteria.Operation, criteria.Value);
-                    }
-                }
-                if (item is SearchViewModel model)
-                {
+                } else if (item is SearchViewModel model) {
                     CardDataStore.CardsQuery query2 = model.CreateQuery(domain);
-                    query.Where(query2);
+                    _ = query.Where(query2);
                 }
             }
-            if (Negated)
-            {
-                query.Negate();
+            if (this.Negated) {
+                query = query.Negate();
             }
             return query;
         }
+
     }
 }

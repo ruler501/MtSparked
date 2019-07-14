@@ -73,7 +73,7 @@ namespace MtSparked.Core.Cube.Parser {
         private static readonly Parser<char, ConstantIntNode> NumberConstant = DecimalNum.Select(n => new ConstantIntNode(n));
 
         // Value
-        private static readonly Parser<char, ICubeParserNode> Value = OneOf(Try(StringConstant.OfType<ICubeParserNode>()),
+        private static readonly Parser<char, ICubeParserNode> Value = Pidgin.Parser.OneOf(Try(StringConstant.OfType<ICubeParserNode>()),
                                                                   Try(NumberConstant.OfType<ICubeParserNode>()),
                                                                   Try(Rec(() => ValueGroup)),
                                                                   Try(Rec(() => ArrayConstant).OfType<ICubeParserNode>()),
@@ -115,7 +115,7 @@ namespace MtSparked.Core.Cube.Parser {
                                                                                                    .Between(LParen, RParen))
                                                                                         .Select(els => new FunctionNode(ValueFunction.Following, els.ToArray()));
         private static readonly Parser<char, FunctionNode> Function = Zip.Or(Rotate).Or(Concat)
-                                                                         .Or(OneOf(Try(GetProperty), Try(GetBoard)))
+                                                                         .Or(Pidgin.Parser.OneOf(Try(GetProperty), Try(GetBoard)))
                                                                          .Or(Following);
         
         // Operations
@@ -129,7 +129,7 @@ namespace MtSparked.Core.Cube.Parser {
                                                                         Value, UnpackOperator.Between(SkipWhitespaces), Identifier.Between(SkipWhitespaces)
                                                                                                          .Separated(Comma));
         private static readonly Parser<char, ICubeParserNode> AddCard = Add.Then(Value.Between(LParen, RParen)).Select<ICubeParserNode>(v => new AddNode(v));
-        private static readonly Parser<char, ICubeParserNode> ValueOperations = OneOf(Try(Assignment),
+        private static readonly Parser<char, ICubeParserNode> ValueOperations = Pidgin.Parser.OneOf(Try(Assignment),
                                                                           Try(ExtractWithReplacement),
                                                                           Try(ExtractNoReplacement),
                                                                           Try(Unpack),
@@ -150,7 +150,7 @@ namespace MtSparked.Core.Cube.Parser {
         private static readonly Parser<char, PropOperatorNode> Not = NotOperator.Then(SkipWhitespaces).Then(Proposition)
                                                                                 .Select(p => new PropOperatorNode(PropositionOperator.Not, new CubeParserNode<bool>[] { p }));
         
-        private static readonly Parser<char, PropOperatorNode> PropOperator = OneOf(Try(And), Try(Or), Try(Not));
+        private static readonly Parser<char, PropOperatorNode> PropOperator = Pidgin.Parser.OneOf(Try(And), Try(Or), Try(Not));
         
         // Proposition Functions
         private static readonly Parser<char, PropFunctionNode> ContainsExact = ContainsExactProp.Then(Value.Between(SkipWhitespaces)
@@ -177,12 +177,12 @@ namespace MtSparked.Core.Cube.Parser {
                                                                                             .Separated(Comma)
                                                                                             .Between(LParen, RParen))
                                                                                  .Select(els => new PropFunctionNode(PropositionFunction.Equals, els.ToArray()));
-        private static readonly Parser<char, PropFunctionNode> PropFunction = OneOf(Try(ContainsExact),
-                                                                                    Try(ContainsAtLeast),
-                                                                                    Try(Contains),
-                                                                                    Try(Intersects),
-                                                                                    Try(Subset),
-                                                                                    Try(Equal));
+        private static readonly Parser<char, PropFunctionNode> PropFunction = Pidgin.Parser.OneOf(Try(ContainsExact),
+                                                                                                 Try(ContainsAtLeast),
+                                                                                                 Try(Contains),
+                                                                                                 Try(Intersects),
+                                                                                                 Try(Subset),
+                                                                                                 Try(Equal));
 
         // Comprehension
         private static readonly Parser<char, ComprehensionNode> Comprehension = Map((v, _, p) => new ComprehensionNode(v, p),
@@ -190,8 +190,9 @@ namespace MtSparked.Core.Cube.Parser {
                                                                                     .Between(LBracket, RBracket);
 
         // Commands
-        private static readonly Parser<char, ICubeParserNode> Command = OneOf(Try(ValueOperations),
-                                                                    Try(Rec(() => RepeatBlock))).Between(SkipWhitespaces);
+        private static readonly Parser<char, ICubeParserNode> Command = Pidgin.Parser.OneOf(Try(ValueOperations),
+                                                                                            Try(Rec(() => RepeatBlock)))
+                                                                                     .Between(SkipWhitespaces);
         private static readonly Parser<char, ArrayNode> CommandBlock = Command.AtLeastOnce().Select(els => new ArrayNode(els.ToArray()));
 
         // Repeats

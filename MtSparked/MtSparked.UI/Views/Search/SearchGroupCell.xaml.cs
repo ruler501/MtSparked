@@ -1,118 +1,94 @@
-﻿using MtSparked.Models;
-using MtSparked.Services;
-using MtSparked.ViewModels;
+﻿using MtSparked.Interop.Models;
+using MtSparked.Core.Services;
+using MtSparked.UI.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using MtSparked.UI.Models;
 
-namespace MtSparked.Views
-{
+namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class SearchGroupCell : ContentView, IQueryable
-    {
-        SearchViewModel viewModel;
-        IEnumerable<Card> domain = null;
+	public partial class SearchGroupCell : ContentView, IQueryable {
+        private SearchViewModel ViewModel { get; }
+        private IEnumerable<Card> Domain { get; set; }
 
         public SearchGroupCell ()
             : this(new SearchViewModel())
-		{
-        }
+		{}
 
-        public SearchGroupCell(SearchViewModel model)
-        {
-            InitializeComponent();
+        public SearchGroupCell(SearchViewModel model) {
+            this.InitializeComponent();
 
-            this.BindingContext = viewModel = model;
+            this.BindingContext = this.ViewModel = model;
 
             this.CreateChildren();
         }
 
-        public void AddItem(object sender, EventArgs e)
-        {
-            SearchCriteria criteria = viewModel.AddCriteria();
+        public void AddItem(object sender, EventArgs e) {
+            SearchCriteria criteria = this.ViewModel.AddCriteria();
             this.AddCriteria(criteria);
         }
 
-        void AddGroup(object sender, EventArgs e)
-        {
-            SearchViewModel model = viewModel.AddGroup();
+        public void AddGroup(object sender, EventArgs e) {
+            SearchViewModel model = this.ViewModel.AddGroup();
             this.AddModel(model);
         }
 
         protected void CreateChildren() { 
             this.StackLayout.Children.Clear();
-            foreach(object value in viewModel.Items)
-            {
-                if(value is SearchViewModel model)
-                {
+            foreach(object value in this.ViewModel.Items) {
+                if(value is SearchViewModel model) {
                     this.AddModel(model);
-                }
-                else if(value is SearchCriteria criteria){
+                } else if(value is SearchCriteria criteria) {
                     this.AddCriteria(criteria);
-                }
-                else
-                {
+                } else {
                     throw new NotImplementedException();
                 }
             }
         }
 
-        protected void AddModel(SearchViewModel model)
-        {
-            var grid = new Grid();
+        protected void AddModel(SearchViewModel model) {
+            Grid grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(19, GridUnitType.Star) });
 
-            grid.Children.Add(new Frame()
-            {
-                IsVisible = false
-            }, 0, 0);
+            grid.Children.Add(new Frame() { IsVisible = false }, 0, 0);
             grid.Children.Add(new SearchGroupCell(model), 1, 0);
             this.StackLayout.Children.Add(grid);
         }
 
-        protected void AddCriteria(SearchCriteria criteria)
-        {
-            this.StackLayout.Children.Add(new SearchCriteriaCell(criteria));
+        protected void AddCriteria(SearchCriteria criteria) => this.StackLayout.Children.Add(new SearchCriteriaCell(criteria));
+
+        public CardDataStore.CardsQuery GetQuery() {
+            SearchViewModel model = this.ViewModel;
+
+            return model.CreateQuery(this.Domain);
         }
 
-        public CardDataStore.CardsQuery GetQuery()
-        {
-            SearchViewModel model = viewModel;
-
-            return model.CreateQuery(this.domain);
-        }
-
-        public void Clear()
-        {
-            this.viewModel.Items.Clear();
+        public void Clear() {
+            this.ViewModel.Items.Clear();
             this.StackLayout.Children.Clear();
         }
 
-        double translatedX = 0;
-        void OnPanUpdated(object sender, PanUpdatedEventArgs e)
-        {
-            switch (e.StatusType)
-            {
-                case GestureStatus.Running:
-                    this.ControlGrid.TranslationX = translatedX + e.TotalX ;
-                    break;
-
-                case GestureStatus.Completed:
-                    // Store the translation applied during the pan
-                    this.translatedX = Content.TranslationX;
-                    break;
+        private double translatedX = 0;
+        private void OnPanUpdated(object sender, PanUpdatedEventArgs e) {
+            switch (e.StatusType) { 
+            case GestureStatus.Running:
+                this.ControlGrid.TranslationX = translatedX + e.TotalX ;
+                break;
+            case GestureStatus.Completed:
+                // Store the translation applied during the pan
+                this.translatedX = Content.TranslationX;
+                break;
+            default:
+                throw new NotImplementedException();
             }
         }
 
-        public void SetDomain(IEnumerable<Card> domain)
-        {
-            this.domain = domain;
+        // TODO: Why don't we have a setter for this?
+        public void SetDomain(IEnumerable<Card> domain) {
+            this.Domain = domain;
         }
     }
 }

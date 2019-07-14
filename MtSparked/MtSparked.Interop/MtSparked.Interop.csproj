@@ -1,11 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OneOf" Version="2.1.146" />
     <PackageReference Include="Realm" Version="4.0.1" />
+    <PackageReference Include="ruler501.Equ" Version="2.0.4" />
     <PackageReference Include="ThomasLevesque.WeakEvent" Version="3.0.0" />
   </ItemGroup>
 

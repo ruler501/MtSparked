@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:MtSparked.Views"
-             x:Class="MtSparked.Views.DomainPage"
+             xmlns:local="clr-namespace:MtSparked.UI.Views.Search"
+             x:Class="MtSparked.UI.Views.Search.DomainPage"
              x:Name="SearchPage">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Clear" Clicked="Clear" />

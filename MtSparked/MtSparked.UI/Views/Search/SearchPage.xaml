@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:MtSparked.Views"
-             x:Class="MtSparked.Views.SearchPage"
-             x:Name="SearchPage">
+             xmlns:local="clr-namespace:MtSparked.UI.Views.Search"
+             x:Class="MtSparked.UI.Views.Search.SearchPage"
+             x:Name="SearchView">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Set Domain" Clicked="SetDomain"/>
         <ToolbarItem Text="Clear" Clicked="Clear" />

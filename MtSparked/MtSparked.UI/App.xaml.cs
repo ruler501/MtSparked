@@ -1,9 +1,9 @@
 ﻿using System;
 
-using MtSparked.Views;
+using MtSparked.UI.Views;
 using Xamarin.Forms;
 
-namespace MtSparked
+namespace MtSparked.UI
 {
 	public partial class App : Application
 	{

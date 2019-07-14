@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -15,11 +15,12 @@
     <PackageReference Include="Ooui.Forms" Version="0.10.222" />
     <PackageReference Include="Ooui.Wasm" Version="0.10.222" />
     <PackageReference Include="Realm" Version="4.0.1" />
+    <PackageReference Include="Xamarin.Forms" Version="4.1.0.581479" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\MtSparked.Core\MtSparked.Core.csproj" />
-    <ProjectReference Include="..\..\MtSparked\MtSparked.UI.csproj" />
+    <ProjectReference Include="..\..\MtSparked.UI\MtSparked.UI.csproj" />
   </ItemGroup>
 
 </Project>

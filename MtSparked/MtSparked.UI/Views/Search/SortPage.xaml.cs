@@ -1,39 +1,31 @@
-﻿using MtSparked.Services;
+﻿using MtSparked.Core.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace MtSparked.Views
-{
+namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class SortPage : ContentPage
-	{
-		public SortPage ()
-		{
-			InitializeComponent ();
+	public partial class SortPage : ContentPage {
 
+		public SortPage () {
+			this.InitializeComponent ();
             int index = this.CriteriaPicker.Items.IndexOf(ConfigurationManager.SortCriteria);
-            index = index >= 0 ? index : 0;
-
+            if(index < 0) {
+                index = 0;
+            }
             this.CriteriaPicker.SelectedIndex = index;
-
             this.CountByGroupSwitch.IsToggled = ConfigurationManager.CountByGroup;
-
             this.DescendingSortSwitch.IsToggled = ConfigurationManager.DescendingSort;
 		}
 
-        public void OnConfirm(object sender, EventArgs args)
-        {
+        public void OnConfirm(object sender, EventArgs args) {
             ConfigurationManager.SortCriteria = (string)this.CriteriaPicker.SelectedItem;
             ConfigurationManager.CountByGroup = this.CountByGroupSwitch.IsToggled;
             ConfigurationManager.DescendingSort = this.DescendingSortSwitch.IsToggled;
 
-            Navigation.RemovePage(this);
+            this.Navigation.RemovePage(this);
         }
+
 	}
 }

@@ -298,7 +298,7 @@ namespace MtSparked.Interop.Models {
                 set { _ = this.SetProperty(ref this.name, value); }
             }
             private bool viewable; 
-            public bool Visibible {
+            public bool Visible {
                 get { return this.viewable; }
                 set { _ = this.SetProperty(ref this.viewable, value); }
             }

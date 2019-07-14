@@ -1,108 +1,70 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 using Xamarin.Forms;
 
-using MtSparked.Models;
-using MtSparked.Services;
+using MtSparked.Interop.Models;
+using MtSparked.Core.Services;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Diagnostics;
 
-namespace MtSparked.ViewModels
-{
-    public class CardsViewModel : INotifyPropertyChanged
-    {
-        public CardDataStore DataStore;
+namespace MtSparked.UI.ViewModels {
+    public class CardsViewModel : Model {
+        
+        public CardDataStore DataStore { get; }
 
-        bool isBusy = false;
-        public bool IsBusy
-        {
-            get { return isBusy; }
-            set { SetProperty(ref isBusy, value); }
+        private bool isBusy = false;
+        public bool IsBusy {
+            get { return this.isBusy; }
+            set { _ = this.SetProperty(ref this.isBusy, value); }
         }
 
-        string title = string.Empty;
-        public string Title
-        {
-            get { return title; }
-            set { SetProperty(ref title, value); }
+        private string title = "Cards";
+        public string Title {
+            get { return this.title; }
+            set { _ = this.SetProperty(ref this.title, value); }
         }
 
-        private ObservableCollection<EnhancedGrouping<Card>> items;
-        public ObservableCollection<EnhancedGrouping<Card>> Items { get => items; set => SetProperty(ref items, value); }
-        public int CardCount => Items.Count;
-        public Command LoadItemsCommand { get; set; }
+        private ObservableCollection<EnhancedGrouping<Card>> items = new ObservableCollection<EnhancedGrouping<Card>>();
+        public ObservableCollection<EnhancedGrouping<Card>> Items {
+            get { return this.items; }
+            set { _ = this.SetProperty(ref this.items, value); }
+        }
+        public int CardCount => this.Items.Count;
+        public Command LoadItemsCommand { get; private set; }
 
-        void ExecuteLoadItemsCommand()
-        {
-            if (IsBusy)
+        private void ExecuteLoadItemsCommand() {
+            if (this.IsBusy) {
                 return;
+            }
 
-            IsBusy = true;
+            this.IsBusy = true;
 
-            try
-            {
+            try {
                 this.DataStore.LoadCards();
 
                 this.Items = new ObservableCollection<EnhancedGrouping<Card>>(this.DataStore.Items);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-            finally
-            {
-                IsBusy = false;
+            } catch (Exception ex) {
+                System.Diagnostics.Debug.WriteLine(ex);
+            } finally {
+                this.IsBusy = false;
             }
         }
 
-        public CardsViewModel(CardDataStore store)
-        {
-            Title = "Cards";
-            Items = new ObservableCollection<EnhancedGrouping<Card>>();
-            LoadItemsCommand = new Command(() => ExecuteLoadItemsCommand());
+        public CardsViewModel(CardDataStore store) {
+            this.LoadItemsCommand = new Command(() => this.ExecuteLoadItemsCommand());
             this.DataStore = store;
             ConfigurationManager.PropertyChanged += this.OnUniqueUpdated;
             this.LoadItemsCommand.Execute(null);
         }
 
-        private void OnUniqueUpdated(object sender, PropertyChangedEventArgs args)
-        {
+        private void OnUniqueUpdated(object sender, PropertyChangedEventArgs args) {
             if (args.PropertyName == nameof(ConfigurationManager.ShowUnique)
                 || args.PropertyName == nameof(ConfigurationManager.SortCriteria)
                 || args.PropertyName == nameof(ConfigurationManager.DescendingSort)
-                || args.PropertyName == nameof(ConfigurationManager.CountByGroup))
-            {
+                || args.PropertyName == nameof(ConfigurationManager.CountByGroup)) {
                 this.LoadItemsCommand.Execute(null);
             }
         }
 
-        protected bool SetProperty<T>(ref T backingStore, T value,
-            [CallerMemberName]string propertyName = "",
-            Action onChanged = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return false;
-
-            backingStore = value;
-            onChanged?.Invoke();
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            var changed = PropertyChanged;
-            if (changed == null)
-                return;
-
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
     }
 }

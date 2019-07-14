@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 using MtSparked.Interop.Models;
+using MtSparked.Interop.Utils;
 using Realms;
 
 namespace MtSparked.Core.Services {
@@ -177,13 +178,12 @@ namespace MtSparked.Core.Services {
             Items = grouping.Select(g => new EnhancedGrouping<Card>(g, labelFunc)).ToList();
         }
         
-        // TODO: Can we make this look like an Enumerable?
         public class CardsQuery {
 
-            Expression builtExpression = null;
-            static ParameterExpression param = Expression.Parameter(typeof(Card), "card");
+            private Expression BuiltExpression { get; set; } = null;
+            private static ParameterExpression Param { get; } = Expression.Parameter(typeof(Card), "card");
             // TODO: Connector should be an enum.
-            string Connector;
+            private string Connector { get; }
 
             public IEnumerable<Card> Domain { get; private set; }
 
@@ -192,18 +192,23 @@ namespace MtSparked.Core.Services {
                 this.Domain = domain;
             }
 
+            public static CardsQuery FromString(string query) {
+                // TODO: Implement
+                return null;
+            }
+
             public CardsQuery Where(string field, bool set) {
                 field = field.Replace(" ", "");
-                Expression property = Expression.Property(param, field);
+                Expression property = Expression.Property(CardsQuery.Param, field);
                 Expression constant = Expression.Constant(set, typeof(bool));
                 Expression fullCombine = Expression.Equal(property, constant);
 
-                if (this.builtExpression is null) {
-                    this.builtExpression = fullCombine;
+                if (this.BuiltExpression is null) {
+                    this.BuiltExpression = fullCombine;
                 } else if (this.Connector == "All") {
-                    this.builtExpression = Expression.AndAlso(builtExpression, fullCombine);
+                    this.BuiltExpression = Expression.AndAlso(BuiltExpression, fullCombine);
                 } else if (this.Connector == "Any") {
-                    this.builtExpression = Expression.OrElse(builtExpression, fullCombine);
+                    this.BuiltExpression = Expression.OrElse(BuiltExpression, fullCombine);
                 } else {
                     throw new NotImplementedException();
                 }
@@ -235,8 +240,8 @@ namespace MtSparked.Core.Services {
                     }
                 }
 
-                Expression property = Expression.Property(param, field);
-                Expression constant = Expression.Constant(value);
+                Expression property = Expression.Property(Param, field);
+                Expression constant;
                 PropertyInfo propertyInfo = typeof(Card).GetProperty(field);
                 if(propertyInfo.PropertyType == typeof(bool) || op == "Exists") {
                     bool val = Boolean.Parse(value);
@@ -291,12 +296,12 @@ namespace MtSparked.Core.Services {
                     throw new NotImplementedException();
                 }
 
-                if (this.builtExpression is null) {
-                    this.builtExpression = fullCombine;
-                } else if(Connector == "All")  {
-                    this.builtExpression = Expression.AndAlso(builtExpression, fullCombine);
-                } else if (Connector == "Any") {
-                    this.builtExpression = Expression.OrElse(builtExpression, fullCombine);
+                if (this.BuiltExpression is null) {
+                    this.BuiltExpression = fullCombine;
+                } else if (this.Connector == "All") {
+                    this.BuiltExpression = Expression.AndAlso(this.BuiltExpression, fullCombine);
+                } else if (this.Connector == "Any") {
+                    this.BuiltExpression = Expression.OrElse(this.BuiltExpression, fullCombine);
                 } else {
                     throw new NotImplementedException();
                 }
@@ -306,16 +311,16 @@ namespace MtSparked.Core.Services {
 
             public CardsQuery Where(CardsQuery other)
             {
-                Expression otherExpression = other?.builtExpression;
+                Expression otherExpression = other?.BuiltExpression;
                 if(otherExpression is null) {
                     throw new ArgumentNullException(nameof(other));
                 }
-                if(this.builtExpression is null) {
-                    this.builtExpression = other.builtExpression;
-                } else if (Connector == "All") {
-                    this.builtExpression = Expression.AndAlso(builtExpression, otherExpression);
-                } else if (Connector == "Any") {
-                    this.builtExpression = Expression.OrElse(builtExpression, otherExpression);
+                if(this.BuiltExpression is null) {
+                    this.BuiltExpression = other.BuiltExpression;
+                } else if (this.Connector == "All") {
+                    this.BuiltExpression = Expression.AndAlso(BuiltExpression, otherExpression);
+                } else if (this.Connector == "Any") {
+                    this.BuiltExpression = Expression.OrElse(BuiltExpression, otherExpression);
                 } else {
                     throw new NotImplementedException();
                 }
@@ -325,20 +330,20 @@ namespace MtSparked.Core.Services {
 
             public CardsQuery Negate()
             {
-                if(this.builtExpression is null) {
+                if(this.BuiltExpression is null) {
                     throw new Exception("Cannot negate an empty query");
                 } else {
-                    this.builtExpression = Expression.Not(this.builtExpression);
+                    this.BuiltExpression = Expression.Not(this.BuiltExpression);
                 }
 
                 return this;
             }
 
-            private Expression<Func<Card, bool>> BuildExpression() => Expression.Lambda<Func<Card, bool>>(this.builtExpression ?? Expression.Constant(true), param);
+            private Expression<Func<Card, bool>> BuildExpression() => Expression.Lambda<Func<Card, bool>>(this.BuiltExpression ?? Expression.Constant(true), CardsQuery.Param);
 
             public CardDataStore ToDataStore() => new CardDataStore(this.BuildExpression(), this.Domain);
 
-            public List<Card> ToList() {
+            public IList<Card> ToList() {
                 if(this.Domain is null) {
                     return realm.All<Card>().Where(this.BuildExpression()).ToList();
                 } else {

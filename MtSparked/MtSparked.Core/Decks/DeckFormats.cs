@@ -12,8 +12,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 // TODO: Refactor into multiple services
-namespace MtSparked.Core.Cube.Decks {
-    static class DeckFormats {
+namespace MtSparked.Core.Decks {
+    public static class DeckFormats {
 
         // Refactor a JDec management class/namespace
         public static Deck FromJdec(string path) {
@@ -233,7 +233,7 @@ namespace MtSparked.Core.Cube.Decks {
                 // TODO: Change Viewable into Visible?
                 boardInfos.Add(new JObject {
                     [Deck.NAME] = info.Name,
-                    [Deck.VISIBLE] = info.Visibible,
+                    [Deck.VISIBLE] = info.Visible,
                     [Deck.EDITABLE] = info.Editable
                 });
             }

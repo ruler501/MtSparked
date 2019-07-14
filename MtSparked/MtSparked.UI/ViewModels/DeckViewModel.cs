@@ -1,30 +1,35 @@
-﻿using MtSparked.Models;
-using MtSparked.Services;
-using System;
+﻿using MtSparked.Interop.Models;
+using MtSparked.Core.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
+using MtSparked.Core;
+using MtSparked.Interop.Utils;
 
-namespace MtSparked.ViewModels
-{
-    class DeckViewModel : INotifyPropertyChanged
-    {
-        ObservableCollection<Board> boards = new ObservableCollection<Board>();
-        public ObservableCollection<Board> Boards { get => boards; set => SetProperty(ref boards, value); }
+namespace MtSparked.UI.ViewModels {
+    public class DeckViewModel : Model {
 
-        public IDictionary<string, Board> BoardByName = new Dictionary<string, Board>();
+        private ObservableCollection<Board> boards = new ObservableCollection<Board>();
+        public ObservableCollection<Board> Boards {
+            get { return this.boards; }
+            set { _ = this.SetProperty(ref this.boards, value); }
+        }
 
-        Deck Deck;
+        public IDictionary<string, Board> BoardByName { get; } = new Dictionary<string, Board>();
 
-        string name = "Unnamed";
-        public string Name { get => name; set => SetProperty(ref name, value); }
+        private Deck deck;
+        public Deck Deck {
+            get { return this.deck; }
+            set {
+                _ = this.SetProperty(ref this.deck, value);
+                this.OnPropertyChanged(nameof(this.Name));
+            }
+        }
 
-        public DeckViewModel(Deck deck)
-        {
-            this.Name = deck.Name;
+        public string Name => this.Deck?.Name;
+
+        public DeckViewModel(Deck deck) {
             this.Deck = deck;
 
             this.UpdateBoards();
@@ -33,28 +38,24 @@ namespace MtSparked.ViewModels
             ConfigurationManager.PropertyChanged += this.OnUniqueChanged;
         }
         
-        public void UpdateBoards(object sender = null, DeckChangedEventArgs args = null)
-        {
-            if (args is NameChangedEventArgs nameChange)
-            {
-                this.Name = nameChange.Name;
-            }
-            else if (args is null ||
+        public void UpdateBoards(object sender = null, DeckChangedEventArgs args = null) {
+            if (args is NameChangedEventArgs nameChange) {
+                this.OnPropertyChanged(nameof(this.Name));
+            } else if (args is null ||
                      args is CardCountChangedEventArgs ||
-                     args is BoardChangedEventArgs)
-            {
+                     args is BoardChangedEventArgs) {
                 this.BoardByName.Clear();
                 ObservableCollection<Board> boards = new ObservableCollection<Board>();
-                foreach (Deck.BoardInfo boardInfo in this.Deck.BoardInfos)
-                {
+                foreach (Deck.BoardInfo boardInfo in this.Deck.BoardInfos) {
                     string name = boardInfo.Name;
-                    if (!boardInfo.Viewable) continue;
+                    if (!boardInfo.Visible) {
+                        continue;
+                    }
 
                     List<Deck.BoardItem> boardItems = new List<Deck.BoardItem>(this.Deck.Boards[name].Values);
                     IEnumerable<CardWithBoard> cards = boardItems.OrderBy(bi => bi.Card.Cmc).ThenBy(bi => bi.Card.Name)
                                                                        .Select(bi => new CardWithBoard(bi.Card, name, this.Deck));
-                    if (ConfigurationManager.ShowUnique)
-                    {
+                    if (ConfigurationManager.ShowUnique) {
                         cards = cards.DistinctBy(cwb => cwb.Name);
                     }
                     Board board = new Board(name + ": " + this.Deck.GetCountInBoard(name).ToString(), cards);
@@ -65,62 +66,35 @@ namespace MtSparked.ViewModels
             }
         }
 
-        public void OnUniqueChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if(args.PropertyName == nameof(ConfigurationManager.ShowUnique))
-            {
+        public void OnUniqueChanged(object sender, PropertyChangedEventArgs args) {
+            if(args.PropertyName == nameof(ConfigurationManager.ShowUnique)) {
                 this.UpdateBoards();
             }
         }
 
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
+        public class Board : List<CardWithBoard> {
 
-        protected bool SetProperty<T>(ref T backingStore, T value,
-            [CallerMemberName]string propertyName = "",
-            Action onChanged = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return false;
-
-            backingStore = value;
-            onChanged?.Invoke();
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            var changed = PropertyChanged;
-            if (changed == null)
-                return;
-
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
-
-        public class Board : List<CardWithBoard>
-        {
-            public string Name { get; set; }
+            public string Name { get; }
 
             public Board(string name, IEnumerable<CardWithBoard> cards)
-            : base(cards)
-            {
+            : base(cards) {
                 this.Name = name;
             }
+
         }
 
-        public class CardWithBoard
-        {
-            public string Id { get; set; }
-            public string Name { get; set; }
-            public string TypeLine { get; set; }
-            public string ManaCost { get; set; }
-            public string SetCode { get; set; }
-            public string CroppedImageUrl { get; set; }
-            public string ColorIdentity { get; set; }
-            public string Rarity { get; set; }
-            public Deck Deck { get; set; }
+        public class CardWithBoard {
+
+            public string Id { get; }
+            public string Name { get; }
+            public string TypeLine { get; }
+            public string ManaCost { get; }
+            public string SetCode { get; }
+            public string CroppedImageUrl { get; }
+            public string ColorIdentity { get; }
+            public string Rarity { get; }
+            public Deck Deck { get; }
+            public string Board { get; }
 
             public CardWithBoard(Card card, string board, Deck deck)
             {
@@ -136,7 +110,7 @@ namespace MtSparked.ViewModels
                 this.Deck = deck;
             }
 
-            public string Board { get; set; }
         }
+
     }
 }

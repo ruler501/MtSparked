@@ -1,44 +1,29 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Threading.Tasks;
 
-using Xamarin.Forms;
-
-using MtSparked.Models;
-using MtSparked.Views;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using MtSparked.Services;
-using System.Reflection;
+using MtSparked.UI.Models;
+using MtSparked.Interop.Models;
+using MtSparked.Core.Services;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MtSparked.ViewModels
-{
-    public class DomainViewModel : Model
-    {
-        public ObservableCollection<object> Items { get; set; }
-        public string Connector { get; set; }
-        public bool Negated { get; set; }
+namespace MtSparked.UI.ViewModels {
+    public class DomainViewModel : Model {
 
-        public DomainViewModel()
-        {
-            Items = new ObservableCollection<object>();
-            this.Connector = "All";
-        }
+        public ObservableCollection<object> Items { get; private set; } = new ObservableCollection<object>();
+        // TODO: Make Enum.
+        public string Connector { get; private set; } = "All";
+        public bool Negated { get; private set; }
 
-        public DomainCriteria AddCriteria()
-        {
+        public DomainCriteria AddCriteria() {
             DomainCriteria criteria = new DomainCriteria();
             this.Items.Add(criteria);
             return criteria;
         }
 
-        public DomainViewModel AddGroup()
-        {
+        public DomainViewModel AddGroup() {
             DomainViewModel model = new DomainViewModel();
-            model.AddCriteria();
+            _ = model.AddCriteria();
 
             this.Items.Add(model);
 
@@ -46,71 +31,51 @@ namespace MtSparked.ViewModels
         }
 
         public static IEnumerable<Card> universe = null;
-        public static IEnumerable<Card> Universe { get => universe ?? (universe = CardDataStore.realm.All<Card>().ToList()); }
+        public static IEnumerable<Card> Universe => universe ?? (universe = CardDataStore.realm.All<Card>().ToList());
 
-        public IEnumerable<Card> CreateDomain()
-        {
+        public IEnumerable<Card> CreateDomain() {
             IEnumerable<Card> result = null;
-            foreach(object item in this.Items)
-            {
+            foreach(object item in this.Items) {
                 IEnumerable<Card> otherSet = null;
-                if(item is DomainCriteria criteria)
-                {
-                    if(criteria.Field == DomainCriteria.ALL_CARDS)
-                    {
+                if(item is DomainCriteria criteria) {
+                    if(criteria.Field == DomainCriteria.ALL_CARDS) {
                         otherSet = Universe;
-                    }
-                    else if(criteria.Field == DomainCriteria.ACTIVE_DECK)
-                    {
+                    } else if(criteria.Field == DomainCriteria.ACTIVE_DECK) {
                         otherSet = ConfigurationManager.ActiveDeck.Cards.Select(bi => bi.Card);
-                    }
-                    else if(criteria.Field is null)
-                    {
+                    } else if(criteria.Field is null) {
                         continue;
-                    }
-                    else
-                    {
+                    } else {
                         otherSet = ConfigurationManager.ActiveDeck.Boards[criteria.Field].Values.Select(bi => bi.Card);
                     }
 
-                    if (!criteria.Set)
-                    {
+                    if (!criteria.Set) {
                         otherSet = Universe.Except(otherSet, new CardEqualityComparer());
                     }
-                }
-                else if(item is DomainViewModel model)
-                {
+                } else if(item is DomainViewModel model) {
                     otherSet = model.CreateDomain();
+                } else {
+                    throw new NotImplementedException();
                 }
 
-                if(result is null)
-                {
+                if(result is null) {
                     result = otherSet;
-                }
-                else if(otherSet is null)
-                {
+                } else if(otherSet is null) {
                     continue;
-                }
-                else if(Connector == "All")
-                {
+                } else if(this.Connector == "All") {
                     result = result.Intersect(otherSet, new CardEqualityComparer());
-                }
-                else if(Connector == "Any")
-                {
+                } else if (this.Connector == "Any") {
                     result = result.Union(otherSet, new CardEqualityComparer());
-                }
-                else
-                {
+                } else {
                     throw new NotImplementedException();
                 }
             }
 
-            if (this.Negated && !(result is null))
-            {
+            if (this.Negated && !(result is null)) {
                 result = Universe.Except(result, new CardEqualityComparer());
             }
 
             return result;
         }
+
     }
 }
