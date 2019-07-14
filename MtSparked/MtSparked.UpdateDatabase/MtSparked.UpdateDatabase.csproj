@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <StartupObject>MtSparked.UpdateDatabase.Program</StartupObject>
+    <Configurations>Debug;Release;Android Debug;Android Release;iOS Debug;iOS Release;Wasm Debug;Wasm Release;AspNetCore Debug;AspNetCore Release;Libraries Debug;Libraries Release</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />

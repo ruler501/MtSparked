@@ -23,7 +23,7 @@ namespace MtSparked.iOS {
             
             SfDataGridRenderer.Init();
 
-            LoadApplication(new UI.App());
+            this.LoadApplication(new UI.App());
 
             const string prepopulated = "cards.db.cache";
             const string realmDB = "cards.db";

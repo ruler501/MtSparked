@@ -33,9 +33,9 @@ namespace MtSparked.Platforms.Droid {
             Intent intent;
             if (saving) {
                 intent = new Intent(Intent.ActionCreateDocument);
-                _ = intent.PutExtra(Intent.ExtraTitle, Intent.GetStringExtra(TITLE_KEY));
+                _ = intent.PutExtra(Intent.ExtraTitle, this.Intent.GetStringExtra(TITLE_KEY));
                 requestCode = WRITE_REQUEST_CODE;
-                this.data = Intent.GetByteArrayExtra(DATA_KEY);
+                this.data = this.Intent.GetByteArrayExtra(DATA_KEY);
             } else {
                 intent = new Intent(Intent.ActionOpenDocument);
                 requestCode = READ_REQUEST_CODE;
@@ -46,10 +46,15 @@ namespace MtSparked.Platforms.Droid {
             _ = intent.SetType("*/*");
             _ = intent.AddCategory(Intent.CategoryOpenable);
 
+            Intent chooser = null;
             try {
-                this.StartActivityForResult(Intent.CreateChooser(intent, "Select file"), requestCode);
+                chooser = Intent.CreateChooser(intent, "Select file");
+                this.StartActivityForResult(chooser, requestCode);
             } catch (Exception exAct) {
                 System.Diagnostics.Debug.Write(exAct);
+            } finally {
+                intent?.Dispose();
+                chooser?.Dispose();
             }
         }
 

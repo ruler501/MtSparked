@@ -24,16 +24,10 @@ namespace MtSparked.Interop.Models {
             get { return this.name; }
             set {
                 this.name = value;
-                // Can't save deck here because of the constructor.
-                // TODO: Fix this since the constructor will no longer call it.
                 this.changeEventSource.Raise(this, new NameChangedEventArgs(value));
             }
         }
 
-        public static Deck FromJdec(string defaultDeckPath) => throw new NotImplementedException();
-
-        // TODO: Update all public set methods to conform to Model requirements.
-        // TODO: Given how several of these are interrelated it should not be possible to modify one without also modifying the others.
         public bool AutoSave { get; set; }
         private string storagePath;
         public string StoragePath {
@@ -60,7 +54,8 @@ namespace MtSparked.Interop.Models {
         public ICollection<BoardItem> Cards => this.Master.Values;
         public ICollection<string> CardNames => this.CardsByName.Keys;
 
-        private bool Loading = false;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+        private bool Loading { get; set; } = false;
 
         private readonly WeakEventSource<DeckChangedEventArgs> changeEventSource = new WeakEventSource<DeckChangedEventArgs>();
         public event EventHandler<DeckChangedEventArgs> ChangeEvent {
@@ -80,7 +75,7 @@ namespace MtSparked.Interop.Models {
             this.Boards[name] = new Dictionary<string, BoardItem>();
             this.BoardInfos.Add(new BoardInfo(name));
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, true));
-            /* TODO: Handle integration with file management.
+            /* TODO #59: Have Decks use IDeckFormats from ConfigurationManager for Persistence
             if(this.AutoSave) {
                 this.SaveDeck();
             }
@@ -89,7 +84,7 @@ namespace MtSparked.Interop.Models {
 
         public void RemoveBoard(string name)
         {
-            if (name is null || !Boards.ContainsKey(name) || name == MASTER) {
+            if (name is null || !this.Boards.ContainsKey(name) || name == MASTER) {
                 return;
             }
 
@@ -101,7 +96,7 @@ namespace MtSparked.Interop.Models {
                 }
             }
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(name, false));
-            /* TODO: Handle integration with file management.
+            /* TODO #59: Have Decks use IDeckFormats from ConfigurationManager for Persistence
             if(this.AutoSave) {
                 this.SaveDeck();
             }
@@ -121,7 +116,7 @@ namespace MtSparked.Interop.Models {
                 boardItem = new BoardItem() { Card = card };
                 board[card.Id] = boardItem;
                 if (this.CardsByName.ContainsKey(card.Name)) {
-                    this.CardsByName[card.Name].Add(card.Id);
+                    _ = this.CardsByName[card.Name].Add(card.Id);
                 } else {
                     this.CardsByName.Add(card.Name, new HashSet<string> { card.Id });
                 }
@@ -142,7 +137,7 @@ namespace MtSparked.Interop.Models {
             }
 
             this.changeEventSource.Raise(this, new CardCountChangedEventArgs(card, boardName, normal, amount));
-            /* TODO: Handle integration with file management.
+            /* TODO #59: Have Decks use IDeckFormats from ConfigurationManager for Persistence
             if(this.AutoSave) {
                 this.SaveDeck();
             }
@@ -188,13 +183,13 @@ namespace MtSparked.Interop.Models {
                     otherBoardItem.FoilCount = Math.Min(otherBoardItem.FoilCount, masterFoilCount);
 
                     if(otherBoardItem.NormalCount == 0 && otherBoardItem.FoilCount == 0) {
-                        cards.Remove(card.Id);
+                        _ = cards.Remove(card.Id);
                     }
                 }
             }
 
             if(boardItem.NormalCount == 0 && boardItem.FoilCount == 0) {
-                board.Remove(card.Id);
+                _ = board.Remove(card.Id);
                 if (boardName == MASTER) {
                     _ = this.CardsByName[card.Name].Remove(card.Id);
                     if (this.CardsByName[card.Name].Count == 0) {
@@ -204,7 +199,7 @@ namespace MtSparked.Interop.Models {
             }
 
             this.changeEventSource.Raise(this, new CardCountChangedEventArgs(card, boardName, normal, -amount));
-            /* TODO: Handle integration with file management.
+            /* TODO #59: Have Decks use IDeckFormats from ConfigurationManager for Persistence
             if(this.AutoSave) {
                 this.SaveDeck();
             }
@@ -260,18 +255,19 @@ namespace MtSparked.Interop.Models {
             return sum;
         }
 
-        // TODO: Should we just call this from the modification methods?
+
+        // TODO #74: Investigate Best Way to Handle ChangeEvents for Deck.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0022:Use expression body for methods", Justification = "<Pending>")]
         public void BoardInfoRefreshed() {
             this.changeEventSource.Raise(this, new BoardChangedEventArgs(null, false));
-            /* TODO: Handle integration with file management.
+            /* TODO #59: Have Decks use IDeckFormats from ConfigurationManager for Persistence
             if(this.AutoSave) {
                 this.SaveDeck();
             }
             */
         }
 
-        public class BoardItem
-        {
+        public class BoardItem {
 
             public Card Card { get; set; }
             public int FoilCount { get; set; }

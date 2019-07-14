@@ -112,6 +112,7 @@ namespace MtSparked.Interop.Models
 
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
         public static void MigrationCallback(Migration migration, ulong oldSchemaVersion) {
             // None needed yet.
         }

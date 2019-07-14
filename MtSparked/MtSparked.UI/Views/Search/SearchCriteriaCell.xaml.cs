@@ -16,18 +16,18 @@ namespace MtSparked.UI.Views.Search {
         public SearchCriteriaCell(SearchCriteria criteria) {
             this.InitializeComponent();
 
-            this.BindingContext = SearchCriteria = criteria;
+            this.BindingContext = this.SearchCriteria = criteria;
         }
 
         public CardDataStore.CardsQuery GetQuery() {
             string field = this.SearchCriteria.Field.Replace(" ", "");
             PropertyInfo property = typeof(Card).GetProperty(field);
             if (property.PropertyType == typeof(bool)) {
-                return CardDataStore.Where(SearchCriteria.Field, SearchCriteria.Set);
-            } else if (SearchCriteria.Operation == "Exists") {
-                return CardDataStore.Where(SearchCriteria.Field, SearchCriteria.Operation, SearchCriteria.Set.ToString());
+                return CardDataStore.Where(this.SearchCriteria.Field, this.SearchCriteria.Set);
+            } else if (this.SearchCriteria.Operation == "Exists") {
+                return CardDataStore.Where(this.SearchCriteria.Field, this.SearchCriteria.Operation, this.SearchCriteria.Set.ToString());
             } else {
-                return CardDataStore.Where(SearchCriteria.Field, SearchCriteria.Operation, SearchCriteria.Value);
+                return CardDataStore.Where(this.SearchCriteria.Field, this.SearchCriteria.Operation, this.SearchCriteria.Value);
             }
         }
 

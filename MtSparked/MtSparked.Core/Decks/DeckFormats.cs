@@ -11,17 +11,18 @@ using MtSparked.Core.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-// TODO: Refactor into multiple services
+// TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
 namespace MtSparked.Core.Decks {
     public static class DeckFormats {
 
-        // Refactor a JDec management class/namespace
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
         public static Deck FromJdec(string path) {
             Deck self = new Deck();
             if (ConfigurationManager.FilePicker.PathExists(path)) {
                 try {
-                    // TODO: Is this needed? If so how best to provide access.
-                    // self.Loading = true;
+                    /* TODO #58: Investigate if Decks need a Loading property
+                    self.Loading = true;
+                    */
                     self.Boards = new Dictionary<string, IDictionary<string, Deck.BoardItem>>() {
                         [Deck.MASTER] = new Dictionary<string, Deck.BoardItem>()
                     };
@@ -72,15 +73,16 @@ namespace MtSparked.Core.Decks {
                     System.Diagnostics.Debug.Fail(exc.ToString());
                     self = new Deck();
                 } finally {
-                    // TODO: See above.
-                    // self.Loading = false;
+                    /* TODO #58: Investigate if Decks need a Loading property
+                    self.Loading = false;
+                    */
                 }
             }
 
             return self;
         }
 
-        // TODO: Refactor into a Dec management class/namespace
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
         public static Deck FromDec(string path) {
             Deck self = new Deck {
                 Name = Deck.UNNAMED,
@@ -88,9 +90,10 @@ namespace MtSparked.Core.Decks {
             };
             if (ConfigurationManager.FilePicker.PathExists(path)) {
                 try {
-                    // TODO: Really need a better way of managing these as a single object/interface.
-                    // TODO: See above
-                    // self.Loading = true;
+                    // TODO #61: Have a Single Object for Managing Boards and BoardInfos
+                    /* TODO #58: Investigate if Decks need a Loading property
+                    self.Loading = true;
+                    */
                     self.Boards = new Dictionary<string, IDictionary<string, Deck.BoardItem>>() {
                         [Deck.MASTER] = new Dictionary<string, Deck.BoardItem>()
                     };
@@ -140,16 +143,17 @@ namespace MtSparked.Core.Decks {
                     System.Diagnostics.Debug.Fail(exc.ToString());
                     self = new Deck();
                 } finally {
-                    // TODO: See above.
-                    // self.Loading = false;
+                    /* TODO #58: Investigate if Decks need a Loading property
+                    self.Loading = false;
+                    */
                 }
             }
             return self;
         }
 
-        // TODO: Refactor into a separate JDec management class/namespace.
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
         public static async void SaveDeckAs(this Deck self) {
-            /* TODO: See above.
+            /* TODO #58: Investigate if Decks need a Loading property
             if (self.Loading) {
                 return;
             }
@@ -171,9 +175,9 @@ namespace MtSparked.Core.Decks {
             }
         }
 
-        // TODO: Refactor into a separate Dec management class/namespace
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
         public static async void SaveAsDec(this Deck self) {
-            /* TODO: See above.
+            /* TODO #58: Investigate if Decks need a Loading property
             if (self.Loading) {
                 return;
             }
@@ -189,9 +193,9 @@ namespace MtSparked.Core.Decks {
             }
         }
 
-        // TODO: Refactor into separate Dec management class/namespace.
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
         public static void SaveTempDec(this Deck self) {
-            /* TODO: See above.
+            /* TODO #58: Investigate if Decks need a Loading property
             if (self.Loading) {
                 return;
             }
@@ -204,9 +208,9 @@ namespace MtSparked.Core.Decks {
             ConfigurationManager.FilePicker.SaveFile(fileContents, ConfigurationManager.DefaultTempDecPath);
         }
 
-        // TODO: Move into separate JDec handling class/namespace.
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
         public static void SaveDeck(this Deck self) {
-            /* TODO: See above.
+            /* TODO #58: Investigate if Decks need a Loading property
             if (self.Loading) {
                 return;
             }
@@ -223,14 +227,13 @@ namespace MtSparked.Core.Decks {
             ConfigurationManager.FilePicker.SaveFile(fileContents, self.StoragePath);
         }
 
-        // TODO: Move into separate JDec handling class/namespace.
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
         public static string ToJDecString(this Deck self) {
             JObject result = new JObject {
                 [Deck.NAME] = self.Name,
             };
             JArray boardInfos = new JArray();
             foreach (Deck.BoardInfo info in self.BoardInfos) {
-                // TODO: Change Viewable into Visible?
                 boardInfos.Add(new JObject {
                     [Deck.NAME] = info.Name,
                     [Deck.VISIBLE] = info.Visible,
@@ -242,7 +245,7 @@ namespace MtSparked.Core.Decks {
             JArray cards = new JArray();
             foreach (Deck.BoardItem bi in self.Boards[Deck.MASTER].Values.OrderBy(bi => bi.Card.Name)
                                                                          .ThenBy(bi => bi.Card.Id)) {
-                // TODO: Have a separate function for converting BoardItem to JObject?
+                // TODO #62: Have Function to Convert BoardItem to JDec Subobject
                 string cardId = bi.Card.Id;
                 JObject card = new JObject {
                     [Deck.NAME] = bi.Card.Name,
@@ -250,7 +253,7 @@ namespace MtSparked.Core.Decks {
                 };
 
                 JArray boards = new JArray();
-                // TODO: This seems ridiculously inefficient to have to loop over every time.
+                // TODO #63: Make it Easier to Lookup What Boards a Card is in and Counts
                 foreach (Deck.BoardInfo boardInfo in self.BoardInfos) {
                     string name = boardInfo.Name;
                     IDictionary<string, Deck.BoardItem> boardValue = self.Boards[name];
@@ -272,14 +275,14 @@ namespace MtSparked.Core.Decks {
             result[Deck.CARDS] = cards;
 
             if (ConfigurationManager.PrettyPrintJDec) {
-                return prettyPrintJson(result.ToString(Formatting.Indented));
+                return PrettyPrintJson(result.ToString(Formatting.Indented));
             } else {
                 return result.ToString(Formatting.None);
             }
         }
 
-        // TODO: Move to dedicated JDeck class/namespace.
-        private static string prettyPrintJson(string jsonDeck) {
+        // TODO #57: Create IDeckFormat and Implemenation JDecFormat and DecFormat
+        private static string PrettyPrintJson(string jsonDeck) {
             string preliminary = jsonDeck;
             // Collapse BoardNames to one line by combining lines one at a time
             string prev = null;

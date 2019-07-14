@@ -75,18 +75,20 @@ namespace MtSparked.UI.Views.Search {
         private void OnPanUpdated(object sender, PanUpdatedEventArgs e) {
             switch (e.StatusType) { 
             case GestureStatus.Running:
-                this.ControlGrid.TranslationX = translatedX + e.TotalX ;
+                this.ControlGrid.TranslationX = this.translatedX + e.TotalX ;
                 break;
             case GestureStatus.Completed:
                 // Store the translation applied during the pan
-                this.translatedX = Content.TranslationX;
+                this.translatedX = this.Content.TranslationX;
                 break;
             default:
                 throw new NotImplementedException();
             }
         }
 
-        // TODO: Why don't we have a setter for this?
+
+        // TODO #90: Remove Duplicate Setter Method for SearchGroupCell.Domain
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0022:Use expression body for methods", Justification = "<Pending>")]
         public void SetDomain(IEnumerable<Card> domain) {
             this.Domain = domain;
         }

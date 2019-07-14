@@ -42,7 +42,7 @@ namespace MtSparked.UI.Views.Decks {
             if (args.SelectedItem is null) {
                 return;
             }
-            // TODO: Avoid doing this
+            // TODO #82: Investigate Not Manually Setting SelectedItem to null in OnItemSelected
             // Manually deselect item.
             ((ListView)sender).SelectedItem = null;
             if (args.SelectedItem is DeckViewModel.CardWithBoard cwb) {
@@ -75,13 +75,13 @@ namespace MtSparked.UI.Views.Decks {
             List<string> actions = new List<string>() {
                 NAME_DECK, OPEN_DECK, SAVE_DECK_AS, IMPORT_FROM_DEC, EXPORT_TO_DEC, MANAGE_BOARDS, ADD_BOARD
             };
-            foreach(string name in Deck.BoardNames.Where(n => n != Deck.MASTER)) {
+            foreach(string name in this.Deck.BoardNames.Where(n => n != Deck.MASTER)) {
                 actions.Add(REMOVE_BOARD_PREFIX + name);
             }
             string action = await this.Dialogs.ActionSheetAsync("Manage Deck", "Cancel", NEW_DECK, null, actions.ToArray());
-            
-            // TODO: Refactor into a more extensible framework.
-            if(action == NEW_DECK) {
+
+            // TODO #89: More Extensible Way to Manage Deck Menu Actions
+            if (action == NEW_DECK) {
                 this.Deck = ConfigurationManager.ActiveDeck = new Deck();
                 this.BindingContext = this.ViewModel = new DeckViewModel(this.Deck);
             } else if(action == NAME_DECK) {
@@ -96,7 +96,7 @@ namespace MtSparked.UI.Views.Decks {
                 } else {
                     if (fileData.FilePath != this.Deck.StoragePath) {
                         string toRelease = this.Deck.StoragePath;
-                        ConfigurationManager.ActiveDeck = this.Deck = Deck.FromJdec(fileData.FilePath);
+                        ConfigurationManager.ActiveDeck = this.Deck = DeckFormats.FromJdec(fileData.FilePath);
                         this.BindingContext = this.ViewModel = new DeckViewModel(this.Deck);
                         ConfigurationManager.FilePicker.ReleaseFile(toRelease);
                     }
@@ -118,7 +118,7 @@ namespace MtSparked.UI.Views.Decks {
             } else if(action == EXPORT_TO_DEC) {
                 this.Deck.SaveAsDec();
             } else if (action == MANAGE_BOARDS) {
-                await Navigation.PushAsync(new BoardEditing(this.Deck));
+                await this.Navigation.PushAsync(new BoardEditing(this.Deck));
             } else if(action == ADD_BOARD) {
                 PromptResult result = await this.Dialogs.PromptAsync(new PromptConfig().SetMessage("Board Name"));
                 if (result.Ok) {

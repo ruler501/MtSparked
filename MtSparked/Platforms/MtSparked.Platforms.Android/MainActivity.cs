@@ -13,14 +13,14 @@ using MtSparked.UI;
 namespace MtSparked.Platforms.Droid {
     [Activity(Label = "MtSparked", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity {
-        private TextView MsgText { get; }
 
         protected override void OnCreate(Bundle bundle) {
             base.OnCreate(bundle);
-            // TODO: Fix
+            // TODO #98: Fix Android Tabbar and Toolbar
             // TabLayoutResource = Resource.Layout.Tabbar;
             // ToolbarResource = Resource.Layout.Toolbar;
-            /* TODO: Switch to using Couchbase Lite
+
+            /* TODO #99: Provide Couchbase Lite Database Service
             DateTime start = DateTime.Now;
             const string prepopulated = "cards.db.cache";
             const string realmDB = "cards.db";

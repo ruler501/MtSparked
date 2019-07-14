@@ -6,6 +6,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <Configurations>Debug;Release;Android Debug;Android Release;iOS Debug;iOS Release;Wasm Debug;Wasm Release;AspNetCore Debug;AspNetCore Release;Libraries Debug;Libraries Release</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Services\**" />

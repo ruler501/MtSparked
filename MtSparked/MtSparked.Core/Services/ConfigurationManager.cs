@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using WeakEvent;
+using MtSparked.Core.Decks;
 
 namespace MtSparked.Core.Services
 {
@@ -18,7 +19,7 @@ namespace MtSparked.Core.Services
             AppDomain currentDomain = AppDomain.CurrentDomain;
             Assembly[] assemblies = currentDomain.GetAssemblies();
             ContainerBuilder builder = new ContainerBuilder();
-            builder.RegisterAssemblyModules(assemblies);
+            _ = builder.RegisterAssemblyModules(assemblies);
             Container = builder.Build();
 
             AppSettings = Container.Resolve<ISettings>();
@@ -37,9 +38,9 @@ namespace MtSparked.Core.Services
                 if(activeDeck is null) {
                     string activeDeckPath = AppSettings.GetValueOrDefault(ACTIVE_DECK_KEY, null);
                     if(activeDeckPath is null || !FilePicker.PathExists(activeDeckPath)) {
-                        ActiveDeck = Deck.FromJdec(DefaultDeckPath);
+                        ActiveDeck = DeckFormats.FromJdec(DefaultDeckPath);
                     } else {
-                        ActiveDeck = Deck.FromJdec(activeDeckPath);
+                        ActiveDeck = DeckFormats.FromJdec(activeDeckPath);
                     }
                 }
                 return activeDeck;
@@ -52,7 +53,7 @@ namespace MtSparked.Core.Services
                 }
                 activeDeck = value;
                 if(activeDeck is null) {
-                    activeDeck = Deck.FromJdec(DefaultDeckPath);
+                    activeDeck = DeckFormats.FromJdec(DefaultDeckPath);
                 }
 
                 if (FilePicker.PathExists(activeDeck.StoragePath)) {
@@ -74,6 +75,7 @@ namespace MtSparked.Core.Services
             set { AppSettings.AddOrUpdateValue(PRETTY_PRINT_JDEC_KEY, value); }
         }
 
+        // TODO #72: Investigate Logic in ConfigurationManager.ActiveCubePath
         private const string ACTIVE_CUBE_DEF_KEY = "ActiveCubeDefPath";
         private static string activeCubePath = null;
         public static string ActiveCubePath {
@@ -87,17 +89,15 @@ namespace MtSparked.Core.Services
                 if (activeCubePath != value) {
                     FilePicker.ReleaseFile(activeCubePath);
                     activeCubePath = value;
-
-                    // TODO: Review this logic
+                    
                     if (!FilePicker.PathExists(value)) {
                         AppSettings.AddOrUpdateValue(ACTIVE_CUBE_DEF_KEY, value);
                     }
-                    // TODO: Why does this not call onPropertyChanged?
                 }
             }
         }
 
-        private static string SHOW_UNIQUE_KEY = "ShowUnique";
+        private const string SHOW_UNIQUE_KEY = "ShowUnique";
         public static bool ShowUnique {
             get { return AppSettings.GetValueOrDefault(SHOW_UNIQUE_KEY, false); }
             set {
@@ -106,13 +106,13 @@ namespace MtSparked.Core.Services
             }
         }
 
-        private static string DATABASE_VERSION_KEY = "DatabaseVersion";
+        private const string DATABASE_VERSION_KEY = "DatabaseVersion";
         public static int DatabaseVersion {
             get { return AppSettings.GetValueOrDefault(DATABASE_VERSION_KEY, 0); }
             set { AppSettings.AddOrUpdateValue(DATABASE_VERSION_KEY, value); }
         }
 
-        private static string SORT_CRITERIA_KEY = "SortCriteria";
+        private const string SORT_CRITERIA_KEY = "SortCriteria";
         public static string SortCriteria {
             get { return AppSettings.GetValueOrDefault(SORT_CRITERIA_KEY, "Cmc"); }
             set {
@@ -121,7 +121,7 @@ namespace MtSparked.Core.Services
             }
         }
 
-        private static string COUNT_BY_GROUP_KEY = "CountByGroup";
+        private const string COUNT_BY_GROUP_KEY = "CountByGroup";
         public static bool CountByGroup {
             get { return AppSettings.GetValueOrDefault(COUNT_BY_GROUP_KEY, false); }
             set {
@@ -130,7 +130,7 @@ namespace MtSparked.Core.Services
             }
         }
 
-        private static string DESCENDING_SORT_KEY = "DescendingSort";
+        private const string DESCENDING_SORT_KEY = "DescendingSort";
         public static bool DescendingSort {
             get { return AppSettings.GetValueOrDefault(DESCENDING_SORT_KEY, false); }
             set {
@@ -140,15 +140,14 @@ namespace MtSparked.Core.Services
         }
 
         #region INotifyPropertyChanged
-        private static WeakEventSource<PropertyChangedEventArgs> propertyChangedSource = new WeakEventSource<PropertyChangedEventArgs>();
+        private static readonly WeakEventSource<PropertyChangedEventArgs> propertyChangedSource = new WeakEventSource<PropertyChangedEventArgs>();
         public static event EventHandler<PropertyChangedEventArgs> PropertyChanged {
             add { propertyChangedSource.Subscribe(value); }
             remove { propertyChangedSource.Unsubscribe(value); }
         }
 
-        private static void OnPropertyChanged([CallerMemberName] string propertyName = "") {
+        private static void OnPropertyChanged([CallerMemberName] string propertyName = "") => 
             propertyChangedSource.Raise(null, new PropertyChangedEventArgs(propertyName));
-        }
         #endregion
 
         private static IFilePicker filePicker = null;

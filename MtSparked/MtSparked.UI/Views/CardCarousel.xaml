@@ -4,7 +4,7 @@
              x:Class="MtSparked.UI.Views.CardCarousel"
              xmlns:local="clr-namespace:MtSparked.UI.Views">
     <ContentPage.Content>
-        <!-- TODO: Figure out InterPageSpacing -->
+        <!-- TODO #80: Investigate CarouselView Providers -->
         <CarouselView x:Name="Carousel">
             <CarouselView.ItemsLayout>
                 <GridItemsLayout Orientation="Horizontal"

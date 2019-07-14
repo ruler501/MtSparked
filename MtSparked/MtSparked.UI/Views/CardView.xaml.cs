@@ -19,8 +19,8 @@ namespace MtSparked.UI.Views {
 			this.InitializeComponent ();
         }
 
-        // TODO: Move the logic into the ViewModel.
-        // TODO: Factor out constants into variables/fields.
+        // TODO #84: Move Logic From Views Back Into ViewModels as Much as Possible
+        // TODO #83: Move All Constant Values to const/static readonly Fields
         protected override void OnBindingContextChanged() {
             base.OnBindingContextChanged();
             this.Card = this.BindingContext as Card;
@@ -163,7 +163,7 @@ namespace MtSparked.UI.Views {
                     HorizontalTextAlignment = TextAlignment.Center
                 };
                 this.GridView.Children.Add(normal, 5, row);
-                // TODO: Call update counts instead?
+                // TODO #86: We Duplicate UpdateCounts in UpdateCounters
                 if (ConfigurationManager.ShowUnique) {
                     normal.Text = ConfigurationManager.ActiveDeck.GetNormalCountByName(this.Card, name).ToString();
                 } else {

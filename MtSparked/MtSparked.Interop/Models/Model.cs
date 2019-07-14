@@ -18,8 +18,8 @@ namespace MtSparked.Interop.Models {
             this.OnPropertyChanged(propertyName);
             return true;
         }
-        
-        // TODO: Do we want this to be a weak event?
+
+        // TODO #75: Investigate Making Model.PropertyChanged a WeakEvent
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {

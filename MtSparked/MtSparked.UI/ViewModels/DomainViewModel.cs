@@ -11,7 +11,7 @@ namespace MtSparked.UI.ViewModels {
     public class DomainViewModel : Model {
 
         public ObservableCollection<object> Items { get; private set; } = new ObservableCollection<object>();
-        // TODO: Make Enum.
+        // TODO #67: Make Connector a Custom Class or Enum
         public string Connector { get; private set; } = "All";
         public bool Negated { get; private set; }
 

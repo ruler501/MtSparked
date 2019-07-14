@@ -10,8 +10,6 @@ namespace MtSparked.Platforms.AspNetCore.Controllers
     public class CardsController : ControllerBase
     {
         [HttpGet]
-        public IList<Card> ListCards([FromQuery]string query) {
-            return CardDataStore.CardsQuery.FromString(query).ToList();
-        }
+        public IList<Card> ListCards([FromQuery]string query) => CardDataStore.CardsQuery.FromString(query).ToList();
     }
 }

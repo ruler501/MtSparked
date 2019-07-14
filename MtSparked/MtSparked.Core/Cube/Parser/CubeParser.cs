@@ -169,7 +169,7 @@ namespace MtSparked.Core.Cube.Parser {
                                                                                                      .Separated(Comma)
                                                                                                      .Between(LParen, RParen))
                                                                                           .Select(els => new PropFunctionNode(PropositionFunction.Intersects, els.ToArray()));
-        private static readonly Parser<char, PropFunctionNode> Subset = ContainsExactProp.Then(Value.Between(SkipWhitespaces)
+        private static readonly Parser<char, PropFunctionNode> Subset = SubsetProp.Then(Value.Between(SkipWhitespaces)
                                                                                                     .Separated(Comma)
                                                                                                     .Between(LParen, RParen))
                                                                                          .Select(els => new PropFunctionNode(PropositionFunction.Subset, els.ToArray()));

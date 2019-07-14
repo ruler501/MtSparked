@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace MtSparked.UpdateDatabase {
-    class Program {
+    public class Program {
         public const string PLACEHOLDER_FULL_IMAGE_URL = null;
         public const string PLACEHOLDER_CROPPED_IMAGE_URL = null;
         public const string REALM_DB_PATH = "G:\\Gatherer\\MtSparked\\MtSparked.Database\\cards.db";
@@ -16,7 +16,7 @@ namespace MtSparked.UpdateDatabase {
         internal const string BASE_URL = "https://api.scryfall.com";
 
 #pragma warning disable IDE0060 // Remove unused parameter
-        static void Main(string[] _IgnoredParam) {
+        public static void Main(string[] _IgnoredParam) {
 #pragma warning restore IDE0060 // Remove unused parameter
             IRestClient client = new RestClient(BASE_URL);
             List<Card> cardsArray = new List<Card>();
@@ -66,7 +66,6 @@ namespace MtSparked.UpdateDatabase {
                         MarketPrice = card.Value<double?>("usd")
                     };
 
-                    // TODO: Convert to nullable int
                     string loyaltyString = card.Value<string>("loyalty");
                     if (Int32.TryParse(loyaltyString, out int loyalty)) {
                         value.Loyalty = loyalty;
@@ -80,7 +79,7 @@ namespace MtSparked.UpdateDatabase {
                     } else if(multiverse_ids.Count == 1) {
                         value.MultiverseId = multiverse_ids[0].Value<int>().ToString();
                     } else {
-                        // TODO: Something weird is happening likely multifaced cards/splits
+                        // TODO #92: Correctly Handle Loading MultiFaced and Split Cards Into Card Models
                         System.Diagnostics.Debug.WriteLine($"Multiple MultiverseIds: {card.Value<string>("id")}, {card.Value<string>("name")}");
                         continue;
                     }
@@ -96,7 +95,7 @@ namespace MtSparked.UpdateDatabase {
                     if(!(faces is null)) {
                         System.Diagnostics.Debug.WriteLine($"Multiple Faces: {card.Value<string>("id")}, {card.Value<string>("name")}");
 
-                        // TODO: Deal with multi-faced cards
+                        // TODO #92: Correctly Handle Loading MultiFaced and Split Cards Into Card Models
                         continue;
                     }
 
@@ -116,7 +115,7 @@ namespace MtSparked.UpdateDatabase {
                         value.LegalInModern = legalities.Value<string>("modern") == "legal";
                         value.LegalInPauper = legalities.Value<string>("pauper") == "legal";
                         value.LegalInLegacy = legalities.Value<string>("legacy") == "legal";
-                        // TODO: Figure out how best to handle Vintage.
+                        // TODO #93: Redo Legality to Handle Vintage
                         // value.LegalInVintage = legalities.Value<string>("vintage") == "legal";
                         value.LegalInDuelCommander = legalities.Value<string>("duel") == "legal";
                         value.LegalInCommander = legalities.Value<string>("commander") == "legal";
@@ -129,14 +128,15 @@ namespace MtSparked.UpdateDatabase {
                     value.Colorless = value.Colors.Length == 0;
 
                     string rulingsUrl = card.Value<string>("rulings_uri");
-                    // TODO: Figure out how to manage this in a reasonable time
-                    if(!(rulingsUrl is null))  {
+                    // TODO #94: Find a Feasible Way to Download Rulings
+                    if (!(rulingsUrl is null))  {
                         // Really slow
                         // CreateRulingsList(rulingsUrl, value.Rulings);
                     }
 
-                    // TODO: Need to populate TcgPlayerId will probably be slow
-                    // TODO: Populate pricing as possible.
+                    // TODO #95: Find a Feasible Way to Populate TcgPlayerId
+                    // We can leave the pricing in the model as the data from Scryfall but we need the TcgPlayerId
+                    // so we can refresh and update that information dynamically.
 
                     cardsArray.Add(value);
                 }
@@ -153,7 +153,7 @@ namespace MtSparked.UpdateDatabase {
             Realm realm = Realm.GetInstance(config);
 
             Console.WriteLine($"Total cards stored: {cardsArray.Count}");
-            // TODO: Handle deleting any that are no longer needed. Is that even possible?
+            // TODO #96: Investigate Purging Cards No Longer on Scryfall
             realm.Write(() => {
                foreach (Card card in cardsArray) {
                    _ = realm.Add(card, true);
@@ -165,7 +165,7 @@ namespace MtSparked.UpdateDatabase {
             _ = Realm.Compact(config2);
         }
 
-        static string CreateColorList(JArray colors) {
+        private static string CreateColorList(JArray colors) {
             string result = "";
             if (colors is null || colors.Count == 0) {
                 return "";
@@ -177,7 +177,8 @@ namespace MtSparked.UpdateDatabase {
                     _ = colorsSet.Add(colorValue);
                 }
             }
-            foreach(char colorChar in "WUBRG") {
+            // TODO #65: Custom Class for Dealing with Color
+            foreach (char colorChar in "WUBRG") {
                 string color = new string(colorChar, 1);
                 if(colorsSet.Contains(color)) {
                     result += color;
@@ -186,6 +187,8 @@ namespace MtSparked.UpdateDatabase {
             return result;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0040:Add accessibility modifiers", Justification = "<Pending>")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         static void CreateRulingsList(string url, IList<Card.Ruling> rulingsList) {
             RestClient client = new RestClient(BASE_URL);
             string next = url;

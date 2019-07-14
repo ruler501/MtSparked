@@ -2,11 +2,37 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <StartupObject>MtSparked.Platforms.Wasm.Program</StartupObject>
+    <Configurations>Debug;Release;Android Debug;Android Release;iOS Debug;iOS Release;Wasm Debug;Wasm Release;AspNetCore Debug;AspNetCore Release;Libraries Debug;Libraries Release</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Libraries Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Wasm Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AspNetCore Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Android Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='iOS Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -20,6 +46,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MtSparked.Core\MtSparked.Core.csproj" />
+    <ProjectReference Include="..\..\MtSparked.Interop\MtSparked.Interop.csproj" />
     <ProjectReference Include="..\..\MtSparked.UI\MtSparked.UI.csproj" />
   </ItemGroup>
 

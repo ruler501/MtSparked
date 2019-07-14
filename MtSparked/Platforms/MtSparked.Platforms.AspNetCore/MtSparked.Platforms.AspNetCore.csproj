@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <Configurations>Debug;Release;Android Debug;Android Release;iOS Debug;iOS Release;Wasm Debug;Wasm Release;AspNetCore Debug;AspNetCore Release;Libraries Debug;Libraries Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

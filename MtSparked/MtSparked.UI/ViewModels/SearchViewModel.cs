@@ -9,7 +9,7 @@ using MtSparked.UI.Models;
 namespace MtSparked.UI.ViewModels {
     public class SearchViewModel : Model {
 
-        // TODO: Better restriction on typing for items.
+        // TODO #76: Make ItemsSources as Type Strict as Possible
         public ObservableCollection<object> Items { get; private set; } = new ObservableCollection<object>();
         public string Connector { get; private set; } = "All";
         public bool Negated { get; private set; } = false;

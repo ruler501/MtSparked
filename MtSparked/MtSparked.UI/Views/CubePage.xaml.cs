@@ -13,7 +13,7 @@ using MtSparked.UI.Views.Decks;
 
 namespace MtSparked.UI.Views {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-    // TODO: Move the logic into the ViewModel.
+    // TODO #84: Move Logic From Views Back Into ViewModels as Much as Possible
     public partial class CubePage : ContentPage {
 
         public const string NUMBER_OF_PACKS = "Number of Packs";
@@ -94,7 +94,7 @@ namespace MtSparked.UI.Views {
         }
 
         public async void ManageCubeDef(object sender, EventArgs args) {
-            // TODO: Enum?
+            // TODO #87: More Extensible Way to Manage Cube Menu Actions
             string[] actions = new[] { OPEN_CUBE_DEF, SAVE_CUBE_DEF_AS, ACCESS_HELP };
             string action = await this.Dialogs.ActionSheetAsync("Manage Cube Definition", "Cancel", NEW_CUBE_DEF, null, actions);
 
@@ -111,7 +111,7 @@ namespace MtSparked.UI.Views {
                 }
             } else if(action == SAVE_CUBE_DEF_AS) {
                 byte[] contents = Encoding.UTF8.GetBytes(this.CubeDefEditor.Text);
-                // TODO: Management for CDef files.
+                // TODO #88: CDef File Management
                 FileData data = await ConfigurationManager.FilePicker.SaveFileAs(contents, ConfigurationManager.ActiveDeck.Name + ".cdef");
                 if(data is null) {
                     await this.DisplayAlert("Error", "Failed to save Cube Defintion", "Okay");

@@ -36,7 +36,7 @@ namespace MtSparked.UI.Views {
             double colors = 0.0;
             double div = colorIdentity.Length > 1 ? colorIdentity.Length - 1 : 1.0;
             Color lastColor = new Color(225 / 255.0, 228 / 255.0, 233 / 255.0);
-            // TODO: Use a dictionary or something to simplify.
+            // TODO #81: Simplify Mapping from ColorIdentity to Gradient
             if (colorIdentity.Contains("W")) {
                 lastColor = new Color(242 / 255.0, 226 / 255.0, 182 / 255.0);
                 colorGradient.AddStep(lastColor, colors++ / div);

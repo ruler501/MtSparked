@@ -25,17 +25,19 @@ namespace MtSparked.UI.Models {
         public bool Set { get; set; }
         public string Color { get; set; } = "White";
 
-        private List<string> operations = StringOperations;
-        public List<string> Operations { get => operations; set => SetProperty(ref operations, value); }
+        private List<string> operations = SearchCriteria.StringOperations;
+        public List<string> Operations {
+            get { return this.operations; }
+            set { _ = this.SetProperty(ref this.operations, value); }
+        }
 
-		// TODO: Convert to enum.
-		// TODO: Should this be a static readonly thing?
+        // TODO #65: Custom Class for Dealing with Color
         private List<string> colors = new List<string> {
             "White", "Blue", "Black", "Red", "Green"
         };
         public List<string> Colors {
 			get { return this.colors; }
-			set { this.SetProperty(ref this.colors, value); }
+			set { _ = this.SetProperty(ref this.colors, value); }
 		}
     }
 }

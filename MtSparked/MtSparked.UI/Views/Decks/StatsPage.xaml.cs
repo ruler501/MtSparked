@@ -28,8 +28,8 @@ namespace MtSparked.UI.Views.Decks {
             if (this.SamplesCount > this.PopulationSize || this.SuccessesCount > this.PopulationSize) {
                 return;
             }
+            /* TODO #79: Investigate Charts Provider for StatsView
             Hypergeometric dist = new Hypergeometric(this.PopulationSize, this.SuccessesCount, this.SamplesCount);
-            /*
             LineChart cdfchart = new LineChart() {
                 Entries = Enumerable.Range(0, this.SamplesCount + 1).Select(i =>
                     new Microcharts.Entry(1 - (float)dist.CumulativeDistribution(i-1)) {
@@ -107,8 +107,7 @@ namespace MtSparked.UI.Views.Decks {
                         this.CalculateHypergeometric();
                     }
                 } else {
-                    valid = Int32.TryParse(args.OldTextValue, out samples);
-                    if (valid) {
+                    if (Int32.TryParse(args.OldTextValue, out _)) {
                         this.SamplesEntry.Text = args.OldTextValue;
                     } else {
                         this.SamplesEntry.Text = "";

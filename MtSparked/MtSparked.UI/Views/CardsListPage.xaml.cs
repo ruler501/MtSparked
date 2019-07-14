@@ -23,19 +23,19 @@ namespace MtSparked.UI.Views {
         }
 
         private async void OnItemSelected(object sender, SelectedItemChangedEventArgs args) {
-            if(args.SelectedItem is null) {
+            if (args.SelectedItem is null) {
                 return;
             }
-            // TODO: Is there a way to avoid doing this?
+            // TODO #82: Investigate Not Manually Setting SelectedItem to null in OnItemSelected
             // Manually deselect item.
             ((ListView)sender).SelectedItem = null;
             Card card = (Card)args.SelectedItem;
             IEnumerable<Card> cards = new List<Card>();
-            foreach(EnhancedGrouping<Card> grouping in ViewModel.Items) {
+            foreach (EnhancedGrouping<Card> grouping in this.ViewModel.Items) {
                 cards = cards.Concat(grouping);
             }
             List<Card> cardsList = cards.ToList();
-            await Navigation.PushAsync(new CardCarousel(cardsList, cardsList.IndexOf(card)));
+            await this.Navigation.PushAsync(new CardCarousel(cardsList, cardsList.IndexOf(card)));
         }
 
         protected override void OnAppearing() {
@@ -51,7 +51,7 @@ namespace MtSparked.UI.Views {
             ConfigurationManager.ShowUnique = !ConfigurationManager.ShowUnique;
         }
 
-        public async void SortBy(object sender, EventArgs args) => await Navigation.PushAsync(new SortPage());
+        public async void SortBy(object sender, EventArgs args) => await this.Navigation.PushAsync(new SortPage());
 
     }
 }

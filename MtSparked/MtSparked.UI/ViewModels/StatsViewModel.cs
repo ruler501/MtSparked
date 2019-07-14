@@ -19,7 +19,7 @@ namespace MtSparked.UI.ViewModels {
             get { return this.boardName; }
             set {
                 if (this.boardName != value) {
-                    this.SetProperty(ref this.boardName, value);
+                    _ = this.SetProperty(ref this.boardName, value);
                     this.RefreshStats();
                 }
             }
@@ -74,7 +74,7 @@ namespace MtSparked.UI.ViewModels {
                 || !this.Deck.Boards.ContainsKey(this.BoardName)) {
                 return;
             }
-            // TODO: Needs to be Enum.
+            // TODO #65: Custom Class for Dealing with Color
             string[] manaTypes = new[] { "W", "U", "B", "R", "G" };
             Dictionary<string, int> manaCosts = new Dictionary<string, int>(manaTypes.Length);
             foreach(string mana in manaTypes) {
@@ -101,8 +101,8 @@ namespace MtSparked.UI.ViewModels {
                     }
                 }
             }
-            
-            // TODO: Do this initialization first?
+
+            // TODO #78: CmcCounts Initialization in StatsViewModel
             if (cmcCounts.Count > 0) {
                 int min = cmcCounts.Keys.Min();
                 int max = cmcCounts.Keys.Max() + 1;
@@ -116,7 +116,7 @@ namespace MtSparked.UI.ViewModels {
                 cmcCounts[0] = 0;
             }
 
-            /*
+            /* TODO #79: Investigate Charts Provider for StatsView
             Chart cmcChart = new LineChart() {
                 Entries = cmcCounts.OrderBy(p => p.Key).Select(p => new Microcharts.Entry(p.Value) {
                     Label = p.Key.ToString(),

@@ -12,7 +12,7 @@ using MtSparked.Interop.FileSystem;
 using Uri = Android.Net.Uri;
 using MtSparked.Interop.Services;
 
-// TODO: Turn into a Autofac Module.
+// TODO #97: Move Implementations to be Provided in Autofac Modules
 [assembly: Xamarin.Forms.Dependency(typeof(MtSparked.Platforms.Droid.FilePickerImplementation))]
 
 namespace MtSparked.Platforms.Droid {
@@ -49,6 +49,8 @@ namespace MtSparked.Platforms.Droid {
             FilePickerActivity.FilePickCancelled += this.OnCancelled;
             FilePickerActivity.FilePicked += this.OnCompleted;
 
+            pickerIntent.Dispose();
+
             return await this.completionSource.Task;
         }
 
@@ -69,6 +71,8 @@ namespace MtSparked.Platforms.Droid {
 
             FilePickerActivity.FilePickCancelled += this.OnCancelled;
             FilePickerActivity.FilePicked += this.OnCompleted;
+
+            pickerIntent.Dispose();
 
             return await this.completionSource.Task; ;
         }
@@ -111,9 +115,9 @@ namespace MtSparked.Platforms.Droid {
             int id = this.GetRequestId();
 
             TaskCompletionSource<Uri> taskCompletionSource = new TaskCompletionSource<Uri>(id);
-
+            ShareFileCallbackImplementation callback = new ShareFileCallbackImplementation(taskCompletionSource);
             MediaScannerConnection.ScanFile(this.context, new[] { path }, new[] { fileType },
-                                            new ShareFileCallbackImplementation(taskCompletionSource));
+                                            callback);
 
             Uri uri = await taskCompletionSource.Task;
             _ = this.OpenFile(uri.ToString());
@@ -121,9 +125,15 @@ namespace MtSparked.Platforms.Droid {
             Intent sharingIntent = new Intent(Intent.ActionSend);
             _ = sharingIntent.SetType(fileType);
 
-            _ = sharingIntent.PutExtra(Intent.ExtraStream, Android.Net.Uri.Parse(path));
+            _ = sharingIntent.PutExtra(Intent.ExtraStream, Uri.Parse(path));
 
-            this.context.StartActivity(Intent.CreateChooser(sharingIntent, "Share Deck With"));
+            callback.Dispose();
+            uri.Dispose();
+            sharingIntent.Dispose();
+
+            Intent intent = Intent.CreateChooser(sharingIntent, "Share Deck With");
+            this.context.StartActivity(intent);
+            intent.Dispose();
         }
 
         public void ReleaseFile(string path) {

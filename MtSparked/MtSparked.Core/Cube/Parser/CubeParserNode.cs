@@ -6,7 +6,7 @@ using MtSparked.Interop.Models;
 using ConstantIntNode = MtSparked.Core.Cube.Parser.ConstantNode<int>;
 using ConstantStringNode = MtSparked.Core.Cube.Parser.ConstantNode<string>;
 
-// TODO: Refactor into separate namespace.
+// TODO #55: Separate Nodes Into Separate Namespace
 namespace MtSparked.Core.Cube.Parser {
     public interface ICubeParserNode {
 
@@ -16,7 +16,7 @@ namespace MtSparked.Core.Cube.Parser {
 
     }
 
-    // TODO: Investigate full use of typing in the language.
+    // TODO #56: Investigate Typing System for MtCubed Language
     public abstract class CubeParserNode<T> : ICubeParserNode {
 
         public abstract T Evaluate(CubeState state);
@@ -123,7 +123,9 @@ namespace MtSparked.Core.Cube.Parser {
 
     }
 
+   
     public class ArrayNode : ICubeParserNode {
+
         public ICubeParserNode[] Children { get; private set; }
         public ArrayNode(ICubeParserNode[] children) {
             this.Children = children;
@@ -131,14 +133,17 @@ namespace MtSparked.Core.Cube.Parser {
         }
 
         public object Evaluate(CubeState state) {
-            // CodeReview: Should this assert that all children are of the same type?
+            // TODO 106: Make Arrays Homogenous Types in MtCubed
             return this.Children.Select(c => c.Evaluate(state)).ToList();
         }
 
         public Type Type { get; private set; }
+
     }
 
+    // TODO #107: Split Up Function Nodes
     public class FunctionNode : ICubeParserNode {
+
         public ICubeParserNode[] Children { get; private set; }
         public ValueFunction Function { get; private set; }
         public FunctionNode(ValueFunction function, ICubeParserNode[] children) {
@@ -262,6 +267,7 @@ namespace MtSparked.Core.Cube.Parser {
         }
 
         public Type Type { get; private set; }
+
     }
 
     public class AssignNode : ICubeParserNode {
@@ -283,7 +289,9 @@ namespace MtSparked.Core.Cube.Parser {
     }
 
     public class ExtractNode : ICubeParserNode {
-        private static Random rnd = new Random();
+
+        // TODO #103: Handle Random Creation Better
+        private static readonly Random rnd = new Random();
         public ICubeParserNode Value { get; private set; }
         public VariableNode Identifier { get; private set; }
         public bool Replacement { get; private set; }
@@ -524,7 +532,7 @@ namespace MtSparked.Core.Cube.Parser {
         public object Evaluate(CubeState state) {
             object pVal = this.Value.Evaluate(state);
             if (pVal is CubeParserNode<List<PackCard>> board && !this.IsRecursive) {
-                return new BoardComprehension(board, Criteria);
+                return new BoardComprehension(board, this.Criteria);
             }
             IList value = pVal as IList;
 

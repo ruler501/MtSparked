@@ -12,8 +12,8 @@ namespace MtSparked.Core.Services {
     public class CardDataStore {
 
         public List<EnhancedGrouping<Card>> Items { get; set; }
-        Expression<Func<Card, bool>> Query;
-        IEnumerable<Card> Domain;
+        private Expression<Func<Card, bool>> Query { get; }
+        private IEnumerable<Card> Domain { get; }
 
         public static Realm realm = null;
 
@@ -32,9 +32,9 @@ namespace MtSparked.Core.Services {
         public void LoadCards() {
             IEnumerable<Card> mockItems;
             if (this.Domain is null) {
-                mockItems = realm.All<Card>().Where(Query);
+                mockItems = realm.All<Card>().Where(this.Query);
             } else {
-                mockItems = Domain.Where(Query.Compile());
+                mockItems = this.Domain.Where(this.Query.Compile());
             }
 
             if (ConfigurationManager.ShowUnique) {
@@ -43,9 +43,9 @@ namespace MtSparked.Core.Services {
 
             IEnumerable<IGrouping<string, Card>> grouping = null;
             Func<string, string> labelFunc = null;
-            // TODO: Update SortCriteria to be an enum.
-            // TODO: Come up with a more compact way to specify this so we don't have this absurd if cascade.
-            if(ConfigurationManager.SortCriteria == "Cmc") {
+            // TODO #64: Make SortCriteria Simpler to Work With
+            // BODY: Come up with a more compact way to specify this so we don't have this absurd if cascade.
+            if (ConfigurationManager.SortCriteria == "Cmc") {
                 if (ConfigurationManager.DescendingSort) {
                     mockItems = mockItems.OrderByDescending(c => c.Cmc).ThenBy(c => c.Name);
                 } else {
@@ -73,7 +73,7 @@ namespace MtSparked.Core.Services {
                 }
             } else if (ConfigurationManager.SortCriteria == "Colors") {
                 if (ConfigurationManager.DescendingSort) {
-                    // TODO: More reasonable color sort, Mono, Ally, Enemy, Shard, Wedge, Four, Five, Colorless
+                    // TODO #65: Custom Class for Dealing with Color
                     mockItems = mockItems.OrderByDescending(c => c.Colors.Length).ThenByDescending(c => c.Colors)
                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
                 } else {
@@ -85,7 +85,7 @@ namespace MtSparked.Core.Services {
                 }
             } else if (ConfigurationManager.SortCriteria == "Color Identity") {
                 if (ConfigurationManager.DescendingSort) {
-                    // TODO: More reasonable color sort, Mono, Ally, Enemy, Shard, Wedge, Four, Five, Colorless
+                    // TODO #65: Custom Class for Dealing with Color
                     mockItems = mockItems.OrderByDescending(c => c.ColorIdentity.Length).ThenByDescending(c => c.ColorIdentity)
                         .ThenBy(c => c.Cmc).ThenBy(c => c.Name);
                 } else {
@@ -96,13 +96,13 @@ namespace MtSparked.Core.Services {
                     grouping = mockItems.GroupBy(c => c.ColorIdentity);
                 }
             } else if (ConfigurationManager.SortCriteria == "Power") {
-                Func<Card, int> powerToInt = c => {
+                int powerToInt(Card c) {
                     if (Int32.TryParse(c.Power ?? "0", out int power)) {
                         return power;
                     } else {
                         return 0;
                     }
-                };
+                }
                 if (ConfigurationManager.DescendingSort) {
                     mockItems = mockItems.OrderByDescending(powerToInt).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
                 } else {
@@ -112,13 +112,14 @@ namespace MtSparked.Core.Services {
                     grouping = mockItems.GroupBy(c => c.Power ?? "");
                 }
             } else if (ConfigurationManager.SortCriteria == "Toughness") {
-                Func<Card, int> toughnessToInt = c => {
+                int toughnessToInt(Card c) {
                     if (Int32.TryParse(c.Toughness ?? "0", out int toughness)) {
                         return toughness;
-                    } else {
+                    }
+                    else {
                         return 0;
                     }
-                };
+                }
                 if (ConfigurationManager.DescendingSort) {
                     mockItems = mockItems.OrderByDescending(toughnessToInt).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
                 } else {
@@ -138,7 +139,7 @@ namespace MtSparked.Core.Services {
                 }
             } else if (ConfigurationManager.SortCriteria == "Rarity") {
                 if (ConfigurationManager.DescendingSort) {
-                    // TODO: Make sure Rarity is according to how rare they are in packs, not alphabetical
+                    // TODO #66: Make Rarity an Enum
                     mockItems = mockItems.OrderByDescending(c => c.Rarity).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
                 } else {
                     mockItems = mockItems.OrderBy(c => c.Rarity).ThenBy(c => c.Cmc).ThenBy(c => c.Name);
@@ -175,14 +176,14 @@ namespace MtSparked.Core.Services {
                 grouping = mockItems.GroupBy(c => "Total");
             }
 
-            Items = grouping.Select(g => new EnhancedGrouping<Card>(g, labelFunc)).ToList();
+            this.Items = grouping.Select(g => new EnhancedGrouping<Card>(g, labelFunc)).ToList();
         }
         
         public class CardsQuery {
 
             private Expression BuiltExpression { get; set; } = null;
             private static ParameterExpression Param { get; } = Expression.Parameter(typeof(Card), "card");
-            // TODO: Connector should be an enum.
+            // TODO #67: Make Connector a Custom Class or Enum
             private string Connector { get; }
 
             public IEnumerable<Card> Domain { get; private set; }
@@ -192,8 +193,10 @@ namespace MtSparked.Core.Services {
                 this.Domain = domain;
             }
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0022:Use expression body for methods", Justification = "<Pending>")]
             public static CardsQuery FromString(string query) {
-                // TODO: Implement
+                // TODO #68: Implement Language for CardsQueries
                 return null;
             }
 
@@ -206,9 +209,9 @@ namespace MtSparked.Core.Services {
                 if (this.BuiltExpression is null) {
                     this.BuiltExpression = fullCombine;
                 } else if (this.Connector == "All") {
-                    this.BuiltExpression = Expression.AndAlso(BuiltExpression, fullCombine);
+                    this.BuiltExpression = Expression.AndAlso(this.BuiltExpression, fullCombine);
                 } else if (this.Connector == "Any") {
-                    this.BuiltExpression = Expression.OrElse(BuiltExpression, fullCombine);
+                    this.BuiltExpression = Expression.OrElse(this.BuiltExpression, fullCombine);
                 } else {
                     throw new NotImplementedException();
                 }
@@ -224,7 +227,7 @@ namespace MtSparked.Core.Services {
                 field = field.Replace(" ", "");
                 value = value.Trim();
                 if (field.Contains("Color")) {
-                    // TODO: static Dictionary with case insensitive lookup?
+                    // TODO #65: Custom Class for Dealing with Color 
                     if (value.Equals("White", StringComparison.OrdinalIgnoreCase)) {
                         value = "W";
                     } else if (value.Equals("Blue", StringComparison.OrdinalIgnoreCase)) {
@@ -258,9 +261,9 @@ namespace MtSparked.Core.Services {
                     throw new ArgumentOutOfRangeException(nameof(field));
                 }
                 Expression fullCombine = null;
-                // TODO: Op needs to be an enum.
-                if(op == "Equals") {
-                    // TODO: Should we have a setting to disable case insensitive compare?
+                // TODO #70: CardsQuery.Op needs to be a Custom Class
+                if (op == "Equals") {
+                    // TODO #71: Configuration Setting or Separate Operator to do Case Sensitive Matching
                     if (propertyInfo.PropertyType == typeof(string)) {
                         Expression caseInsensitive = Expression.Constant(StringComparison.OrdinalIgnoreCase);
                         fullCombine = Expression.Call(property, "Equals", Type.EmptyTypes, new[] { constant, caseInsensitive });
@@ -318,9 +321,9 @@ namespace MtSparked.Core.Services {
                 if(this.BuiltExpression is null) {
                     this.BuiltExpression = other.BuiltExpression;
                 } else if (this.Connector == "All") {
-                    this.BuiltExpression = Expression.AndAlso(BuiltExpression, otherExpression);
+                    this.BuiltExpression = Expression.AndAlso(this.BuiltExpression, otherExpression);
                 } else if (this.Connector == "Any") {
-                    this.BuiltExpression = Expression.OrElse(BuiltExpression, otherExpression);
+                    this.BuiltExpression = Expression.OrElse(this.BuiltExpression, otherExpression);
                 } else {
                     throw new NotImplementedException();
                 }
