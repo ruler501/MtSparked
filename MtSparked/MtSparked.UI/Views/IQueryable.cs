@@ -1,9 +1,11 @@
-﻿using MtSparked.Core.Services;
+﻿using MtSparked.Interop.Databases;
+using MtSparked.Interop.Models;
+using MtSparked.Interop.Services;
 
 namespace MtSparked.UI.Views {
-    public interface IQueryable {
+    public interface IHasCardQuery {
 
-        CardDataStore.CardsQuery GetQuery();
+        DataStore<Card>.IQuery GetQuery();
 
     }
 }

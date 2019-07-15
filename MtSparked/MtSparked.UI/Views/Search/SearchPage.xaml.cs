@@ -5,7 +5,8 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
+using MtSparked.Interop.Databases;
 
 namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
@@ -18,7 +19,7 @@ namespace MtSparked.UI.Views.Search {
         }
 
         private async void Search(object sender, EventArgs e) {
-            CardDataStore.CardsQuery query = this.RootGroup.GetQuery();
+            DataStore<Card>.IQuery query = this.RootGroup.GetQuery();
             await this.Navigation.PushAsync(new CardsListPage(query.ToDataStore()));
         }
 

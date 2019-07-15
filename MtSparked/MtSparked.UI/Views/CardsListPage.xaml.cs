@@ -1,5 +1,5 @@
 ﻿using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using MtSparked.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -8,14 +8,15 @@ using System.Linq;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using MtSparked.UI.Views.Search;
+using MtSparked.Interop.Databases;
 
 namespace MtSparked.UI.Views {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class CardsListPage : ContentPage {
         private CardsViewModel ViewModel { get; }
-        private CardDataStore CardStore { get; }
+        private DataStore<Card> CardStore { get; }
 
-        public CardsListPage(CardDataStore cards) {
+        public CardsListPage(DataStore<Card> cards) {
             this.InitializeComponent();
             this.CardStore = cards;
 

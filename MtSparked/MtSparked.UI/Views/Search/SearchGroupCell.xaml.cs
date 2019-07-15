@@ -1,15 +1,16 @@
 ﻿using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using MtSparked.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using MtSparked.UI.Models;
+using MtSparked.Interop.Databases;
 
 namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class SearchGroupCell : ContentView, IQueryable {
+	public partial class SearchGroupCell : ContentView, IHasCardQuery {
         private SearchViewModel ViewModel { get; }
         private IEnumerable<Card> Domain { get; set; }
 
@@ -60,7 +61,7 @@ namespace MtSparked.UI.Views.Search {
 
         protected void AddCriteria(SearchCriteria criteria) => this.StackLayout.Children.Add(new SearchCriteriaCell(criteria));
 
-        public CardDataStore.CardsQuery GetQuery() {
+        public DataStore<Card>.IQuery GetQuery() {
             SearchViewModel model = this.ViewModel;
 
             return model.CreateQuery(this.Domain);

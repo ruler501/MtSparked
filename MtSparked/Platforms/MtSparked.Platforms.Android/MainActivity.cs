@@ -7,7 +7,7 @@ using Android.OS;
 using System.IO;
 using Acr.UserDialogs;
 using Xamarin.Forms;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using MtSparked.UI;
 
 namespace MtSparked.Platforms.Droid {

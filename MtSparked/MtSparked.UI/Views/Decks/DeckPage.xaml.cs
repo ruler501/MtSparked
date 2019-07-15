@@ -1,5 +1,5 @@
 ﻿using Acr.UserDialogs;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using MtSparked.Interop.Models;
 using MtSparked.UI.ViewModels;
 using MtSparked.Core.Decks;

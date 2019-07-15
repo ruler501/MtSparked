@@ -5,9 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using MtSparked.Interop.Databases;
 using MtSparked.Interop.FileSystem;
 using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -54,7 +55,8 @@ namespace MtSparked.Core.Decks {
                         foreach (JObject card in cards) {
                             string cardId = (string)card["Id"];
 
-                            Card cardValue = CardDataStore.ById(cardId);
+                            Card cardValue = null;
+                            // Card cardValue = DataStore<Card>.ById(cardId);
 
                             JArray boards = (JArray)card["Boards"];
                             // Must process Master first to prevent duplication
@@ -126,7 +128,8 @@ namespace MtSparked.Core.Decks {
 
                         string loc = line.Substring(locIndex + LOC.Length);
 
-                        Card card = CardDataStore.ByMvid(mvid);
+                        // Card card = DataStore<Card>.ByMvid(mvid);
+                        Card card = null;
                         if (card is null) {
                             continue;
                         }

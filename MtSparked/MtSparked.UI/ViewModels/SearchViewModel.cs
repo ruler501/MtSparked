@@ -1,10 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 
 using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using System.Reflection;
 using System.Collections.Generic;
 using MtSparked.UI.Models;
+using MtSparked.Interop.Databases;
 
 namespace MtSparked.UI.ViewModels {
     public class SearchViewModel : Model {
@@ -29,24 +30,26 @@ namespace MtSparked.UI.ViewModels {
             return model;
         }
 
-        public CardDataStore.CardsQuery CreateQuery(IEnumerable<Card> domain = null) {
-            CardDataStore.CardsQuery query = new CardDataStore.CardsQuery(this.Connector, domain);
+        public DataStore<Card>.IQuery CreateQuery(IEnumerable<Card> domain = null) {
+            // TODO: Update to use Connectors correctly.
+            DataStore<Card>.IQuery query = new ListQuery<Card>(domain, null);
             foreach (object item in this.Items) {
                 if (item is SearchCriteria criteria) {
                     string field = criteria.Field.Replace(" ", "");
                     PropertyInfo property = typeof(Card).GetProperty(field);
                     if (property.PropertyType == typeof(bool)) {
-                        query = query.Where(criteria.Field, criteria.Set);
+                        // query = query.Where(criteria.Field, criteria.Set);
                     } else if (criteria.Operation == "Exists") {
-                        query = query.Where(criteria.Field, criteria.Operation, criteria.Set.ToString());
+                        // TODO: Update to use BinaryOperations correctly
+                        // query = query.Where(criteria.Field, criteria.Operation, criteria.Set.ToString());
                     } else if (criteria.Operation == "Contains" &&
                             property.PropertyType == typeof(string) && field.Contains("Color")) {
-                        query = query.Where(criteria.Field, criteria.Operation, criteria.Color);
+                        // query = query.Where(criteria.Field, criteria.Operation, criteria.Color);
                     } else {
-                        query = query.Where(criteria.Field, criteria.Operation, criteria.Value);
+                        // query = query.Where(criteria.Field, criteria.Operation, criteria.Value);
                     }
                 } else if (item is SearchViewModel model) {
-                    CardDataStore.CardsQuery query2 = model.CreateQuery(domain);
+                    DataStore<Card>.IQuery query2 = model.CreateQuery(domain);
                     _ = query.Where(query2);
                 }
             }

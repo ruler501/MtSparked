@@ -1,6 +1,5 @@
 ﻿using MtSparked.Interop.Models;
 using Newtonsoft.Json.Linq;
-using Realms;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -20,11 +19,10 @@ namespace MtSparked.UpdateDatabase {
 #pragma warning restore IDE0060 // Remove unused parameter
             IRestClient client = new RestClient(BASE_URL);
             List<Card> cardsArray = new List<Card>();
-            JToken json = null;
             string next = BASE_URL + "/cards";
             int totalProcessed = 0;
+            JToken json;
             do {
-                DateTime loopStart = DateTime.Now;
                 next = next.Substring(BASE_URL.Length);
                 Thread.Sleep(50);
                 IRestRequest cardsRequest = new RestRequest(next);
@@ -41,7 +39,7 @@ namespace MtSparked.UpdateDatabase {
                         Layout = card.Value<string>("layout"),
                         Cmc = card.Value<int?>("cmc") ?? 0,
                         TypeLine = card.Value<string>("type_line"),
-                        Text = card.Value<string>("oracle_text"),
+                        Oracle = card.Value<string>("oracle_text"),
                         ManaCost = card.Value<string>("mana_cost"),
                         ReservedList = card.Value<bool?>("reserved") ?? false,
                         Reprint = card.Value<bool?>("reprint") ?? false,
@@ -69,16 +67,19 @@ namespace MtSparked.UpdateDatabase {
                     string loyaltyString = card.Value<string>("loyalty");
                     if (Int32.TryParse(loyaltyString, out int loyalty)) {
                         value.Loyalty = loyalty;
-                    } else {
+                    }
+                    else {
                         value.Loyalty = null;
                     }
-                    
+
                     JArray multiverse_ids = card.Value<JArray>("multiverse_ids");
-                    if(multiverse_ids is null || multiverse_ids.Count == 0) {
+                    if (multiverse_ids is null || multiverse_ids.Count == 0) {
                         value.MultiverseId = value.SetCode + '|' + value.Number;
-                    } else if(multiverse_ids.Count == 1) {
+                    }
+                    else if (multiverse_ids.Count == 1) {
                         value.MultiverseId = multiverse_ids[0].Value<int>().ToString();
-                    } else {
+                    }
+                    else {
                         // TODO #92: Correctly Handle Loading MultiFaced and Split Cards Into Card Models
                         System.Diagnostics.Debug.WriteLine($"Multiple MultiverseIds: {card.Value<string>("id")}, {card.Value<string>("name")}");
                         continue;
@@ -92,7 +93,7 @@ namespace MtSparked.UpdateDatabase {
                     value.ColorIndicator = CreateColorList(colorIdentity);
 
                     JArray faces = card.Value<JArray>("card_faces");
-                    if(!(faces is null)) {
+                    if (!(faces is null)) {
                         System.Diagnostics.Debug.WriteLine($"Multiple Faces: {card.Value<string>("id")}, {card.Value<string>("name")}");
 
                         // TODO #92: Correctly Handle Loading MultiFaced and Split Cards Into Card Models
@@ -100,16 +101,17 @@ namespace MtSparked.UpdateDatabase {
                     }
 
                     JToken imageUrls = card.Value<JToken>("image_uris");
-                    if(!(imageUrls is null)) {
+                    if (!(imageUrls is null)) {
                         value.FullImageUrl = imageUrls.Value<string>("png");
                         value.CroppedImageUrl = imageUrls.Value<string>("art_crop");
-                    } else {
+                    }
+                    else {
                         value.FullImageUrl = PLACEHOLDER_FULL_IMAGE_URL;
                         value.CroppedImageUrl = PLACEHOLDER_CROPPED_IMAGE_URL;
                     }
 
                     JToken legalities = card.Value<JToken>("legalities");
-                    if(!(legalities is null)) {
+                    if (!(legalities is null)) {
                         value.LegalInStandard = legalities.Value<string>("standard") == "legal";
                         value.LegalInFrontier = legalities.Value<string>("frontier") == "legal";
                         value.LegalInModern = legalities.Value<string>("modern") == "legal";
@@ -129,7 +131,7 @@ namespace MtSparked.UpdateDatabase {
 
                     string rulingsUrl = card.Value<string>("rulings_uri");
                     // TODO #94: Find a Feasible Way to Download Rulings
-                    if (!(rulingsUrl is null))  {
+                    if (!(rulingsUrl is null)) {
                         // Really slow
                         // CreateRulingsList(rulingsUrl, value.Rulings);
                     }
@@ -143,26 +145,6 @@ namespace MtSparked.UpdateDatabase {
                 totalProcessed += cards.Count;
                 Console.WriteLine((double)100 * totalProcessed / json.Value<int>("total_cards"));
             } while (json.Value<bool>("has_more"));
-
-
-            RealmConfiguration config = new RealmConfiguration(REALM_DB_PATH) {
-                SchemaVersion = Card.SchemaVersion,
-                MigrationCallback = Card.MigrationCallback
-            };
-            config.ObjectClasses = new[] { typeof(Card), typeof(Card.Ruling) };
-            Realm realm = Realm.GetInstance(config);
-
-            Console.WriteLine($"Total cards stored: {cardsArray.Count}");
-            // TODO #96: Investigate Purging Cards No Longer on Scryfall
-            realm.Write(() => {
-               foreach (Card card in cardsArray) {
-                   _ = realm.Add(card, true);
-               }
-           });
-
-            RealmConfiguration config2 = new RealmConfiguration(REALM_COMPRESSED_DB_PATH);
-            realm.WriteCopy(config2);
-            _ = Realm.Compact(config2);
         }
 
         private static string CreateColorList(JArray colors) {

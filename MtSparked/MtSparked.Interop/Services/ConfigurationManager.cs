@@ -1,16 +1,14 @@
 ﻿using Autofac;
-using MtSparked.Interop.Services;
 using MtSparked.Interop.Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using WeakEvent;
-using MtSparked.Core.Decks;
 
-namespace MtSparked.Core.Services
-{
+namespace MtSparked.Interop.Services {
     public static class ConfigurationManager {
 
         public const int CurrentDatabaseVersion = 2;
@@ -27,20 +25,20 @@ namespace MtSparked.Core.Services
 
         public static Autofac.IContainer Container { get; }
 
-        public static string DefaultDeckPath => Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "temp.jdec");
-        public static string DefaultTempDecPath => Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "temp.dec");
-        public static string DefaultCubeDefPath => Path.Combine(Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "temp.cdef");
+        public static string DefaultDeckPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "temp.jdec");
+        public static string DefaultTempDecPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "temp.dec");
+        public static string DefaultCubeDefPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "temp.cdef");
 
         private const string ACTIVE_DECK_KEY = "ActiveDeck";
         private static Deck activeDeck = null;
         public static Deck ActiveDeck {
             get {
-                if(activeDeck is null) {
+                if (activeDeck is null) {
                     string activeDeckPath = AppSettings.GetValueOrDefault(ACTIVE_DECK_KEY, null);
-                    if(activeDeckPath is null || !FilePicker.PathExists(activeDeckPath)) {
-                        ActiveDeck = DeckFormats.FromJdec(DefaultDeckPath);
+                    if (activeDeckPath is null || !FilePicker.PathExists(activeDeckPath)) {
+                        // ActiveDeck = DeckFormats.FromJdec(DefaultDeckPath);
                     } else {
-                        ActiveDeck = DeckFormats.FromJdec(activeDeckPath);
+                        // ActiveDeck = DeckFormats.FromJdec(activeDeckPath);
                     }
                 }
                 return activeDeck;
@@ -52,8 +50,8 @@ namespace MtSparked.Core.Services
                     path = activeDeck.StoragePath;
                 }
                 activeDeck = value;
-                if(activeDeck is null) {
-                    activeDeck = DeckFormats.FromJdec(DefaultDeckPath);
+                if (activeDeck is null) {
+                    // activeDeck = DeckFormats.FromJdec(DefaultDeckPath);
                 }
 
                 if (FilePicker.PathExists(activeDeck.StoragePath)) {
@@ -80,16 +78,16 @@ namespace MtSparked.Core.Services
         private static string activeCubePath = null;
         public static string ActiveCubePath {
             get {
-                if(activeCubePath is null) {
+                if (activeCubePath is null) {
                     ActiveCubePath = AppSettings.GetValueOrDefault(ACTIVE_CUBE_DEF_KEY, DefaultCubeDefPath);
                 }
                 return activeCubePath;
             }
-             set {
+            set {
                 if (activeCubePath != value) {
                     FilePicker.ReleaseFile(activeCubePath);
                     activeCubePath = value;
-                    
+
                     if (!FilePicker.PathExists(value)) {
                         AppSettings.AddOrUpdateValue(ACTIVE_CUBE_DEF_KEY, value);
                     }
@@ -146,12 +144,27 @@ namespace MtSparked.Core.Services
             remove { propertyChangedSource.Unsubscribe(value); }
         }
 
-        private static void OnPropertyChanged([CallerMemberName] string propertyName = "") => 
-            propertyChangedSource.Raise(null, new PropertyChangedEventArgs(propertyName));
+        private static void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
+            ConfigurationManager.propertyChangedSource.Raise(null, new PropertyChangedEventArgs(propertyName));
         #endregion
 
         private static IFilePicker filePicker = null;
-        public static IFilePicker FilePicker => filePicker ?? (filePicker = Container.Resolve<IFilePicker>());
+        public static IFilePicker FilePicker {
+            get {
+                if (filePicker is null) {
+                    filePicker = Container.Resolve<IFilePicker>();
+                }
+                return filePicker;
+            }
+        }
+
+        private static IDictionary<Type, object> QueryProviders { get; } = new Dictionary<Type, object>();
+        public static IQueryProvider<T> QueryProviderFor<T>() where T : Model {
+            if (!ConfigurationManager.QueryProviders.ContainsKey(typeof(T))) {
+                QueryProviders[typeof(T)] = Container.Resolve<IQueryProvider<T>>();
+            }
+            return QueryProviders[typeof(T)] as IQueryProvider<T>;
+        }
 
         private static ISettings AppSettings { get; }
 

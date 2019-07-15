@@ -1,4 +1,4 @@
-﻿using MtSparked.Core.Services;
+﻿using MtSparked.Interop.Services;
 using MtSparked.Interop.Models;
 using MtSparked.UI.Models;
 using System;
@@ -6,10 +6,11 @@ using System.Linq;
 using System.Reflection;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using MtSparked.Interop.Databases;
 
 namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class SearchCriteriaCell : ContentView, IQueryable {
+	public partial class SearchCriteriaCell : ContentView, IHasCardQuery {
 
         private SearchCriteria SearchCriteria { get; }
 
@@ -19,16 +20,18 @@ namespace MtSparked.UI.Views.Search {
             this.BindingContext = this.SearchCriteria = criteria;
         }
 
-        public CardDataStore.CardsQuery GetQuery() {
+        public DataStore<Card>.IQuery GetQuery() {
             string field = this.SearchCriteria.Field.Replace(" ", "");
             PropertyInfo property = typeof(Card).GetProperty(field);
             if (property.PropertyType == typeof(bool)) {
-                return CardDataStore.Where(this.SearchCriteria.Field, this.SearchCriteria.Set);
+                // TODO: Update to use BinaryOperations correctly
+                // return DataStore<Card>.Where(this.SearchCriteria.Field, this.SearchCriteria.Set);
             } else if (this.SearchCriteria.Operation == "Exists") {
-                return CardDataStore.Where(this.SearchCriteria.Field, this.SearchCriteria.Operation, this.SearchCriteria.Set.ToString());
+                // return DataStore<Card>.Where(this.SearchCriteria.Field, this.SearchCriteria.Operation, this.SearchCriteria.Set.ToString());
             } else {
-                return CardDataStore.Where(this.SearchCriteria.Field, this.SearchCriteria.Operation, this.SearchCriteria.Value);
+                // return DataStore<Card>.Where(this.SearchCriteria.Field, this.SearchCriteria.Operation, this.SearchCriteria.Value);
             }
+            return null;
         }
 
         protected override void OnBindingContextChanged() {

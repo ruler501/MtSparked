@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using MtSparked.Interop.Models;
 
 namespace MtSparked.Interop.Utils {
     public static class Utils {
@@ -13,6 +15,10 @@ namespace MtSparked.Interop.Utils {
                 }
             }
         }
+
+        public static IEnumerable<EnhancedGrouping<TSource>> EnhancedGroupBy<TSource>(this IEnumerable<TSource> self,
+                                                                         Func<TSource, string> labeler) =>
+            self.GroupBy(labeler).Select(grouping => new EnhancedGrouping<TSource>(grouping));
 
     }
 }

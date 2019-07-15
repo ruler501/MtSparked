@@ -4,13 +4,14 @@ using System.ComponentModel;
 using Xamarin.Forms;
 
 using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using System.Collections.ObjectModel;
+using MtSparked.Interop.Databases;
 
 namespace MtSparked.UI.ViewModels {
     public class CardsViewModel : Model {
         
-        public CardDataStore DataStore { get; }
+        public DataStore<Card> DataStore { get; }
 
         private bool isBusy = false;
         public bool IsBusy {
@@ -40,8 +41,6 @@ namespace MtSparked.UI.ViewModels {
             this.IsBusy = true;
 
             try {
-                this.DataStore.LoadCards();
-
                 this.Items = new ObservableCollection<EnhancedGrouping<Card>>(this.DataStore.Items);
             } catch (Exception ex) {
                 System.Diagnostics.Debug.WriteLine(ex);
@@ -50,7 +49,7 @@ namespace MtSparked.UI.ViewModels {
             }
         }
 
-        public CardsViewModel(CardDataStore store) {
+        public CardsViewModel(DataStore<Card> store) {
             this.LoadItemsCommand = new Command(() => this.ExecuteLoadItemsCommand());
             this.DataStore = store;
             ConfigurationManager.PropertyChanged += this.OnUniqueUpdated;

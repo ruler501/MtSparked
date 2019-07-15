@@ -1,5 +1,5 @@
 ﻿using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using System;
 using System.Collections.Generic;
 
@@ -22,7 +22,7 @@ namespace MtSparked.UI.Views
 		}
         /* TODO #80: Investigate CarouselView Providers
         private async void AllWithArt(object sender, EventArgs e)
-            => await this.Navigation.PushAsync(new CardsListPage(CardDataStore.Where("IllustrationId", "Equals",
+            => await this.Navigation.PushAsync(new CardsListPage(DataStore<Card>.Where("IllustrationId", "Equals",
                 this.Carousel.
                                                                                      this.Cards[this.Carousel.Position].IllustrationId).ToDataStore()));
         */

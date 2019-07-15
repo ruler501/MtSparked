@@ -40,7 +40,6 @@
   <ItemGroup>
     <PackageReference Include="Ooui.Forms" Version="0.10.222" />
     <PackageReference Include="Ooui.Wasm" Version="0.10.222" />
-    <PackageReference Include="Realm" Version="4.0.1" />
     <PackageReference Include="Xamarin.Forms" Version="4.1.0.581479" />
   </ItemGroup>
 

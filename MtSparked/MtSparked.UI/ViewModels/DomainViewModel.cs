@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 using MtSparked.UI.Models;
 using MtSparked.Interop.Models;
-using MtSparked.Core.Services;
+using MtSparked.Interop.Services;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,8 +30,10 @@ namespace MtSparked.UI.ViewModels {
             return model;
         }
 
+        /* TODO #108: Create Database Persistence Interface
         public static IEnumerable<Card> universe = null;
-        public static IEnumerable<Card> Universe => universe ?? (universe = CardDataStore.realm.All<Card>().ToList());
+        public static IEnumerable<Card> Universe => universe ?? (universe = DataStore<Card>.realm.All<Card>().ToList());
+        */
 
         public IEnumerable<Card> CreateDomain() {
             IEnumerable<Card> result = null;
@@ -39,7 +41,8 @@ namespace MtSparked.UI.ViewModels {
                 IEnumerable<Card> otherSet = null;
                 if(item is DomainCriteria criteria) {
                     if(criteria.Field == DomainCriteria.ALL_CARDS) {
-                        otherSet = Universe;
+                        otherSet = null;
+                        // otherSet = Universe;
                     } else if(criteria.Field == DomainCriteria.ACTIVE_DECK) {
                         otherSet = ConfigurationManager.ActiveDeck.Cards.Select(bi => bi.Card);
                     } else if(criteria.Field is null) {
@@ -49,7 +52,8 @@ namespace MtSparked.UI.ViewModels {
                     }
 
                     if (!criteria.Set) {
-                        otherSet = Universe.Except(otherSet, new CardEqualityComparer());
+                        otherSet = null;
+                        // otherSet = Universe.Except(otherSet, new CardEqualityComparer());
                     }
                 } else if(item is DomainViewModel model) {
                     otherSet = model.CreateDomain();
@@ -62,16 +66,17 @@ namespace MtSparked.UI.ViewModels {
                 } else if(otherSet is null) {
                     continue;
                 } else if(this.Connector == "All") {
-                    result = result.Intersect(otherSet, new CardEqualityComparer());
+                    result = result.Intersect(otherSet);
                 } else if (this.Connector == "Any") {
-                    result = result.Union(otherSet, new CardEqualityComparer());
+                    result = result.Union(otherSet);
                 } else {
                     throw new NotImplementedException();
                 }
             }
 
             if (this.Negated && !(result is null)) {
-                result = Universe.Except(result, new CardEqualityComparer());
+                result = null;
+                // result = Universe.Except(result, new CardEqualityComparer());
             }
 
             return result;
@@ -79,3 +84,4 @@ namespace MtSparked.UI.ViewModels {
 
     }
 }
+ 
