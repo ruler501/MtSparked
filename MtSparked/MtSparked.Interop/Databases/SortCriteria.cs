@@ -1,77 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using MtSparked.Interop.Models;
 
 namespace MtSparked.Interop.Databases {
-    public class SortCriteria<T> where T : Model {
+    public interface IPropertyTransformation {
+        bool Reversible { get; }
+        Expression Expression { get; }
+
+    }
+
+    public interface ISortCriteria {
+
+        List<IPropertyTransformation> UntypedCriteria { get; }
+        IPropertyTransformation UntypedGrouping { get; }
+    }
+
+    public class SortCriteria<T> : ISortCriteria where T : Model {
 
         public const string TOTAL = "Total";
 
-        public interface IPropertyTransformation {
+        public interface IPropertyTransformation : Databases.IPropertyTransformation {
 
-            bool Reversible { get; }
-            Expression Expression { get; }
-            Func<T, object> CompiledExpression { get; }
+            Func<T, object> UntypedCompiledLambda { get; }
 
         }
 
         public interface IPropertyTransformation<V> : IPropertyTransformation {
 
-            Func<T, V> CompiledExpressionWithType { get; }
+            Expression<Func<T, V>> LambdaExpression { get; }
+            Func<T, V> CompiledLambda { get; }
             
         }
 
-        public class ConstantPropertyTransformation<V> : IPropertyTransformation<V> {
+        public abstract class AbstractPropertyTransformation<V> : IPropertyTransformation<V> {
 
-            public ConstantPropertyTransformation(V value) {
-                this.Value = value;
+            protected AbstractPropertyTransformation(bool reversible,
+                                                     Expression expression) {
+                this.Reversible = reversible;
+                this.Expression = expression;
+            }
+
+            public bool Reversible { get; }
+            public Expression Expression { get; }
+
+            public Expression<Func<T, V>> LambdaExpression
+                => Expression.Lambda<Func<T, V>>(this.Expression, DataStore<T>.Param);
+            public Func<T, V> CompiledLambda => this.LambdaExpression.Compile();
+            public Func<T, object> UntypedCompiledLambda => model => this.CompiledLambda(model);
+
+        }
+
+        public class ConstantPropertyTransformation<V> : AbstractPropertyTransformation<V> {
+
+            public ConstantPropertyTransformation(V value)
+                    : base(false, Expression.Constant(value)) {
             }
 
             public V Value { get; }
-            public bool Reversible => false;
-            public Expression Expression => Expression.Constant(this.Value); 
-            public Func<T, object> CompiledExpression => model => this.CompiledExpressionWithType(model);
-            public Func<T, V> CompiledExpressionWithType =>
-                Expression.Lambda<Func<T, V>>(this.Expression, DataStore<T>.Param).Compile();
+
         }
 
-        public class PropertyTransformation<U, V> : IPropertyTransformation<V> {
+        public class PropertyTransformation<U, V> : AbstractPropertyTransformation<V> {
+
+            private static Expression CalculateExpression(MethodInfo accessor,
+                                                          Func<U, V> transformation) {
+                Expression propertyAccess = Expression.Property(DataStore<T>.Param,
+                                                                accessor);
+                if (transformation is null) {
+                    return propertyAccess;
+                } else {
+                    return Expression.Call(Expression.Constant(transformation.Target),
+                                                               transformation.Method,
+                                                               propertyAccess);
+                }
+            }
 
             public MethodInfo PropertyAccessor { get; }
             public Func<U, V> Transformation { get; }
-            public bool Reversible { get; }
-
-            public Expression Expression {
-                get {
-                    Expression propertyAccess = Expression.Property(DataStore<T>.Param, 
-                                                                    this.PropertyAccessor);
-                    if (this.Transformation is null) {
-                        return propertyAccess;
-                    } else {
-                        return Expression.Call(Expression.Constant(this.Transformation.Target),
-                                               this.Transformation.Method,
-                                               propertyAccess);
-                    }
-                }
-            }
-            public Func<T, object> CompiledExpression => model => this.CompiledExpressionWithType(model);
-            public Func<T, V> CompiledExpressionWithType =>
-                Expression.Lambda<Func<T, V>>(this.Expression, DataStore<T>.Param).Compile();
     
             public PropertyTransformation(MethodInfo propertyAccessor,
                                           Func<U, V> transformation = null,
-                                          bool reversible = true) {
+                                          bool reversible = true)
+                    : base(reversible,
+                           PropertyTransformation<U, V>.CalculateExpression(propertyAccessor, transformation)) {
                 this.PropertyAccessor = propertyAccessor;
                 this.Transformation = transformation;
-                this.Reversible = reversible;
             }
 
         }
 
-        public List<IPropertyTransformation> Criteria { get; }
-        public IPropertyTransformation<string> Grouping { get; } = new ConstantPropertyTransformation<string>(TOTAL);
+        public List<IPropertyTransformation<T>> Criteria { get; }
+        public IPropertyTransformation<string> Grouping { get; private set; } = new ConstantPropertyTransformation<string>(TOTAL);
+        public List<Databases.IPropertyTransformation> UntypedCriteria
+            => this.Criteria.Cast<Databases.IPropertyTransformation>().ToList();
+        public Databases.IPropertyTransformation UntypedGrouping => this.Grouping;
 
     }
 }

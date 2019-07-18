@@ -9,6 +9,8 @@ namespace MtSparked.Platforms.AspNetCore.Controllers {
     [ApiController]
     public class CardsController : ControllerBase {
         [HttpGet]
+        // TODO: Implement CardsController.ListCards
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
         public IList<Card> ListCards([FromQuery]string query) =>
             //DataStore<Card>.IQuery.FromString(query).ToDataStore().Items.ToArray().FirstOrDefault();
             null;

@@ -7,6 +7,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using MtSparked.UI.Models;
 using MtSparked.Interop.Databases;
+using System.Linq;
 
 namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
@@ -61,7 +62,7 @@ namespace MtSparked.UI.Views.Search {
 
         protected void AddCriteria(SearchCriteria criteria) => this.StackLayout.Children.Add(new SearchCriteriaCell(criteria));
 
-        public DataStore<Card>.IQuery GetQuery() {
+        public IQueryable<Card> GetQuery() {
             SearchViewModel model = this.ViewModel;
 
             return model.CreateQuery(this.Domain);

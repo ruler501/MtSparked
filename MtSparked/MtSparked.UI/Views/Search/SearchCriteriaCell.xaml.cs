@@ -20,7 +20,7 @@ namespace MtSparked.UI.Views.Search {
             this.BindingContext = this.SearchCriteria = criteria;
         }
 
-        public DataStore<Card>.IQuery GetQuery() {
+        public IQueryable<Card> GetQuery() {
             string field = this.SearchCriteria.Field.Replace(" ", "");
             PropertyInfo property = typeof(Card).GetProperty(field);
             if (property.PropertyType == typeof(bool)) {

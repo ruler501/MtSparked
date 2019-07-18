@@ -6,11 +6,11 @@ using MtSparked.Interop.Services;
 namespace MtSparked.Services.CouchBaseLite {
     public class CouchbaseQueryProvider<T> : IQueryProvider<T> where T : Model {
 
-        public SortCriteria<T> DefaultSortCriteria { get; set; }
-        public Connector DefaultConnector { get; set; }
+        public CouchbaseQueryProvider()
+            : base(new SortCriteria<T>(), Connector.Connective.ALL)
+        { }
 
-        public DataStore<T> All() => throw new NotImplementedException();
-        public DataStore<T>.IQuery Where(string field, BinaryOperation op, object value) => throw new NotImplementedException();
-
+        public override DataStore<T>.IQuery All(Connector connector = null) => throw new NotImplementedException();
+        
     }
 }

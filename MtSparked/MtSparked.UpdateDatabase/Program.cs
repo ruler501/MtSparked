@@ -67,19 +67,16 @@ namespace MtSparked.UpdateDatabase {
                     string loyaltyString = card.Value<string>("loyalty");
                     if (Int32.TryParse(loyaltyString, out int loyalty)) {
                         value.Loyalty = loyalty;
-                    }
-                    else {
+                    } else {
                         value.Loyalty = null;
                     }
 
                     JArray multiverse_ids = card.Value<JArray>("multiverse_ids");
                     if (multiverse_ids is null || multiverse_ids.Count == 0) {
                         value.MultiverseId = value.SetCode + '|' + value.Number;
-                    }
-                    else if (multiverse_ids.Count == 1) {
+                    } else if (multiverse_ids.Count == 1) {
                         value.MultiverseId = multiverse_ids[0].Value<int>().ToString();
-                    }
-                    else {
+                    } else {
                         // TODO #92: Correctly Handle Loading MultiFaced and Split Cards Into Card Models
                         System.Diagnostics.Debug.WriteLine($"Multiple MultiverseIds: {card.Value<string>("id")}, {card.Value<string>("name")}");
                         continue;
@@ -104,8 +101,7 @@ namespace MtSparked.UpdateDatabase {
                     if (!(imageUrls is null)) {
                         value.FullImageUrl = imageUrls.Value<string>("png");
                         value.CroppedImageUrl = imageUrls.Value<string>("art_crop");
-                    }
-                    else {
+                    } else {
                         value.FullImageUrl = PLACEHOLDER_FULL_IMAGE_URL;
                         value.CroppedImageUrl = PLACEHOLDER_CROPPED_IMAGE_URL;
                     }

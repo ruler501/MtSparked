@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
@@ -6,7 +7,13 @@ using MtSparked.Interop.Models;
 using MtSparked.Interop.Utils;
 
 namespace MtSparked.Interop.Databases {
-    public class DataStore<T> : Model where T : Model {
+    public interface IQuery : IOrderedQueryable {
+
+        Connector Connector { get; }
+
+    }
+
+    public class DataStore<T> : Model, IEnumerable<T> where T : Model {
 
         internal DataStore(IEnumerable<T> items, SortCriteria<T> sortCriteria) {
             this.SortCriteria = sortCriteria;
@@ -34,16 +41,15 @@ namespace MtSparked.Interop.Databases {
 
         public void Reload() {
             this.Items = new ObservableCollection<EnhancedGrouping<T>>(
-                this.AllItems.EnhancedGroupBy(this.SortCriteria.Grouping.CompiledExpressionWithType));
+                this.AllItems.EnhancedGroupBy(this.SortCriteria.Grouping.CompiledLambda));
         }
 
-        public interface IQuery {
+        public IEnumerator<T> GetEnumerator() => this.AllItems.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => this.AllItems.GetEnumerator();
 
-            Connector Connector { get; }
+        public interface IQuery: MtSparked.Interop.Databases.IQuery, IOrderedQueryable<T> {
 
-            IQuery Where(string field, BinaryOperation op, object value);
-            IQuery Where(IQuery other);
-            IQuery Negate();
+            SortCriteria<T> SortCriteria { get; }
 
             DataStore<T> ToDataStore();
 

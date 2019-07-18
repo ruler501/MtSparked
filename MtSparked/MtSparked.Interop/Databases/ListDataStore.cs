@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -11,29 +12,30 @@ namespace MtSparked.Interop.Databases {
 
         public Connector Connector { get; }
 
-        public SortCriteria<T> SortCriteria { get;  }
+        public SortCriteria<T> SortCriteria { get; }
 
         public IEnumerable<T> Domain { get; }
+        public Type ElementType => typeof(T);
+
+        public Expression Expression => this.BuiltExpression;
+        // TODO: Needs a Provider.
+        public IQueryProvider Provider { get; } = null;
+
         public DataStore<T> ToDataStore() =>
             new DataStore<T>(this.Domain.Where(this.CompileExpression()), this.SortCriteria);
-
-        public DataStore<T>.IQuery Where(string field, BinaryOperation op, object value) =>
-            op.ApplyTo(this, field, value);
-        public DataStore<T>.IQuery Where(DataStore<T>.IQuery other) => this.Connector.Apply(this, other);
-        public DataStore<T>.IQuery Negate() {
-            this.BuiltExpression = Expression.Not(this.BuiltExpression);
-            return this;
-        }
 
         private Func<T, bool> CompileExpression() =>
             Expression.Lambda<Func<T, bool>>(this.BuiltExpression 
                                                 ?? Expression.Constant(this.Connector.DefaultValue),
                                                 DataStore<T>.Param)
                         .Compile();
+        public IEnumerator<T> GetEnumerator() => throw new NotImplementedException();
+        IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
 
         public ListQuery(IEnumerable<T> domain, Connector connector) {
             this.Domain = domain;
             this.Connector = connector;
+            this.BuiltExpression = Expression.Constant(connector.DefaultValue);
         }
 
     }

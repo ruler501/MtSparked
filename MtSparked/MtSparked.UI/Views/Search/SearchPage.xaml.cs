@@ -5,8 +5,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 using MtSparked.Interop.Models;
-using MtSparked.Interop.Services;
-using MtSparked.Interop.Databases;
+using System.Linq;
 
 namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
@@ -18,9 +17,12 @@ namespace MtSparked.UI.Views.Search {
             this.RootGroup.AddItem(null, null);
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         private async void Search(object sender, EventArgs e) {
-            DataStore<Card>.IQuery query = this.RootGroup.GetQuery();
-            await this.Navigation.PushAsync(new CardsListPage(query.ToDataStore()));
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+                              // IQueryable<Card> query = this.RootGroup.GetQuery();
+                              // TODO: Get the extensions working correctly with IQuery
+                              // await this.Navigation.PushAsync(new CardsListPage(query.ToDataStore()));
         }
 
         private void Clear(object sender, EventArgs e) {
