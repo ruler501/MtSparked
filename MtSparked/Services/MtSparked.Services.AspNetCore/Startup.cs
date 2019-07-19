@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MtSparked.Platforms.AspNetCore {
+namespace MtSparked.Services.AspNetCore {
     public class Startup {
 
         public Startup(IConfiguration configuration) {

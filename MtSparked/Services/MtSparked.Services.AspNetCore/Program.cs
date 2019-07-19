@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace MtSparked.Platforms.AspNetCore {
+namespace MtSparked.Services.AspNetCore {
     public class Program {
 
         public static void Main(string[] args) => 
