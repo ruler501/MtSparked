@@ -1,5 +1,6 @@
 ﻿using MtSparked.Interop.Models;
 using MtSparked.Interop.Services;
+using MtSparked.UI.Decks.ViewModels;
 using MtSparked.UI.ViewModels;
 
 using Xamarin.Forms;

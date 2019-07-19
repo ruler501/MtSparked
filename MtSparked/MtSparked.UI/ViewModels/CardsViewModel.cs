@@ -58,9 +58,9 @@ namespace MtSparked.UI.ViewModels {
 
         private void OnUniqueUpdated(object sender, PropertyChangedEventArgs args) {
             if (args.PropertyName == nameof(ConfigurationManager.ShowUnique)
-                || args.PropertyName == nameof(ConfigurationManager.SortCriteria)
-                || args.PropertyName == nameof(ConfigurationManager.DescendingSort)
-                || args.PropertyName == nameof(ConfigurationManager.CountByGroup)) {
+                 // || args.PropertyName == nameof(ConfigurationManager.SortCriteria)
+                 // || args.PropertyName == nameof(ConfigurationManager.DescendingSort)
+                 || args.PropertyName == nameof(ConfigurationManager.CountByGroup)) {
                 this.LoadItemsCommand.Execute(null);
             }
         }

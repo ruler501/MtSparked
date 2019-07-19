@@ -15,7 +15,7 @@ namespace MtSparked.Interop.Databases {
 
     public class DataStore<T> : Model, IEnumerable<T> where T : Model {
 
-        internal DataStore(IEnumerable<T> items, SortCriteria<T> sortCriteria) {
+        public DataStore(IEnumerable<T> items, SortCriteria<T> sortCriteria) {
             this.SortCriteria = sortCriteria;
             this.AllItems = items;
         }

@@ -1,17 +1,16 @@
 ﻿using MtSparked.Interop.Models;
-using MtSparked.Interop.Services;
-using MtSparked.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using MtSparked.UI.Models;
-using MtSparked.Interop.Databases;
 using System.Linq;
+using MtSparked.UI.ViewModels.Search;
 
 namespace MtSparked.UI.Views.Search {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class SearchGroupCell : ContentView, IHasCardQuery {
+
         private SearchViewModel ViewModel { get; }
         private IEnumerable<Card> Domain { get; set; }
 

@@ -277,7 +277,7 @@ namespace MtSparked.Core.Decks {
             }
             result[Deck.CARDS] = cards;
 
-            if (ConfigurationManager.PrettyPrintJDec) {
+            if (ConfigurationManager.PrettyPrintDeck) {
                 return PrettyPrintJson(result.ToString(Formatting.Indented));
             } else {
                 return result.ToString(Formatting.None);

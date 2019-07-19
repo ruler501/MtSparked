@@ -7,7 +7,7 @@ using MtSparked.Interop.Services;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MtSparked.UI.ViewModels {
+namespace MtSparked.UI.ViewModels.Search {
     public class DomainViewModel : Model {
 
         public ObservableCollection<object> Items { get; private set; } = new ObservableCollection<object>();

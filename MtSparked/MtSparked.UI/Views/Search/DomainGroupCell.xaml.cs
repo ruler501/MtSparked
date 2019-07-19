@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using MtSparked.Interop.Models;
 using MtSparked.UI.Models;
-using MtSparked.UI.ViewModels;
+using MtSparked.UI.ViewModels.Search;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 

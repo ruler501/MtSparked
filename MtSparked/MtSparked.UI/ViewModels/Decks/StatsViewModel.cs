@@ -1,12 +1,12 @@
 ﻿using MtSparked.Interop.Models;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Xamarin.Forms;
 
-namespace MtSparked.UI.ViewModels {
+namespace MtSparked.UI.Decks.ViewModels {
     public class StatsViewModel : Model {
+
         private ObservableCollection<string> boardNames = new ObservableCollection<string>();
         public ObservableCollection<string> BoardNames {
             get { return this.boardNames; }

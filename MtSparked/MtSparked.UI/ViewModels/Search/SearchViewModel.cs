@@ -1,14 +1,12 @@
 ﻿using System.Collections.ObjectModel;
-
 using MtSparked.Interop.Models;
-using MtSparked.Interop.Services;
 using System.Reflection;
 using System.Collections.Generic;
 using MtSparked.UI.Models;
 using MtSparked.Interop.Databases;
 using System.Linq;
 
-namespace MtSparked.UI.ViewModels {
+namespace MtSparked.UI.ViewModels.Search {
     public class SearchViewModel : Model {
 
         // TODO #76: Make ItemsSources as Type Strict as Possible

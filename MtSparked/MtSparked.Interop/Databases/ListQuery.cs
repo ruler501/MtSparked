@@ -22,15 +22,15 @@ namespace MtSparked.Interop.Databases {
         public IQueryProvider Provider { get; } = null;
 
         public DataStore<T> ToDataStore() =>
-            new DataStore<T>(this.Domain.Where(this.CompileExpression()), this.SortCriteria);
+            new DataStore<T>(this, this.SortCriteria);
 
         private Func<T, bool> CompileExpression() =>
             Expression.Lambda<Func<T, bool>>(this.BuiltExpression 
                                                 ?? Expression.Constant(this.Connector.DefaultValue),
                                                 DataStore<T>.Param)
                         .Compile();
-        public IEnumerator<T> GetEnumerator() => throw new NotImplementedException();
-        IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        public IEnumerator<T> GetEnumerator() => this.Domain.Where(this.CompileExpression()).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         public ListQuery(IEnumerable<T> domain, Connector connector) {
             this.Domain = domain;

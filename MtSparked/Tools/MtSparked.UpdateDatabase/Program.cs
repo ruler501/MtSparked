@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace MtSparked.UpdateDatabase {
+namespace MtSparked.Tools.UpdateDatabase {
     public class Program {
         public const string PLACEHOLDER_FULL_IMAGE_URL = null;
         public const string PLACEHOLDER_CROPPED_IMAGE_URL = null;

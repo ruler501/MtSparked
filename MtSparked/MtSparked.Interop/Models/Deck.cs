@@ -267,8 +267,9 @@ namespace MtSparked.Interop.Models {
             */
         }
 
-        public class BoardItem {
+        public class BoardItem : Model {
 
+            // TODO: Update Model children with proper setters
             public Card Card { get; set; }
             public int FoilCount { get; set; }
             public int NormalCount { get; set; }

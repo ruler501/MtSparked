@@ -3,6 +3,7 @@ using System.Linq;
 using MathNet.Numerics.Distributions;
 // using Microcharts;
 using MtSparked.Interop.Models;
+using MtSparked.UI.Decks.ViewModels;
 using MtSparked.UI.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;

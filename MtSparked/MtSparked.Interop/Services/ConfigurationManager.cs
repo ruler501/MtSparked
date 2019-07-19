@@ -11,8 +11,6 @@ using WeakEvent;
 namespace MtSparked.Interop.Services {
     public static class ConfigurationManager {
 
-        public const int CurrentDatabaseVersion = 2;
-
         static ConfigurationManager() {
             AppDomain currentDomain = AppDomain.CurrentDomain;
             Assembly[] assemblies = currentDomain.GetAssemblies();
@@ -21,6 +19,14 @@ namespace MtSparked.Interop.Services {
             Container = builder.Build();
 
             AppSettings = Container.Resolve<ISettings>();
+        }
+
+        private static ISettings AppSettings { get; }
+
+        private static void UpdateDeckPath(object sender, DeckChangedEventArgs args) {
+            if (args is PathChangedEventArgs pathChange) {
+                AppSettings.AddOrUpdateValue(ACTIVE_DECK_KEY, pathChange.Path);
+            }
         }
 
         public static Autofac.IContainer Container { get; }
@@ -68,7 +74,7 @@ namespace MtSparked.Interop.Services {
         }
 
         private const string PRETTY_PRINT_JDEC_KEY = "PrettyPrintJDec";
-        public static bool PrettyPrintJDec {
+        public static bool PrettyPrintDeck {
             get { return AppSettings.GetValueOrDefault(PRETTY_PRINT_JDEC_KEY, true); }
             set { AppSettings.AddOrUpdateValue(PRETTY_PRINT_JDEC_KEY, value); }
         }
@@ -104,35 +110,11 @@ namespace MtSparked.Interop.Services {
             }
         }
 
-        private const string DATABASE_VERSION_KEY = "DatabaseVersion";
-        public static int DatabaseVersion {
-            get { return AppSettings.GetValueOrDefault(DATABASE_VERSION_KEY, 0); }
-            set { AppSettings.AddOrUpdateValue(DATABASE_VERSION_KEY, value); }
-        }
-
-        private const string SORT_CRITERIA_KEY = "SortCriteria";
-        public static string SortCriteria {
-            get { return AppSettings.GetValueOrDefault(SORT_CRITERIA_KEY, "Cmc"); }
-            set {
-                AppSettings.AddOrUpdateValue(SORT_CRITERIA_KEY, value);
-                OnPropertyChanged();
-            }
-        }
-
         private const string COUNT_BY_GROUP_KEY = "CountByGroup";
         public static bool CountByGroup {
             get { return AppSettings.GetValueOrDefault(COUNT_BY_GROUP_KEY, false); }
             set {
                 AppSettings.AddOrUpdateValue(COUNT_BY_GROUP_KEY, value);
-                OnPropertyChanged();
-            }
-        }
-
-        private const string DESCENDING_SORT_KEY = "DescendingSort";
-        public static bool DescendingSort {
-            get { return AppSettings.GetValueOrDefault(DESCENDING_SORT_KEY, false); }
-            set {
-                AppSettings.AddOrUpdateValue(DESCENDING_SORT_KEY, value);
                 OnPropertyChanged();
             }
         }
@@ -164,14 +146,6 @@ namespace MtSparked.Interop.Services {
                 QueryProviders[typeof(T)] = Container.Resolve<IQueryProvider<T>>();
             }
             return QueryProviders[typeof(T)] as IQueryProvider<T>;
-        }
-
-        private static ISettings AppSettings { get; }
-
-        private static void UpdateDeckPath(object sender, DeckChangedEventArgs args) {
-            if(args is PathChangedEventArgs pathChange) {
-                AppSettings.AddOrUpdateValue(ACTIVE_DECK_KEY, pathChange.Path);
-            }
         }
 
     }

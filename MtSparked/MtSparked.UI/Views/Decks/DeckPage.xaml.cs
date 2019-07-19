@@ -1,7 +1,6 @@
 ﻿using Acr.UserDialogs;
 using MtSparked.Interop.Services;
 using MtSparked.Interop.Models;
-using MtSparked.UI.ViewModels;
 using MtSparked.Core.Decks;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Linq;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using MtSparked.Interop.FileSystem;
+using MtSparked.UI.Decks.ViewModels;
 
 namespace MtSparked.UI.Views.Decks {
 	[XamlCompilation(XamlCompilationOptions.Compile)]

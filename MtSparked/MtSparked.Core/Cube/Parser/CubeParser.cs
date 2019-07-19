@@ -5,11 +5,13 @@ using Pidgin;
 using System.Linq;
 using System.Collections.Generic;
 using MtSparked.Interop.Models;
-using ConstantIntNode = MtSparked.Core.Cube.Parser.ConstantNode<int>;
-using ConstantStringNode = MtSparked.Core.Cube.Parser.ConstantNode<string>;
-using ConstantBoolNode = MtSparked.Core.Cube.Parser.ConstantNode<bool>;
+using ConstantIntNode = MtSparked.Core.Cube.Parser.Nodes.ConstantNode<int>;
+using ConstantStringNode = MtSparked.Core.Cube.Parser.Nodes.ConstantNode<string>;
+using ConstantBoolNode = MtSparked.Core.Cube.Parser.Nodes.ConstantNode<bool>;
+using MtSparked.Core.Cube.Parser;
+using MtSparked.Core.Cube.Parser.Nodes;
 
-namespace MtSparked.Core.Cube.Parser {
+namespace MtSparked.Core.Cube {
     public class CubeParser {
 
         // Special symbols

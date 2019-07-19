@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using MtSparked.Core;
 using MtSparked.Interop.Utils;
 
-namespace MtSparked.UI.ViewModels {
+namespace MtSparked.UI.Decks.ViewModels {
     public class DeckViewModel : Model {
 
         private ObservableCollection<Board> boards = new ObservableCollection<Board>();

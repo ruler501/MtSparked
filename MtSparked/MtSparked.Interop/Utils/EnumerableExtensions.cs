@@ -4,7 +4,7 @@ using System.Linq;
 using MtSparked.Interop.Models;
 
 namespace MtSparked.Interop.Utils {
-    public static class Utils {
+    public static class EnumerableExtensions {
 
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source,
                                                                      Func<TSource, TKey> keySelector) {

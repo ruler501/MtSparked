@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MtSparked.Interop.Models;
-using ConstantIntNode = MtSparked.Core.Cube.Parser.ConstantNode<int>;
-using ConstantStringNode = MtSparked.Core.Cube.Parser.ConstantNode<string>;
+using ConstantIntNode = MtSparked.Core.Cube.Parser.Nodes.ConstantNode<int>;
+using ConstantStringNode = MtSparked.Core.Cube.Parser.Nodes.ConstantNode<string>;
 
 // TODO #55: Separate Nodes Into Separate Namespace
-namespace MtSparked.Core.Cube.Parser {
+namespace MtSparked.Core.Cube.Parser.Nodes {
     public interface ICubeParserNode {
 
         Type Type { get; }

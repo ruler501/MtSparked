@@ -92,6 +92,13 @@ namespace MtSparked.Interop.Databases {
 
         }
 
+        public class PropertyAccessTransformation<V> : PropertyTransformation<V, V> {
+
+            public PropertyAccessTransformation(MethodInfo propertyAccessor, bool reversible = true) : base(propertyAccessor, null, reversible) {
+            }
+
+        }
+
         public List<IPropertyTransformation<T>> Criteria { get; }
         public IPropertyTransformation<string> Grouping { get; private set; } = new ConstantPropertyTransformation<string>(TOTAL);
         public List<Databases.IPropertyTransformation> UntypedCriteria

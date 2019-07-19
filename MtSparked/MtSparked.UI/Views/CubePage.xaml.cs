@@ -10,6 +10,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using MtSparked.Core.Cube.Parser;
 using MtSparked.UI.Views.Decks;
+using MtSparked.Core.Cube;
 
 namespace MtSparked.UI.Views {
 	[XamlCompilation(XamlCompilationOptions.Compile)]

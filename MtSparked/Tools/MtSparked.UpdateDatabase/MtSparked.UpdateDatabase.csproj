@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <StartupObject>MtSparked.UpdateDatabase.Program</StartupObject>
+    <StartupObject>MtSparked.Tools.UpdateDatabase.Program</StartupObject>
     <Configurations>Debug;Release;Android Debug;Android Release;iOS Debug;iOS Release;Wasm Debug;Wasm Release;AspNetCore Debug;AspNetCore Release;Libraries Debug;Libraries Release</Configurations>
   </PropertyGroup>
   <ItemGroup>
@@ -12,6 +12,8 @@
     <PackageReference Include="Pidgin" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MtSparked.Interop\MtSparked.Interop.csproj" />
+    <ProjectReference Include="..\..\MtSparked.Core\MtSparked.Core.csproj" />
+    <ProjectReference Include="..\..\MtSparked.Interop\MtSparked.Interop.csproj" />
+    <ProjectReference Include="..\..\Services\MtSparked.Services.CouchBaseLite\MtSparked.Services.CouchBaseLite.csproj" />
   </ItemGroup>
 </Project>
