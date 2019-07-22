@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\MtSparked.Interop\MtSparked.Interop.csproj" />
     <ProjectReference Include="..\..\Services\MtSparked.Services.CouchBaseLite\MtSparked.Services.CouchBaseLite.csproj" />
   </ItemGroup>
+  
+  <Import Condition="'$(SolutionDir)' != ''"
+		  Project="$(SolutionDir)\ExtraCleanup.targets" />
+		  
 </Project>

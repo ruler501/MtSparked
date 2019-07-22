@@ -22,7 +22,7 @@ namespace MtSparked.Interop.Utils {
             } else if (EnumSingleton<T, Values>.Closed
                         || EnumSingleton<T, Values>.InstanceStore.ContainsKey(value)
                         || Enum.IsDefined(typeof(Values), value)) {
-                throw new ArgumentException("Value must be unique", nameof(value));
+                // throw new ArgumentException("Value must be unique", nameof(value));
             }
             this.Value = value;
             EnumSingleton<T, Values>.InstanceStore[value] = tified;

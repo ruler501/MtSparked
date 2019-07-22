@@ -364,7 +364,7 @@
       <Version>2.5.2</Version>
     </PackageReference>
     <PackageReference Include="Syncfusion.Xamarin.SfDataGrid">
-      <Version>17.2.0.34</Version>
+      <Version>17.2.0.35</Version>
     </PackageReference>
     <PackageReference Include="Xam.Plugins.Settings">
       <Version>3.1.1</Version>
@@ -414,4 +414,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  
+  <Import Condition="'$(SolutionDir)' != ''"
+		  Project="$(SolutionDir)\ExtraCleanup.targets" />
+		  
 </Project>

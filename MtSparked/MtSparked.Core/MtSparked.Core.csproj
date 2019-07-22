@@ -16,5 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\MtSparked.Interop\MtSparked.Interop.csproj" />
   </ItemGroup>
+  
+  <Import Condition="'$(SolutionDir)' != ''"
+		  Project="$(SolutionDir)\ExtraCleanup.targets" />
 
 </Project>

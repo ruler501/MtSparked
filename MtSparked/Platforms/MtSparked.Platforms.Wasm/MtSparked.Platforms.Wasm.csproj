@@ -38,8 +38,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ooui.Forms" Version="0.10.222" />
-    <PackageReference Include="Ooui.Wasm" Version="0.10.222" />
+    <PackageReference Include="Ooui.Forms" Version="0.11.303" />
+    <PackageReference Include="Ooui.Wasm" Version="0.11.303" />
     <PackageReference Include="Xamarin.Forms" Version="4.1.0.581479" />
   </ItemGroup>
 
@@ -48,5 +48,8 @@
     <ProjectReference Include="..\..\MtSparked.Interop\MtSparked.Interop.csproj" />
     <ProjectReference Include="..\..\MtSparked.UI\MtSparked.UI.csproj" />
   </ItemGroup>
+  
+  <Import Condition="'$(SolutionDir)' != ''"
+		  Project="$(SolutionDir)\ExtraCleanup.targets" />
 
 </Project>

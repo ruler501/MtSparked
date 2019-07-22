@@ -11,5 +11,8 @@
     <PackageReference Include="ruler501.Equ" Version="2.0.4" />
     <PackageReference Include="ThomasLevesque.WeakEvent" Version="3.0.0" />
   </ItemGroup>
+  
+  <Import Condition="'$(SolutionDir)' != ''"
+		  Project="$(SolutionDir)\ExtraCleanup.targets" />
 
 </Project>

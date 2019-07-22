@@ -6,10 +6,14 @@
 
   <ItemGroup>
     <PackageReference Include="Couchbase.Lite.Enterprise" Version="2.5.2" />
+    <PackageReference Include="Remotion.Linq" Version="2.2.0" />
+    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\MtSparked.Interop\MtSparked.Interop.csproj" />
   </ItemGroup>
+  
+  <Import Condition="'$(SolutionDir)' != ''" Project="$(SolutionDir)\ExtraCleanup.targets" />
 
 </Project>
