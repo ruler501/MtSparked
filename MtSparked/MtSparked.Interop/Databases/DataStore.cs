@@ -7,9 +7,17 @@ using MtSparked.Interop.Models;
 using MtSparked.Interop.Utils;
 
 namespace MtSparked.Interop.Databases {
-    public interface IQuery : IOrderedQueryable {
+    public abstract class DataStore : Model, IEnumerable {
 
-        Connector Connector { get; }
+        public const string ParamName = "model";
+
+        public abstract IEnumerator GetEnumerator();
+
+        public interface IQuery : IOrderedQueryable {
+
+            Connector Connector { get; }
+
+        }
 
     }
 
@@ -31,7 +39,7 @@ namespace MtSparked.Interop.Databases {
             }
         }
 
-        public static ParameterExpression Param { get; } = Expression.Parameter(typeof(T), typeof(T).Name);
+        public static ParameterExpression Param { get; } = Expression.Parameter(typeof(T), DataStore.ParamName);
 
         private ObservableCollection<EnhancedGrouping<T>> items;
         public ObservableCollection<EnhancedGrouping<T>> Items {
@@ -47,7 +55,7 @@ namespace MtSparked.Interop.Databases {
         public IEnumerator<T> GetEnumerator() => this.AllItems.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => this.AllItems.GetEnumerator();
 
-        public interface IQuery: MtSparked.Interop.Databases.IQuery, IOrderedQueryable<T> {
+        public interface IQuery: Databases.DataStore.IQuery, IOrderedQueryable<T> {
 
             SortCriteria<T> SortCriteria { get; }
 

@@ -1,22 +1,28 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using MtSparked.Interop.Databases;
 using MtSparked.Interop.Models;
 using Remotion.Linq;
-using Remotion.Linq.Parsing.Structure;
 
 namespace MtSparked.Services.CouchBaseLite {
     public class CouchbaseQuery<T> : QueryableBase<T>, DataStore<T>.IQuery where T : Model {
 
         public CouchbaseQuery(Connector connector,
                               SortCriteria<T> sortCriteria,
-                              CouchbaseQueryExecutor<T> executor)
-                : base(QueryParser.CreateDefault(), executor) {
+                              IQueryProvider provider)
+                : base(provider) {
             this.Connector = connector;
             this.SortCriteria = sortCriteria;
         }
 
-        public CouchbaseQuery(IQueryParser queryParser, IQueryExecutor executor) : base(queryParser, executor) {
+        public CouchbaseQuery(Connector connector,
+                              SortCriteria<T> sortCriteria,
+                              IQueryProvider provider,
+                              Expression expression)
+                : base(provider, expression) {
+            this.Connector = connector;
+            this.SortCriteria = sortCriteria;
         }
 
         public Connector Connector { get; }

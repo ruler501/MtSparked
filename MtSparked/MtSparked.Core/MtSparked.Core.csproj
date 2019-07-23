@@ -8,7 +8,6 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.2" />
     <PackageReference Include="MathNet.Numerics" Version="4.8.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Pidgin" Version="2.1.0" />
     <PackageReference Include="ThomasLevesque.WeakEvent" Version="3.0.0" />
   </ItemGroup>
@@ -17,7 +16,6 @@
     <ProjectReference Include="..\MtSparked.Interop\MtSparked.Interop.csproj" />
   </ItemGroup>
   
-  <Import Condition="'$(SolutionDir)' != ''"
-		  Project="$(SolutionDir)\ExtraCleanup.targets" />
+  <Import Condition="'$(SolutionDir)' != ''" Project="$(SolutionDir)\ExtraCleanup.targets" />
 
 </Project>

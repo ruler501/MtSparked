@@ -6,10 +6,10 @@ using MtSparked.Interop.Models;
 namespace MtSparked.Interop.Services {
     public interface IQueryProvider<T> : IQueryProvider where T : Model {
 
-        ISortCriteria DefaultSortCriteria { get; }
+        SortCriteria<T> DefaultSortCriteria { get; }
         Connector DefaultConnector { get; }
 
-        DataStore<T>.IQuery All(Connector connector = null);
+        DataStore<T>.IQuery All(Connector connector = null, SortCriteria<T> sortCriteria = null);
         // Wish we could supply a default here.
         DataStore<T>.IQuery FromEnumerable(IEnumerable<T> enumerable, Connector connector = null);
     }
