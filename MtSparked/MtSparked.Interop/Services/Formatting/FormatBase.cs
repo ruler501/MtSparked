@@ -2,44 +2,40 @@
 using MtSparked.Interop.Utils;
 
 namespace MtSparked.Interop.Services.Formatting {
+    public abstract class IFormatBase : IFormat {
 
-    public class ReverseFormat<Format1, T, FormatResult> where Format1 : class, IFormat<T, FormatResult> {
-
-        public Format1 FormatInstance { get; }
-
-        private ReverseFormat(string name, string description, IDictionary<string, object> formatOptions, string version, bool _) {
+        protected IFormatBase(string name, string description, IDictionary<string, object> formatOptions, string version) {
             this.Name = name;
             this.Description = description;
             this.FormatOptions = formatOptions;
             this.Version = version;
-            this.FormatInstance = this as Format1;
         }
-
-        protected ReverseFormat(string name, string description, IDictionary<string, object> formatOptions, string version)
-                : this(name, description, formatOptions, version, true) {
-            this.FormatInstance = this as Format1;
-        }
-
-        public ReverseFormat(string name, string description, IDictionary<string, object> formatOptions, string version, Format1 format)
-                : this(name, description, formatOptions, version, true) {
-            this.FormatInstance = format;
-        }
-
-        public ReverseFormat(Format1 format)
-                : this("Reverse of " + typeof(Format1).Name, "Reverse the Format direction.",
-                       new Dictionary<string, object>(), "v1.0", format) { }
 
         public string Name { get; }
         public string Description { get; }
         public IDictionary<string, object> FormatOptions { get; }
         public string Version { get; }
 
-        public T Format(FormatResult model) => this.FormatInstance.Parse(model);
-        public FormatResult Parse(T formattedModel) => this.FormatInstance.Format(formattedModel);
+    }
+
+    public class ReversedFormat<Format1, T, FormatResult> : IFormatBase, IFormat<FormatResult, T>
+            where Format1 : FormatBase<T, FormatResult> {
+
+        internal Format1 ReversedInstance { get; }
+
+        internal ReversedFormat(string name, string description, IDictionary<string, object> formatOptions, string version)
+                : base(name, description, formatOptions, version) {
+            this.ReversedInstance = this as Format1;
+        }
+
+        public T Format(FormatResult model) => this.ReversedInstance.Parse(model);
+        public FormatResult Parse(T formattedModel) => this.ReversedInstance.Format(formattedModel);
+        // We coudl implement conversion operators but since this has all Formats reverse themselves there's
+        // no need for conversions or alternate ways to construct
 
     }
 
-    public abstract class FormatBase<T, FormatResult> : ReverseFormat<FormatBase<T, FormatResult>, T, FormatResult>, IFormat<T, FormatResult> {
+    public abstract class FormatBase<T, FormatResult> : ReversedFormat<FormatBase<T, FormatResult>, T, FormatResult>, IFormat<T, FormatResult> {
 
         public FormatBase(string name, string description, IDictionary<string, object> formatOptions, string version)
                 : base(name, description, formatOptions, version) { }
@@ -61,7 +57,7 @@ namespace MtSparked.Interop.Services.Formatting {
                 : base("Any<" + typeof(T).Name + "> to " + typeof(T).Name, "Add or remove Any qualification",
                        new Dictionary<string, object>(), "v1.0") { }
 
-        // Implicit conversions
+        // Implicit conversions on Any make this work.
         public override T Format(Formatted<T>.Any model) => model;
         public override Formatted<T>.Any Parse(T formattedModel) => formattedModel;
 
@@ -109,6 +105,12 @@ namespace MtSparked.Interop.Services.Formatting {
         public override T Parse(FormattedMid formattedModel) => this.Format1Instance.Parse(formattedModel);
         FormattedResult IOutFormat<T, FormattedResult>.Format(T model) => this.Format2Instance.Format(this.Format1Instance.Format(model));
         T IInFormat<T, FormattedResult>.Parse(FormattedResult formattedModel) => this.Format1Instance.Parse(this.Format2Instance.Parse(formattedModel));
+
+        // Doesn't compile because ChainFormat is not one of the arguments.
+        // Putting it on FormatBase doesn't work eitheer because it only has the type info for Format1(or Format2)
+        // but you need both and you can't have generics on types. Maybe a subclass with implicit conversions could work?
+        // public static ChainFormat<Format1, T, Mid, FormattedMid, Format2, FormatResult, FormattedResult> operator|(Format1 format1, Format2 format2)
+        //    => new ChainFormat<Format1, T, Mid, FormattedMid, Format2, FormatResult, FormattedResult>(format1, format2);
 
     }
 }

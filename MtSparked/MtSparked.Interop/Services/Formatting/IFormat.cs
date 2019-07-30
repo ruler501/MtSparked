@@ -30,7 +30,6 @@ namespace MtSparked.Interop.Services.Formatting {
 
     }
 
-
     public interface IFormat<T, FormatResult>
             : IOutFormat<T, FormatResult>,
               IInFormat<T, FormatResult> { }
@@ -44,66 +43,4 @@ namespace MtSparked.Interop.Services.Formatting {
 
     public interface IFormatMarked<T, FormatResult, Marker>
             : IFormat<T, FormatResult, Formatted<FormatResult>.For<Marker>> { }
-
-    public interface IFormatted<out FormatResult> {
-
-        FormatResult Value { get; }
-
-    }
-
-    public interface IFormatted : IFormatted<object> { }
-
-    public abstract class Formatted<FormatResult> : IFormatted<FormatResult> {
-
-        public FormatResult Value { get; }
-
-        public static implicit operator FormatResult(Formatted<FormatResult> self)
-            => self.Value;
-
-        protected Formatted(FormatResult value) {
-            this.Value = value;
-        }
-
-        public class Any : Formatted<FormatResult> {
-
-            public Any(FormatResult value) : base(value) { }
-
-            public static implicit operator Any(FormatResult value)
-                => new Any(value);
-
-        }
-
-        public class For<Marker> : Formatted<FormatResult> {
-
-            public For(FormatResult value) : base(value) { }
-
-            public static implicit operator Any(For<Marker> self)
-                => new Any(self.Value);
-    
-        }
-
-    }
-
-    public interface IJsonFormat {
-
-        JsonWriter CurrentWriter { get; set; }
-
-        JsonSerializer CurrentSerializer { get; set; }
-
-    }
-
-    public interface IJsonFormat<T>
-            : IFormat<T, JToken>,
-              IJsonFormat { }
-
-    public interface IJsonFormat<T, FormattedResult>
-            : IFormat<T, JToken, FormattedResult>,
-              IJsonFormat
-            where FormattedResult : Formatted<JToken> { }
-
-    public interface IJsonFormatToAny<T>
-            : IJsonFormat<T, Formatted<JToken>.Any> { }
-
-    public interface IJsonFormatMarked<T, Marker>
-            : IJsonFormat<T, Formatted<JToken>.For<Marker>> { }
 }
