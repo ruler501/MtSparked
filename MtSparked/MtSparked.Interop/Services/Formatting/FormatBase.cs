@@ -88,7 +88,7 @@ namespace MtSparked.Interop.Services.Formatting {
 
         // It has the same argument as the version from ReversedFormat.
         // Can still call the original by casting up to it.
-        public new FormattedResult Format(FormattedMid model) => this.Format2Instance.Format(model);
+        FormattedResult IOutFormat<FormattedMid, FormattedResult>.Format(FormattedMid model) => this.Format2Instance.Format(model);
         public FormattedMid Parse(FormattedResult formattedModel) => this.Format2Instance.Parse(formattedModel);
     }
 
