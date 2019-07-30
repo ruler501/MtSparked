@@ -15,7 +15,6 @@ namespace MtSparked.Services.CouchBaseLite {
         public const int MAX_REDUCTIONS = 10;
 
         public static CB.IExpression FromLinq(Expression expression) {
-            // TODO: Probably need the Param value to properly evaluate some of these things.
             // TODO: Refactor into an ExpressionVisitor?
             if (expression is null) {
                 throw new ArgumentNullException(nameof(expression));
