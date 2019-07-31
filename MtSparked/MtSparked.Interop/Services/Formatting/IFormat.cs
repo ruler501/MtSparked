@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MtSparked.Interop.Utils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
 
 namespace MtSparked.Interop.Services.Formatting {
     public interface IFormat {
