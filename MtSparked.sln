@@ -40,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.Services.CouchBas
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{ECB1CB67-8198-4A67-BF72-770782D13CDB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.UpdateDatabase", "MtSparked\Tools\MtSparked.UpdateDatabase\MtSparked.UpdateDatabase.csproj", "{F26D2A73-47B5-4B79-807D-FB8D859E3BE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.Tools.UpdateDatabase", "MtSparked\Tools\MtSparked.Tools.UpdateDatabase\MtSparked.Tools.UpdateDatabase.csproj", "{F26D2A73-47B5-4B79-807D-FB8D859E3BE0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtSparked.Services.AspNetCore", "MtSparked\Services\MtSparked.Services.AspNetCore\MtSparked.Services.AspNetCore.csproj", "{F4333CCB-97E8-45FA-93D7-C3C3B02FB53F}"
 EndProject
