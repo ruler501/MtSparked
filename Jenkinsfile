@@ -6,8 +6,8 @@ TEST_PROJECTS = ["MtSparked/Tests/MtSparked.Core.Tests", "MtSparked/Tests/MtSpar
 
 def command_in_each(list, cmd) {
     for (int i = 0; i < list.size(); i++) {
-        dir(${list[i]}) {
-			sh ${cmd}
+        dir(list[i]) {
+			sh cmd
 		}
     }
 }
