@@ -1,4 +1,4 @@
-PROJECTS = ["MtSparked/MtSparked.Interop", "MtSparked/MtSparked.Core", MtSparked/MtSparked.UI", \
+PROJECTS = ["MtSparked/MtSparked.Interop", "MtSparked/MtSparked.Core", "MtSparked/MtSparked.UI", \
             "MtSparked/Services/MtSparked.Services.AspNetCore", "MtSparked/Services/MtSparked.Services.CouchBaseLite", \
 			"MtSparked/Tools/MtSparked.Tools.UpdateDatabase"]
 TEST_PROJECTS = ["MtSparked/Tests/MtSparked.Core.Tests", "MtSparked/Tests/MtSparked.Interop.Tests", \
