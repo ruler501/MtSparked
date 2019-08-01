@@ -3,6 +3,12 @@ pipeline {
 	options {
 		timestamps()
 	}
+	
+	stage('Checkout Code') {
+		steps {
+			checkout([$class: 'GitSCM', branches: [[name: '${BRANCH_NAME}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/ruler501/MtSparked.git']]])
+		}
+	}
 
 	stage('Build') {
 	    steps {
@@ -24,7 +30,6 @@ pipeline {
 		    dir('MtSparked/Services/MtSparked.CouchBaseLite') {
 				sh 'dotnet build'
 			}
-			
 	    }
 
 	    options {
